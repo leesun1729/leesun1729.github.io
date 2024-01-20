@@ -1,8 +1,8 @@
-newContentEditor = "code"
-baseURL = "https://yourname.github.io"
+newContentEditor = ""
+baseURL = "https://leesun1729.github.io"
 languageCode = "en"
-defaultContentLanguage = "zh-cn"                             # en / zh-cn / ... (This field determines which i18n file to use)
-title = "yourname的博客"
+defaultContentLanguage = "en"                             # en / zh-cn / ... (This field determines which i18n file to use)
+title = "leesun1729的博客"
 preserveTaxonomyNames = true
 enableRobotsTXT = true
 enableEmoji = true
@@ -17,11 +17,11 @@ pygmentsCodefences = false
 hasCJKLanguage = true     # has chinese/japanese/korean ? # 自动检测是否包含 中文\日文\韩文
 paginate = 10                                              # 首页每页显示的文章数
 disqusShortname = ""      # disqus_shortname
-googleAnalytics = "UA-yourname"      # UA-XXXXXXXX-X
+googleAnalytics = "UA-leesun1729"      # UA-XXXXXXXX-X
 copyright = ""            # default: author.name ↓        # 默认为下面配置的author.name ↓
 
 [author]                  # essential                     # 必需
-  name = "yourname"
+  name = "leesun1729"
 
 [sitemap]                 # essential                     # 必需
   changefreq = "weekly"
@@ -76,12 +76,12 @@ copyright = ""            # default: author.name ↓        # 默认为下面配
   since = "2018"            # Site creation time          # 站点建立时间
   # use public git repo url to link lastmod git commit, enableGitInfo should be true.
   # 指定 git 仓库地址，可以生成指向最近更新的 git commit 的链接，需要将 enableGitInfo 设置成 true.
-  gitRepo = "https://github.com/yourname/hugo-blog"
+  gitRepo = "https://github.com/leesun1729/hugo-blog"
 
   # site info (optional)                                  # 站点信息（可选，不需要的可以直接注释掉）
   # logoTitle = "Even"        # default: the title value    # 默认值: 上面设置的title值
-  keywords = ["yourname", "blog"]
-  description = "yourname的博客"
+  keywords = ["leesun1729", "blog"]
+  description = "leesun1729的博客"
 
   # paginate of archives, tags and categories             # 归档、标签、分类每页显示的文章数目，建议修改为一个较大的值
   archivePaginate = 25
@@ -120,8 +120,8 @@ copyright = ""            # default: author.name ↓        # 默认为下面配
 
   baiduPush = true        # baidu push                  # 百度
   baiduAnalytics = ""      # Baidu Analytics
-  baiduVerification = "yourname"   # Baidu Verification
-  googleVerification = "yourname"  # Google Verification         # 谷歌
+  baiduVerification = "leesun1729"   # Baidu Verification
+  googleVerification = "leesun1729"  # Google Verification         # 谷歌
 
   # Link custom CSS and JS assets
   #   (relative to /static/css and /static/js respectively)
@@ -155,7 +155,7 @@ copyright = ""            # default: author.name ↓        # 默认为下面配
     clientSecret = ""       # Your client secret
 
   [params.utterances]       # https://utteranc.es/
-    owner = "yourname"              # Your GitHub ID
+    owner = "leesun1729"              # Your GitHub ID
     repo = "blog-comments"               # The repo to store comments
 
   [params.gitalk]           # Gitalk is a comment system based on GitHub issues. see https://github.com/gitalk/gitalk
@@ -197,9 +197,9 @@ copyright = ""            # default: author.name ↓        # 默认为下面配
     alipay = "/path/to/your/alipay-qr-code.png"           # 支付宝二维码
 
   [params.social]                                         # 社交链接
-    a-email = "mailto:yourname@gmail.com"
-    b-github = "https://github.com/yourname"
-    c-bilibili = "https://space.bilibili.com/yourname"
+    a-email = "mailto:leesun1729@gmail.com"
+    b-github = "https://github.com/leesun1729"
+    c-bilibili = "https://space.bilibili.com/leesun1729"
 
 # See https://gohugo.io/about/hugo-and-gdpr/
 [privacy]
