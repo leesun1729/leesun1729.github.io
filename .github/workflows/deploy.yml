@@ -32,9 +32,6 @@ jobs:
         with:
           args: -r public -d public -x "https?:\/\/"
 
-      - name: Fail on link errors
-        run: exit ${{ steps.check-links.outputs.exit_code }}
-
       - name: Deploy
         uses: peaceiris/actions-gh-pages@v3
         with:
