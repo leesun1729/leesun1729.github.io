@@ -46,12 +46,12 @@
 <meta property="og:type" content="article" />
 <meta property="og:url" content="https://leesun1729.github.io/post/003-c&#43;&#43;%E8%BF%90%E7%AE%97%E7%AC%A6%E9%87%8D%E8%BD%BD/" />
 <meta property="article:published_time" content="2024-01-20T21:50:09+08:00" />
-<meta property="article:modified_time" content="2024-01-20T23:16:46+08:00" />
+<meta property="article:modified_time" content="2024-01-20T23:33:16+08:00" />
 <meta itemprop="name" content="C&#43;&#43;运算符重载">
 <meta itemprop="description" content="内部实现 priority_queue 在 C&#43;&#43; 标准模板库 (STL) 中是一个容器适配器，它提供了优先队列的功能。它允许用户从集合中高效地添加新元素、移除最大元素（或根据提供的比较函数">
 <meta itemprop="datePublished" content="2024-01-20T21:50:09+08:00" />
-<meta itemprop="dateModified" content="2024-01-20T23:16:46+08:00" />
-<meta itemprop="wordCount" content="2808">
+<meta itemprop="dateModified" content="2024-01-20T23:33:16+08:00" />
+<meta itemprop="wordCount" content="2746">
 
 
 
@@ -282,9 +282,6 @@ priority_queue&lt;point&gt; q;
 };
 </code></pre>
 </details>
-<ul>
-<li>
-<p><strong>Notion</strong></p>
 <p>优先队列在内部通常使用堆（heap）数据结构，而最常见的形式是最大堆和最小堆。在C++的标准库实现中，<code>std::priority_queue</code> 默认为一个最大堆。这意味着队列的顶部（即队列的<code>top()</code>方法返回的元素）是所有元素中“最大”的元素。更具体地说，如果没有指明比较方式，优先队列使用<code>std::less</code>类型作为内部比较对象，该对象使用元素类型的<code>&lt;</code>运算符来决定元素的顺序。</p>
 <p>那么为何重载<code>&lt;</code>而不是<code>&gt;</code>？在C++中，重载<code>&lt;</code>运算符有一些传统和实际的原因：</p>
 <ol>
@@ -294,31 +291,24 @@ priority_queue&lt;point&gt; q;
 <li><strong>最小化重载的需求</strong>：在C++中，如果你重载了<code>&lt;</code>运算符，那么你可以用<code>std::less</code>(默认)和<code>std::greater</code>这两个标准库提供的比较函数对象来创建最小堆和最大堆。而如果你只重载了<code>&gt;</code>运算符，你不能直接使用<code>std::less</code>，因为它依赖<code>&lt;</code>运算符。</li>
 </ol>
 <p>对于<code>std::priority_queue</code>来说，如果你想要改变排序行为创建一个最小堆（小的元素优先），你可以这样重载<code>&lt;</code>：</p>
-  <details class="admonition note"><summary class="admonition-title">代码</summary>
+<details class="admonition note"><summary class="admonition-title">代码</summary>
 <pre><code class="language-cpp">bool operator&lt;(const node &amp;other) const {
     return val &gt; other.val; // 对于优先队列来说，这样会让小值优先
 }
 </code></pre>
-</li>
-</ul>
 </details>
-<pre><code>或者，你可以使用一个自定义的比较类型：
-
-&lt;details class=&quot;admonition note&quot;&gt;&lt;summary class=&quot;admonition-title&quot;&gt;代码&lt;/summary&gt;
-
-```cpp
-struct CompareNode {
+<p>或者，你可以使用一个自定义的比较类型：</p>
+<details class="admonition note"><summary class="admonition-title">代码</summary>
+<pre><code class="language-cpp">struct CompareNode {
     bool operator()(const node&amp; n1, const node&amp; n2) {
         return n1.val &gt; n2.val; // 也是小值优先
     }
 };
-
+    
 std::priority_queue&lt;node, std::vector&lt;node&gt;, CompareNode&gt; queue;
-```
 </code></pre>
 </details>
-<pre><code>这种做法的一个好处是，代码的意图非常清晰 —— 你看到比较函数时就能立刻知道队列是如何排序的。而且，它使得类型的常规`&lt;`运算符保持按照字面“小于”的意义，这有助于保持代码直观和一致。
-</code></pre>
+<p>这种做法的一个好处是，代码的意图非常清晰 —— 你看到比较函数时就能立刻知道队列是如何排序的。而且，它使得类型的常规<code>&lt;</code>运算符保持按照字面“小于”的意义，这有助于保持代码直观和一致。</p>
 <h3 id="结构体外部">结构体外部</h3>
 <details class="admonition note"><summary class="admonition-title">代码</summary>
 <pre><code class="language-cpp">//定义的比较结构体
@@ -389,8 +379,8 @@ sort(begin(P), end(P), [](const Point &amp;p1, const Point &amp;p2){
   <p class="copyright-item">
     <span class="item-title">LastMod</span>
     <span class="item-content">
-        <span title="2024-01-20 23:16:46 &#43;0800 &#43;0800">2024-01-20</span>
-        <a href="https://github.com/leesun1729/hugo-blog/commit/0d61d37e7573fe6aed2e3308882aa07ad4e3734d" title="first commit" target="_blank">(0d61d37)</a>
+        <span title="2024-01-20 23:33:16 &#43;0800 &#43;0800">2024-01-20</span>
+        <a href="https://github.com/leesun1729/hugo-blog/commit/35d99b104339d0f7d9cd83f7eee19f3e51430914" title="add" target="_blank">(35d99b1)</a>
         ，<a href="https://github.com/leesun1729/hugo-blog/commits/master/content/post/003-C&#43;&#43;%e8%bf%90%e7%ae%97%e7%ac%a6%e9%87%8d%e8%bd%bd.md" target="_blank">更新历史</a>
     </span>
   </p>
