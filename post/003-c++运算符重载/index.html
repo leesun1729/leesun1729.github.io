@@ -46,12 +46,12 @@
 <meta property="og:type" content="article" />
 <meta property="og:url" content="https://leesun1729.github.io/post/003-c&#43;&#43;%E8%BF%90%E7%AE%97%E7%AC%A6%E9%87%8D%E8%BD%BD/" />
 <meta property="article:published_time" content="2024-01-20T21:50:09+08:00" />
-<meta property="article:modified_time" content="2024-01-20T22:10:02+08:00" />
+<meta property="article:modified_time" content="2024-01-20T22:19:19+08:00" />
 <meta itemprop="name" content="C&#43;&#43;运算符重载">
 <meta itemprop="description" content="内部实现 priority_queue 在 C&#43;&#43; 标准模板库 (STL) 中是一个容器适配器，它提供了优先队列的功能。它允许用户从集合中高效地添加新元素、移除最大元素（或根据提供的比较函数">
 <meta itemprop="datePublished" content="2024-01-20T21:50:09+08:00" />
-<meta itemprop="dateModified" content="2024-01-20T22:10:02+08:00" />
-<meta itemprop="wordCount" content="2725">
+<meta itemprop="dateModified" content="2024-01-20T22:19:19+08:00" />
+<meta itemprop="wordCount" content="2808">
 
 
 
@@ -204,12 +204,15 @@
 </ol>
 <p><code>priority_queue:</code>  O( 1 ) 获取最大（或最小）元素，并以 O(logn) 添加和移除元素</p>
 <h3 id="优先队列基本操作--用法">优先队列基本操作 / 用法</h3>
+<details class="admonition note"><summary class="admonition-title">代码</summary>
 <pre><code class="language-cpp">q.empty(); 队列为空返回1
 q.pop();   出队
 q.push();  入队
 q.top();   返回队列中优先级最高的元素
 q.size();  返回队列中元素的个数
 </code></pre>
+</details>
+<details class="admonition note"><summary class="admonition-title">代码</summary>
 <pre><code class="language-cpp">// 默认优先队列 priority_queue 是最大堆
 priority_queue&lt;int&gt; q;
 q.push(1);   // q : 1
@@ -221,13 +224,17 @@ cout &lt;&lt; q.top() &lt;&lt; '\n'; // 2
 q.pop();
 cout &lt;&lt; q.top() &lt;&lt; '\n'; // 1
 </code></pre>
+</details>
+<details class="admonition note"><summary class="admonition-title">代码</summary>
 <pre><code class="language-cpp">//定义优先级队列q，less表示按照递减(从大到小)的顺序插入元素，与默认情况相同
 priority_queue&lt;int,vector&lt;int&gt;,less&lt;int&gt;&gt; q;
 
 //定义优先级队列q，greater表示按照递增（从小到大）的顺序插入元素
 priority_queue&lt;int,vector&lt;int&gt;,greater&lt;int&gt;&gt; q;
 </code></pre>
+</details>
 <h3 id="关于优先队列重载运算符">关于优先队列重载运算符</h3>
+<details class="admonition note"><summary class="admonition-title">代码</summary>
 <pre><code class="language-cpp">struct point{    
     int x;    
     int y;    
@@ -247,8 +254,10 @@ priority_queue&lt;point&gt; q;
 // 由于优先队列是按照从大到小排列，所以结构体b会排列到a之前，然而b.times是最小的，
 // 所以实现了按照times的从小到大排序
 </code></pre>
+</details>
 <h3 id="结构体内部">结构体内部</h3>
 <p>方式一</p>
+<details class="admonition note"><summary class="admonition-title">代码</summary>
 <pre><code class="language-cpp">struct Point {
 	int x, y;
   // 为两个结构体参数，结构体调用一定要写上friend
@@ -259,7 +268,9 @@ priority_queue&lt;point&gt; q;
 	}
 };
 </code></pre>
+</details>
 <p>方式二</p>
+<details class="admonition note"><summary class="admonition-title">代码</summary>
 <pre><code class="language-cpp">struct Point {
     int x, y;
 		// 直接传入一个参数，不必要写friend
@@ -270,6 +281,7 @@ priority_queue&lt;point&gt; q;
     }
 };
 </code></pre>
+</details>
 <ul>
 <li>
 <p><strong>Notion</strong></p>
@@ -282,23 +294,33 @@ priority_queue&lt;point&gt; q;
 <li><strong>最小化重载的需求</strong>：在C++中，如果你重载了<code>&lt;</code>运算符，那么你可以用<code>std::less</code>(默认)和<code>std::greater</code>这两个标准库提供的比较函数对象来创建最小堆和最大堆。而如果你只重载了<code>&gt;</code>运算符，你不能直接使用<code>std::less</code>，因为它依赖<code>&lt;</code>运算符。</li>
 </ol>
 <p>对于<code>std::priority_queue</code>来说，如果你想要改变排序行为创建一个最小堆（小的元素优先），你可以这样重载<code>&lt;</code>：</p>
+  <details class="admonition note"><summary class="admonition-title">代码</summary>
 <pre><code class="language-cpp">bool operator&lt;(const node &amp;other) const {
     return val &gt; other.val; // 对于优先队列来说，这样会让小值优先
 }
 </code></pre>
-<p>或者，你可以使用一个自定义的比较类型：</p>
-<pre><code class="language-cpp">struct CompareNode {
+</li>
+</ul>
+</details>
+<pre><code>或者，你可以使用一个自定义的比较类型：
+
+&lt;details class=&quot;admonition note&quot;&gt;&lt;summary class=&quot;admonition-title&quot;&gt;代码&lt;/summary&gt;
+
+```cpp
+struct CompareNode {
     bool operator()(const node&amp; n1, const node&amp; n2) {
         return n1.val &gt; n2.val; // 也是小值优先
     }
 };
-  
+
 std::priority_queue&lt;node, std::vector&lt;node&gt;, CompareNode&gt; queue;
+```
 </code></pre>
-<p>这种做法的一个好处是，代码的意图非常清晰 —— 你看到比较函数时就能立刻知道队列是如何排序的。而且，它使得类型的常规<code>&lt;</code>运算符保持按照字面“小于”的意义，这有助于保持代码直观和一致。</p>
-</li>
-</ul>
+</details>
+<pre><code>这种做法的一个好处是，代码的意图非常清晰 —— 你看到比较函数时就能立刻知道队列是如何排序的。而且，它使得类型的常规`&lt;`运算符保持按照字面“小于”的意义，这有助于保持代码直观和一致。
+</code></pre>
 <h3 id="结构体外部">结构体外部</h3>
+<details class="admonition note"><summary class="admonition-title">代码</summary>
 <pre><code class="language-cpp">//定义的比较结构体
 //注意：cmp是个结构体 
 struct cmp {//自定义排序规则 
@@ -312,7 +334,9 @@ struct cmp {//自定义排序规则
 //初始化定义
 priority_queue&lt;Point,vector&lt;Point&gt;, cmp&gt; q;
 </code></pre>
+</details>
 <h3 id="函数自定义排序规则可以出现在sort排序中">函数自定义排序规则，可以出现在<code>sort</code>排序中</h3>
+<details class="admonition note"><summary class="admonition-title">代码</summary>
 <pre><code class="language-cpp">struct Point {
     int x, y;
 }p[1005];
@@ -324,7 +348,9 @@ bool cmp(Point a, Point b) {
 }
 sort(p + 1, p + 1 + 1000, cmp);
 </code></pre>
+</details>
 <h3 id="函数自定义排序规则可以直接出现在sort排序中">函数自定义排序规则，可以直接出现在<code>sort</code>排序中</h3>
+<details class="admonition note"><summary class="admonition-title">代码</summary>
 <pre><code class="language-cpp">struct Point {
 		int x, y;
 }p[1005];
@@ -352,7 +378,7 @@ sort(begin(P), end(P), [](const Point &amp;p1, const Point &amp;p2){
 		return p1.x &lt; p2.x;
 });
 </code></pre>
-
+</details>
     </div>
 
     <div class="post-copyright">
@@ -363,8 +389,8 @@ sort(begin(P), end(P), [](const Point &amp;p1, const Point &amp;p2){
   <p class="copyright-item">
     <span class="item-title">LastMod</span>
     <span class="item-content">
-        <span title="2024-01-20 22:10:02 &#43;0800 &#43;0800">2024-01-20</span>
-        <a href="https://github.com/leesun1729/hugo-blog/commit/6dea862025e13cbc9087a664852517b3e48bd701" title="add" target="_blank">(6dea862)</a>
+        <span title="2024-01-20 22:19:19 &#43;0800 &#43;0800">2024-01-20</span>
+        <a href="https://github.com/leesun1729/hugo-blog/commit/834a7bd365bf675ea7702e41a5ed3f7cfd8b01ba" title="add" target="_blank">(834a7bd)</a>
         ，<a href="https://github.com/leesun1729/hugo-blog/commits/master/content/post/003-C&#43;&#43;%e8%bf%90%e7%ae%97%e7%ac%a6%e9%87%8d%e8%bd%bd.md" target="_blank">更新历史</a>
     </span>
   </p>
