@@ -1,8 +1,20 @@
 +++
-title = "关于"
-date = 2018-12-05T13:40:21+08:00
+title = 'About'
+date = 2024-01-20T21:05:36+08:00
+draft = false
+categories = ['']
+tags = ['', '']
 +++
 
----
+### Hello, this is Leesun!
 
-在本博客，推荐安装 [思源宋体](/fonts/SourceHanSerifSC-Regular.otf) 以获得更好的阅读体验。
+
+# About me
+
+- A college student <br>
+
+
+# Contact
+
+- Email: leesun1729@gmail.com
+- QQ/Wechat: 746671499

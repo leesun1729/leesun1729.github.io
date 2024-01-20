@@ -1,5 +1,10 @@
 +++
-title = "搜索"
-date = 2020-02-07T17:43:21+08:00
-layout = "search"
+title = 'Search'
+date = 2024-01-20T21:04:20+08:00
+draft = false
+categories = ['']
+tags = ['', '']
 +++
+
+
+
