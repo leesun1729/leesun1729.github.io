@@ -1,0 +1,630 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <title>004-SCC - leesun1729&#39;s blog</title>
+  <meta name="renderer" content="webkit" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+<meta name="theme-color" content="#f8f5ec" />
+<meta name="msapplication-navbutton-color" content="#f8f5ec">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="#f8f5ec">
+
+
+<meta name="author" content="leesun1729" /><meta name="description" content="强连通分量 SCC (Strongly Connect Component) 定义 在一个 有向图 中，任意取两个节点(u, v) ，u -&amp;gt; v, v -&amp;gt; u 均有路径，这样的图叫做强连通。 SCC（强连通分量）：一个极大的强连" /><meta name="keywords" content="leesun1729, blog" />
+
+
+<meta name="baidu-site-verification" content="leesun1729" />
+<meta name="google-site-verification" content="leesun1729" />
+
+
+<meta name="generator" content="Hugo 0.80.0 with theme even" />
+
+
+<link rel="canonical" href="https://leesun1729.github.io/post/004-scc/" />
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+<link rel="manifest" href="/manifest.json">
+<link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5">
+
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+<link href="/sass/main.min.299b56866ca7e5e86584d6353e1e1a12be9d049f05d134ced7e689b415569dc5.css" rel="stylesheet">
+
+
+
+
+
+<meta property="og:title" content="004-SCC" />
+<meta property="og:description" content="强连通分量 SCC (Strongly Connect Component) 定义 在一个 有向图 中，任意取两个节点(u, v) ，u -&gt; v, v -&gt; u 均有路径，这样的图叫做强连通。 SCC（强连通分量）：一个极大的强连" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://leesun1729.github.io/post/004-scc/" />
+<meta property="article:published_time" content="2024-01-20T21:55:56+08:00" />
+<meta property="article:modified_time" content="2024-01-20T22:03:11+08:00" />
+<meta itemprop="name" content="004-SCC">
+<meta itemprop="description" content="强连通分量 SCC (Strongly Connect Component) 定义 在一个 有向图 中，任意取两个节点(u, v) ，u -&gt; v, v -&gt; u 均有路径，这样的图叫做强连通。 SCC（强连通分量）：一个极大的强连">
+<meta itemprop="datePublished" content="2024-01-20T21:55:56+08:00" />
+<meta itemprop="dateModified" content="2024-01-20T22:03:11+08:00" />
+<meta itemprop="wordCount" content="1491">
+
+
+
+<meta itemprop="keywords" content="SCC,Tarjan," />
+<meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="004-SCC"/>
+<meta name="twitter:description" content="强连通分量 SCC (Strongly Connect Component) 定义 在一个 有向图 中，任意取两个节点(u, v) ，u -&gt; v, v -&gt; u 均有路径，这样的图叫做强连通。 SCC（强连通分量）：一个极大的强连"/>
+
+<!--[if lte IE 9]>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/classlist/1.1.20170427/classList.min.js"></script>
+<![endif]-->
+
+<!--[if lt IE 9]>
+  <script src="https://cdn.jsdelivr.net/npm/html5shiv@3.7.3/dist/html5shiv.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/respond.js@1.4.2/dest/respond.min.js"></script>
+<![endif]-->
+
+</head>
+<body>
+  <div id="mobile-navbar" class="mobile-navbar">
+  <div class="mobile-header-logo">
+    <a href="/" class="logo">leesun1729&#39;s blog</a>
+  </div>
+  <div class="mobile-navbar-icon">
+    <span></span>
+    <span></span>
+    <span></span>
+  </div>
+</div>
+<nav id="mobile-menu" class="mobile-menu slideout-menu">
+  <ul class="mobile-menu-list">
+    <a href="/">
+        <li class="mobile-menu-item">主页</li>
+      </a><a href="/post/">
+        <li class="mobile-menu-item">归档</li>
+      </a><a href="/tags/">
+        <li class="mobile-menu-item">标签</li>
+      </a><a href="/categories/">
+        <li class="mobile-menu-item">分类</li>
+      </a><a href="/about/">
+        <li class="mobile-menu-item">关于</li>
+      </a><a href="/search/">
+        <li class="mobile-menu-item">搜索</li>
+      </a>
+  </ul>
+
+  
+
+
+</nav>
+
+  <div class="container" id="mobile-panel">
+    <header id="header" class="header">
+        <div class="logo-wrapper">
+  <a href="/" class="logo">leesun1729&#39;s blog</a>
+</div>
+
+
+
+
+
+<nav class="site-navbar">
+  <ul id="menu" class="menu">
+    <li class="menu-item">
+        <a class="menu-item-link" href="/">主页</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/post/">归档</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/tags/">标签</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/categories/">分类</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/about/">关于</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/search/">搜索</a>
+      </li>
+  </ul>
+</nav>
+
+    </header>
+
+    <main id="main" class="main">
+      <div class="content-wrapper">
+        <div id="content" class="content">
+          <article class="post">
+    
+    <header class="post-header">
+      <h1 class="post-title">004-SCC</h1>
+
+      <div class="post-meta">
+        <span class="post-time" title="2024-01-20 21:55:56 &#43;0800 &#43;0800"> 2024-01-20 </span>
+        <div class="post-category">
+            <a href="/categories/%E7%AE%97%E6%B3%95/"> 算法 </a>
+            </div>
+        <span id="busuanzi_container_page_pv" class="more-meta"> <span id="busuanzi_value_page_pv"><img src="/img/spinner.svg" alt="spinner.svg"/></span> times read </span>
+      </div>
+    </header>
+
+    
+<div class="post-toc" id="post-toc">
+  <h2 class="post-toc-title">Contents</h2>
+  <div class="post-toc-content">
+    <nav id="TableOfContents">
+  <ul>
+    <li><a href="#定义">定义</a></li>
+    <li><a href="#tarjan-求有向图的-scc">Tarjan 求有向图的 SCC</a>
+      <ul>
+        <li>
+          <ul>
+            <li><a href="#算法流程">算法流程</a></li>
+          </ul>
+        </li>
+      </ul>
+    </li>
+  </ul>
+</nav>
+  </div>
+</div>
+    <div class="post-content">
+      <p><strong>强连通分量 SCC (Strongly Connect Component)</strong></p>
+<h1 id="定义">定义</h1>
+<p>在一个 <strong>有向图</strong> 中，任意取两个节点<code>(u, v)</code> ，<code>u -&gt; v, v -&gt; u</code> 均有路径，这样的图叫做强连通。</p>
+<p><strong>SCC（强连通分量）</strong>：一个极大的强连通子图。</p>
+<p><strong>缩点</strong>：当我们求出一个图中的所有 SCC 后，我们可以将每一个 SCC 缩成一个点。缩点过后，我们可以得到一个新的图，我们遍历所有 <strong>原图中的边</strong>，将原图中的边加到新图中（注意判断 <strong>自环</strong>，并且一般会出现<strong>重复边</strong>）。</p>
+<ul>
+<li>缩点后得到的图一定是一个 <strong>DAG（有向无环图）</strong>。</li>
+<li>DAG 有着很多优秀的性质，比如可以进行 <strong>拓扑排序</strong>，可以利用 拓扑排序进行 <strong>DP</strong> 等。</li>
+</ul>
+<p>求一个有向图中的强连通分量，有两种算法，Tarjan 与 kosaraju 算法（复杂度均为<code>O(V + E)</code>）。</p>
+<h1 id="tarjan-求有向图的-scc">Tarjan 求有向图的 SCC</h1>
+<h3 id="算法流程">算法流程</h3>
+<p>定义 <strong>DFS</strong> 树为：从任意节点出发，形成的一条从上往下的生成树。</p>
+<p>当我们从  访问到 direct neighbor <code>v</code> 时，如果 <code>v</code> 尚未被访问过，那么 <code>(u, v)</code> 是一条 <strong>树边</strong>。否则 <code>(u, v)</code> 是一条 <strong>非树边</strong>。</p>
+<pre><code class="language-cpp">struct SCC {
+    int n;
+    int cnt, cur;
+    std::vector&lt;std::vector&lt;int&gt; &gt; e;
+    std::stack&lt;int&gt; st;     // 用于 Tarjan 算法中保存被访问的节点
+    std::vector&lt;int&gt; dfn, low, f, sz;
+
+    SCC(int n) {
+        cnt = 0;  // 用于计数目前发现的强连通分量个数
+        cur = 0;  // 用作当前访问序号（dfn 的计数）
+        this -&gt; n = n;
+        dfn.assign(n + 1, -1);  // 记录节点在 DFS 搜索中的访问顺序
+        low.assign(n + 1, -1);  // 记录在 DFS 过程中每个节点可达的最小 dfn 值
+        f.assign(n + 1, -1);   //  记录每个节点所属的强连通分量的编号
+        sz.assign(n + 1, 0);   //  统计每个强连通分量中包含的节点数
+        e.assign(n + 1, {});  // 用来存储图的邻接表
+    }
+
+    void add_edge(int u, int v) {
+        e[u].push_back(v);
+    }
+
+    void dfs(int u) {
+        dfn[u] = low[u] = ++cur;
+        st.push(u);
+        for(int v : e[u]) {
+            if(f[v] != -1)  continue;
+            if(dfn[v] == -1) {
+                dfs(v);
+            }
+            low[u] = std::min(low[u], low[v]);
+        }
+
+        if(low[u] == dfn[u]) {
+            cnt++;
+            int x;
+            do {
+                x = st.top();
+                st.pop();
+                f[x] = cnt;
+                sz[cnt]++;
+            } while(x != u);
+        }
+    }
+
+    std::vector&lt;int&gt; work() {
+        for(int i = 1; i &lt;= n; ++i) {
+            if(f[i] == -1) {
+                dfs(i);
+            }
+        }
+        return f;
+    }
+};
+</code></pre>
+<p><strong>例题：</strong>  <a href="https://leetcode.cn/problems/critical-connections-in-a-network/description/" target="_blank">Leetcode 1192. 查找集群内的关键连接</a></p>
+<pre><code class="language-cpp">class Solution {
+public:
+    int cur = 0;
+    vector&lt;int&gt; dfn, low;
+    vector&lt;vector&lt;int&gt;&gt; res;
+    vector&lt;vector&lt;int&gt;&gt; adj;
+
+    void tarjan(int u, int fa) {
+        dfn[u] = low[u] = ++cur;
+        for(int v : adj[u]) {
+            if(v == fa) continue;
+            if(!dfn[v]) {
+                tarjan(v, u);
+                low[u] = min(low[u], low[v]);
+                if(dfn[u] &lt; low[v]) {
+                    res.push_back({u, v});
+                }
+            } else {
+                low[u] = min(low[u], dfn[v]);
+            }
+        }
+    }
+
+    vector&lt;vector&lt;int&gt;&gt; criticalConnections(int n, vector&lt;vector&lt;int&gt;&gt;&amp; connections) {
+        dfn.resize(n);
+        low.resize(n);
+        adj.resize(n);
+        for(auto &amp;e : connections) {
+            adj[e[0]].push_back(e[1]);
+            adj[e[1]].push_back(e[0]);
+        }
+
+        for(int i = 0; i &lt; n; ++i) {
+            if(!dfn[i]) {
+                tarjan(i, -1);
+            }
+        }
+
+        return res;
+    }
+};
+</code></pre>
+<p><strong>例题：<a href="https://www.luogu.com.cn/problem/P2341" target="_blank">洛谷P2341 [USACO03FALL][HAOI2006]受欢迎的牛 G</a></strong></p>
+<pre><code class="language-cpp">#include &lt;bits/stdc++.h&gt;
+
+struct SCC {
+    int n;
+    int cnt, cur;
+    std::vector&lt;std::vector&lt;int&gt; &gt; e;
+    std::stack&lt;int&gt; st;     // 用于 Tarjan 算法中保存被访问的节点
+    std::vector&lt;int&gt; dfn, low, f, sz;
+
+    SCC(int n) {
+        cnt = 0;  // 用于计数目前发现的强连通分量个数
+        cur = 0;  // 用作当前访问序号（dfn 的计数）
+        this -&gt; n = n;
+        dfn.assign(n + 1, -1);  // 记录节点在 DFS 搜索中的访问顺序
+        low.assign(n + 1, -1);  // 记录在 DFS 过程中每个节点可达的最小 dfn 值
+        f.assign(n + 1, -1);   //  记录每个节点所属的强连通分量的编号
+        sz.assign(n + 1, 0);   //  统计每个强连通分量中包含的节点数
+        e.assign(n + 1, {});  // 用来存储图的邻接表
+    }
+
+    void add_edge(int u, int v) {
+        e[u].push_back(v);
+    }
+
+    void dfs(int u) {
+        dfn[u] = low[u] = ++cur;
+        st.push(u);
+        for(int v : e[u]) {
+            if(f[v] != -1)  continue;
+            if(dfn[v] == -1) {
+                dfs(v);
+            }
+            low[u] = std::min(low[u], low[v]);
+        }
+
+        if(low[u] == dfn[u]) {
+            cnt++;
+            int x;
+            do {
+                x = st.top();
+                st.pop();
+                f[x] = cnt;
+                sz[cnt]++;
+            } while(x != u);
+        }
+    }
+
+    std::vector&lt;int&gt; work() {
+        for(int i = 1; i &lt;= n; ++i) {
+            if(f[i] == -1) {
+                dfs(i);
+            }
+        }
+        return f;
+    }
+};
+
+int main() {
+    std::ios::sync_with_stdio(false);
+    std::cin.tie(nullptr);
+    std::cout.tie(nullptr);
+    
+    int n, m;
+    std::cin &gt;&gt; n &gt;&gt; m;
+    SCC g(n);
+    std::vector&lt;std::vector&lt;int&gt; &gt; adj(n + 1);
+    for(int i = 0; i &lt; m; ++i) {
+        int a, b;
+        std::cin &gt;&gt; a &gt;&gt; b;
+        adj[a].push_back(b);
+        g.add_edge(a, b);
+    }
+
+    std::vector&lt;int&gt; f = g.work();
+    std::vector&lt;int&gt; deg(n + 1);
+    for(int i = 1; i &lt;= n; ++i) {
+        for(int v : adj[i]) {
+            if(f[i] != f[v]) {
+                deg[f[i]]++;
+            }
+        }
+    }
+    int ans = 0;
+    for(int i = 1; i &lt;= g.cnt; ++i) {
+        if(!deg[i]) {
+            if(ans) {
+                std::cout &lt;&lt; &quot;0\n&quot;;
+                return 0;
+            }
+            ans = i;
+        }
+    }
+    std::cout &lt;&lt; g.sz[ans] &lt;&lt; '\n';
+    return 0;
+}
+</code></pre>
+<p><strong>模版题：</strong><a href="https://www.luogu.com.cn/problem/P2863" target="_blank">洛谷P2863 [USACO06JAN]The Cow Prom S</a></p>
+<pre><code class="language-cpp">#include &lt;bits/stdc++.h&gt;
+
+struct SCC {
+    int n;
+    int cnt, cur;
+    std::vector&lt;std::vector&lt;int&gt; &gt; e;
+    std::stack&lt;int&gt; st;     // 用于 Tarjan 算法中保存被访问的节点
+    std::vector&lt;int&gt; dfn, low, f, sz, vis;
+
+    SCC(int n) {
+        cnt = 0;  // 用于计数目前发现的强连通分量个数
+        cur = 0;  // 用作当前访问序号（dfn 的计数）
+        this -&gt; n = n;
+        dfn.assign(n + 1, -1);  // 记录节点在 DFS 搜索中的访问顺序
+        low.assign(n + 1, -1);  // 记录在 DFS 过程中每个节点可达的最小 dfn 值
+        f.assign(n + 1, -1);   //  记录每个节点所属的强连通分量的编号
+        sz.assign(n + 1, 0);   //  统计每个强连通分量中包含的节点数
+        e.assign(n + 1, {});  // 用来存储图的邻接表
+    }
+
+    void add_edge(int u, int v) {
+        e[u].push_back(v);
+    }
+
+    void dfs(int u) {
+        dfn[u] = low[u] = ++cur;
+        st.push(u);
+        for(int v : e[u]) {
+            if(f[v] != -1)  continue;
+            if(dfn[v] == -1) {
+                dfs(v);
+            }
+            low[u] = std::min(low[u], low[v]);
+        }
+
+        if(low[u] == dfn[u]) {
+            cnt++;
+            int x;
+            do {
+                x = st.top();
+                st.pop();
+                f[x] = cnt;
+                sz[cnt]++;
+            } while(x != u);
+        }
+    }
+
+    void work() {
+        for(int i = 1; i &lt;= n; ++i) {
+            if(f[i] == -1) {
+                dfs(i);
+            }
+        }
+    }
+};
+
+int main() {
+    std::ios::sync_with_stdio(false);
+    std::cin.tie(nullptr);
+    std::cout.tie(nullptr);
+    
+    int n, m;
+    std::cin &gt;&gt; n &gt;&gt; m;
+    SCC g(n);
+    std::vector&lt;std::vector&lt;int&gt; &gt; adj(n + 1);
+    for(int i = 0; i &lt; m; ++i) {
+        int a, b;
+        std::cin &gt;&gt; a &gt;&gt; b;
+        adj[a].push_back(b);
+        g.add_edge(a, b);
+    }
+    g.work();
+    int ans = 0;
+    for(int i = 1; i &lt;= g.cnt; ++i) {
+        if(g.sz[i] &gt; 1)
+            ans++;
+    }
+
+    std::cout &lt;&lt; ans &lt;&lt; '\n';
+    return 0;
+}
+</code></pre>
+
+    </div>
+
+    <div class="post-copyright">
+  <p class="copyright-item">
+    <span class="item-title">Author</span>
+    <span class="item-content">leesun1729</span>
+  </p>
+  <p class="copyright-item">
+    <span class="item-title">LastMod</span>
+    <span class="item-content">
+        <span title="2024-01-20 22:03:11 &#43;0800 &#43;0800">2024-01-20</span>
+        <a href="https://github.com/leesun1729/hugo-blog/commit/7cbd37a45be37734f71b4e2c62f9e45c46ec9d83" title="add" target="_blank">(7cbd37a)</a>
+        ，<a href="https://github.com/leesun1729/hugo-blog/commits/master/content/post/004-SCC.md" target="_blank">更新历史</a>
+    </span>
+  </p>
+  
+  <p class="copyright-item">
+    <span class="item-title">License</span>
+    <span class="item-content"><a rel="license noopener" href="https://creativecommons.org/licenses/by-sa/4.0/deed.zh" target="_blank">CC BY-SA 4.0</a></span>
+  </p>
+</div>
+<footer class="post-footer">
+      <div class="post-tags">
+          <a href="/tags/scc/">SCC</a>
+          <a href="/tags/tarjan/">Tarjan</a>
+          </div>
+      <nav class="post-nav">
+        <a class="prev" href="/post/005-%E7%8F%82%E6%9C%B5%E8%8E%89%E6%A0%91/">
+            <i class="iconfont icon-left"></i>
+            <span class="prev-text nav-default">005-珂朵莉树</span>
+            <span class="prev-text nav-mobile">Prev</span>
+          </a>
+        <a class="next" href="/post/003-c&#43;&#43;%E8%BF%90%E7%AE%97%E7%AC%A6%E9%87%8D%E8%BD%BD/">
+            <span class="next-text nav-default">003 C&#43;&#43;运算符重载</span>
+            <span class="next-text nav-mobile">Next</span>
+            <i class="iconfont icon-right"></i>
+          </a>
+      </nav>
+    </footer>
+  </article>
+        </div>
+        
+
+  
+
+  
+  <div class="comments">
+    <div class="loading post">
+      <img src="/img/spinner.svg">
+      <p class="post-content">
+        评论正在加载中...如果评论较长时间无法加载，你可以
+        <a href='https://github.com/leesun1729/leesun1729.github.io/issues?q=is%3Aissue+is%3Aopen+"004-SCC - leesun1729%27s%20blog"' target="_blank">搜索对应的 issue</a>
+        或者
+        <a href="https://github.com/leesun1729/leesun1729.github.io/issues/new?title=004-SCC - leesun1729%27s%20blog" target="_blank">新建一个 issue</a>
+        。
+      </p>
+    </div>
+    <script src="https://utteranc.es/client.js"
+            repo="leesun1729/leesun1729.github.io"
+            issue-term="title"
+            theme="github-light"
+            crossorigin="anonymous"
+            async>
+    </script>
+    <noscript>请启用 JavaScript 来查看评论。</a></noscript>
+  </div>
+
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="social-links">
+      <a href="mailto:leesun1729@gmail.com" class="iconfont icon-email" title="email" target="_blank"></a>
+      <a href="https://github.com/leesun1729" class="iconfont icon-github" title="github" target="_blank"></a>
+  <a href="https://leesun1729.github.io/index.xml" type="application/rss+xml" class="iconfont icon-rss" title="rss"></a>
+</div>
+
+<div class="copyright">
+  <span class="power-by">
+    Powered by <a class="hexo-link" href="https://gohugo.io" target="_blank">Hugo</a>
+  </span>
+  <span class="division">|</span>
+  <span class="theme-info">
+    Theme - 
+    <a class="theme-link" href="https://github.com/ouuan/hugo-theme-even" target="_blank">Even</a>
+  </span>
+
+  <div class="busuanzi-footer">
+    <span id="busuanzi_container_site_pv"> site pv: <span id="busuanzi_value_site_pv"><img src="/img/spinner.svg" alt="spinner.svg"/></span> </span>
+      <span class="division">|</span>
+    <span id="busuanzi_container_site_uv"> site uv: <span id="busuanzi_value_site_uv"><img src="/img/spinner.svg" alt="spinner.svg"/></span> </span>
+  </div>
+
+  <span class="copyright-year">
+    &copy; 
+    2024
+    <span class="heart">
+      <a class="iconfont icon-github" title="source code" href="https://github.com/leesun1729/hugo-blog" target="_blank"></a>
+    </span> 
+    <span class="author">leesun1729</span>
+  </span>
+</div>
+
+    </footer>
+
+    <div class="back-to-top" id="back-to-top">
+      <i class="iconfont icon-up"></i>
+    </div>
+  </div>
+  <script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release/build/highlight.min.js"></script>
+  <link href="https://cdn.jsdelivr.net/npm/highlight.js/styles/tomorrow.min.css" rel="stylesheet"/>
+  <script>hljs.configure({tabReplace: '    '});</script>
+<script src="https://cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/slideout@1/dist/slideout.min.js" crossorigin="anonymous"></script>
+
+
+
+
+
+
+<script type="text/javascript" src="/js/main.min.959fe0c07c3b2fcb923fb17e40bdcbf406ad5c8b8543391a2abc1728f469d080.js"></script>
+  <script type="text/javascript">
+    window.MathJax = {
+      tex: {
+        inlineMath: [['$','$'], ['\\(','\\)']],
+        }
+    };
+  </script>
+  <script async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" crossorigin="anonymous"></script>
+
+
+<script type="application/javascript">
+var doNotTrack = false;
+if (!doNotTrack) {
+	window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
+	ga('create', 'UA-leesun1729', 'auto');
+	ga('set', 'anonymizeIp', true);
+	ga('send', 'pageview');
+}
+</script>
+<script async src='https://www.google-analytics.com/analytics.js'></script>
+
+
+<script id="baidu_push">
+  (function(){
+    if (window.location.hostname === 'localhost') return;
+    var bp = document.createElement('script'); bp.async = true;
+    var curProtocol = window.location.protocol.split(':')[0];
+    if (curProtocol === 'https') {
+      bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';
+    }
+    else {
+      bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+    }
+    var s = document.getElementsByTagName("script")[0];
+    s.parentNode.insertBefore(bp, s);
+  })();
+</script>
+
+
+
+
+</body>
+</html>
