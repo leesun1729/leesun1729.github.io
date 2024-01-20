@@ -189,7 +189,6 @@ copyright = ""            # default: author.name ↓        # 默认为下面配
   [params.social]                                         # 社交链接
     a-email = "mailto:leesun1729@gmail.com"
     b-github = "https://github.com/leesun1729"
-    c-bilibili = "https://space.bilibili.com/leesun1729"
 
 # See https://gohugo.io/about/hugo-and-gdpr/
 [privacy]
