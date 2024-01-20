@@ -1,5 +1,5 @@
 +++
-title = '002 Sublimt Text4'
+title = 'Sublimt Text4'
 date = 2024-01-20T21:44:49+08:00
 draft = false
 categories = ['算法']
