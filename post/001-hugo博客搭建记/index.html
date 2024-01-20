@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <title>Hugo博客搭建记 - leesun1729的博客</title>
+  <meta name="renderer" content="webkit" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+<meta name="theme-color" content="#f8f5ec" />
+<meta name="msapplication-navbutton-color" content="#f8f5ec">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="#f8f5ec">
+
+
+<meta name="author" content="leesun1729" /><meta name="description" content="前述 网站构成: hugo &#43; even &#43; github actions , 参考资料: https://ouuan.github.io/post/from-hexo-to-hugo/ 搭建过程 Step 1 引自tom0727的搭建指南 首先阅读ouuan的指南，然后使用他的hugo模版，按照模版" /><meta name="keywords" content="leesun1729, blog" />
+
+
+<meta name="baidu-site-verification" content="leesun1729" />
+<meta name="google-site-verification" content="leesun1729" />
+
+
+<meta name="generator" content="Hugo 0.80.0 with theme even" />
+
+
+<link rel="canonical" href="https://leesun1729.github.io/post/001-hugo%E5%8D%9A%E5%AE%A2%E6%90%AD%E5%BB%BA%E8%AE%B0/" />
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+<link rel="manifest" href="/manifest.json">
+<link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5">
+
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+<link href="/sass/main.min.299b56866ca7e5e86584d6353e1e1a12be9d049f05d134ced7e689b415569dc5.css" rel="stylesheet">
+
+
+
+
+
+<meta property="og:title" content="Hugo博客搭建记" />
+<meta property="og:description" content="前述 网站构成: hugo &#43; even &#43; github actions , 参考资料: https://ouuan.github.io/post/from-hexo-to-hugo/ 搭建过程 Step 1 引自tom0727的搭建指南 首先阅读ouuan的指南，然后使用他的hugo模版，按照模版" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://leesun1729.github.io/post/001-hugo%E5%8D%9A%E5%AE%A2%E6%90%AD%E5%BB%BA%E8%AE%B0/" />
+<meta property="article:published_time" content="2024-01-20T21:06:30+08:00" />
+<meta property="article:modified_time" content="2024-01-20T21:11:35+08:00" />
+<meta itemprop="name" content="Hugo博客搭建记">
+<meta itemprop="description" content="前述 网站构成: hugo &#43; even &#43; github actions , 参考资料: https://ouuan.github.io/post/from-hexo-to-hugo/ 搭建过程 Step 1 引自tom0727的搭建指南 首先阅读ouuan的指南，然后使用他的hugo模版，按照模版">
+<meta itemprop="datePublished" content="2024-01-20T21:06:30+08:00" />
+<meta itemprop="dateModified" content="2024-01-20T21:11:35+08:00" />
+<meta itemprop="wordCount" content="1420">
+
+
+
+<meta itemprop="keywords" content="hugo,博客," />
+<meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="Hugo博客搭建记"/>
+<meta name="twitter:description" content="前述 网站构成: hugo &#43; even &#43; github actions , 参考资料: https://ouuan.github.io/post/from-hexo-to-hugo/ 搭建过程 Step 1 引自tom0727的搭建指南 首先阅读ouuan的指南，然后使用他的hugo模版，按照模版"/>
+
+<!--[if lte IE 9]>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/classlist/1.1.20170427/classList.min.js"></script>
+<![endif]-->
+
+<!--[if lt IE 9]>
+  <script src="https://cdn.jsdelivr.net/npm/html5shiv@3.7.3/dist/html5shiv.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/respond.js@1.4.2/dest/respond.min.js"></script>
+<![endif]-->
+
+</head>
+<body>
+  <div id="mobile-navbar" class="mobile-navbar">
+  <div class="mobile-header-logo">
+    <a href="/" class="logo">leesun1729的博客</a>
+  </div>
+  <div class="mobile-navbar-icon">
+    <span></span>
+    <span></span>
+    <span></span>
+  </div>
+</div>
+<nav id="mobile-menu" class="mobile-menu slideout-menu">
+  <ul class="mobile-menu-list">
+    <a href="/">
+        <li class="mobile-menu-item">主页</li>
+      </a><a href="/post/">
+        <li class="mobile-menu-item">归档</li>
+      </a><a href="/tags/">
+        <li class="mobile-menu-item">标签</li>
+      </a><a href="/categories/">
+        <li class="mobile-menu-item">分类</li>
+      </a><a href="/about/">
+        <li class="mobile-menu-item">关于</li>
+      </a><a href="/ranking/">
+        <li class="mobile-menu-item">排行</li>
+      </a><a href="/search/">
+        <li class="mobile-menu-item">搜索</li>
+      </a>
+  </ul>
+
+  
+
+
+</nav>
+
+  <div class="container" id="mobile-panel">
+    <header id="header" class="header">
+        <div class="logo-wrapper">
+  <a href="/" class="logo">leesun1729的博客</a>
+</div>
+
+
+
+
+
+<nav class="site-navbar">
+  <ul id="menu" class="menu">
+    <li class="menu-item">
+        <a class="menu-item-link" href="/">主页</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/post/">归档</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/tags/">标签</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/categories/">分类</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/about/">关于</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/ranking/">排行</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/search/">搜索</a>
+      </li>
+  </ul>
+</nav>
+
+    </header>
+
+    <main id="main" class="main">
+      <div class="content-wrapper">
+        <div id="content" class="content">
+          <article class="post">
+    
+    <header class="post-header">
+      <h1 class="post-title">Hugo博客搭建记</h1>
+
+      <div class="post-meta">
+        <span class="post-time" title="2024-01-20 21:06:30 &#43;0800 &#43;0800"> 2024-01-20 </span>
+        <div class="post-category">
+            <a href="/categories/%E5%B7%A5%E7%A8%8B/"> 工程 </a>
+            </div>
+        <span id="busuanzi_container_page_pv" class="more-meta"> <span id="busuanzi_value_page_pv"><img src="/img/spinner.svg" alt="spinner.svg"/></span> times read </span>
+      </div>
+    </header>
+
+    
+<div class="post-toc" id="post-toc">
+  <h2 class="post-toc-title">Contents</h2>
+  <div class="post-toc-content">
+    <nav id="TableOfContents">
+  <ul>
+    <li>
+      <ul>
+        <li><a href="#前述">前述</a></li>
+        <li><a href="#搭建过程">搭建过程</a>
+          <ul>
+            <li><a href="#step-1-引自tom0727的搭建指南httpstom0727githubiopost001-hugo-tutorial">Step 1 引自<a href="https://tom0727.github.io/post/001-hugo-tutorial/">tom0727的搭建指南</a></a></li>
+            <li><a href="#step-2-config的修改">Step 2 Config的修改</a></li>
+            <li><a href="#step-25-创建repository">Step 2.5 创建repository</a></li>
+            <li><a href="#step-3-本地测试">Step 3 本地测试</a></li>
+            <li><a href="#step-4-github-settings">Step 4 Github Settings</a></li>
+            <li><a href="#step-5-github-actions">Step 5 Github Actions</a></li>
+            <li><a href="#step-6-其他">Step 6 其他</a></li>
+          </ul>
+        </li>
+      </ul>
+    </li>
+  </ul>
+</nav>
+  </div>
+</div>
+    <div class="post-content">
+      <h2 id="前述">前述</h2>
+<p>网站构成: <strong>hugo + even + github actions</strong> , 参考资料:</p>
+<blockquote>
+<p><a href="https://ouuan.github.io/post/from-hexo-to-hugo/">https://ouuan.github.io/post/from-hexo-to-hugo/</a></p>
+</blockquote>
+<h2 id="搭建过程">搭建过程</h2>
+<h3 id="step-1-引自tom0727的搭建指南httpstom0727githubiopost001-hugo-tutorial">Step 1 引自<a href="https://tom0727.github.io/post/001-hugo-tutorial/" target="_blank">tom0727的搭建指南</a></h3>
+<p>首先阅读<a href="https://ouuan.github.io/post/from-hexo-to-hugo/" target="_blank">ouuan的指南</a>，然后使用他的<a href="https://github.com/ouuan/hugo-blog-template" target="_blank">hugo模版</a>，按照模版里指示的进行clone</p>
+<h3 id="step-2-config的修改">Step 2 Config的修改</h3>
+<p>还是按照模版里指示的，修改一下配置文件<code>config.toml</code>里的相关配置，一些需要更改的内容：</p>
+<ol>
+<li>包含<code>yourname</code>的部分</li>
+<li><code>newContentEditor = &quot;&quot;</code></li>
+<li><code>defaultContentLanguage = &quot;en&quot;</code></li>
+<li><code>[[menu.main]]</code>的相关内容 (视情况进行保留和删除)</li>
+<li><strong>不要</strong>更改 <code>[params]</code> 中的 <code>version=&quot;4.x&quot;</code></li>
+</ol>
+<p><strong>注:这里还有一个需要注意的，执行命令<code>hugo server</code>会出现报错，因为现在不支持<code>google_news.html</code>,解决办法删除目录<code>hugo/themes/even/layouts/partials/head.html</code>的<code>{{- template &quot;_internal/google_news.html&quot; . -}}</code>,<a href="https://discourse.gohugo.io/t/page-render-error/43594" target="_blank">相关讨论</a></strong></p>
+<h3 id="step-25-创建repository">Step 2.5 创建repository</h3>
+<p>因为我打算部署到github pages上，就在github上创建一个新的repository，叫<code>leesun1729.github.io</code></p>
+<pre><code>git init
+git add .
+git commit -m &quot;first commit&quot;
+git remote add origin https://github.com/leesun1729/leesun1729.github.io.git
+git branch -M master
+git push -u origin master
+</code></pre>
+<h3 id="step-3-本地测试">Step 3 本地测试</h3>
+<p>配置完成后，可以 <code>hugo new post/test.md</code> 创建一个新的post(在<code>hugo-blog/content/post/test.md</code>), 按照markdown随便写点东西以后保存，然后 <code>hugo server</code>，打开localhost看一下效果
+最后用<code>hugo --theme=even --baseURL=&quot;https://leesun1729.github.io/&quot; --buildDrafts</code>命令生成静态文件，就是<code>hugo-blog/public/</code>文件夹，把这个文件夹内的内容push到github上就可以了</p>
+<pre><code>cd public
+git init
+git add .
+git commit -m &quot;first commit&quot;
+git remote add origin https://github.com/leesun1729/leesun1729.github.io.git
+git branch -M publish
+git push -u origin publish
+</code></pre>
+<p>注： blog的源代码和网页内容并不是一个东西!</p>
+<ol>
+<li>源代码: 是<code>hugo-blog/</code> 下除了<code>hugo-blog/public/</code>以外的内容，包含了 <code>content/</code>, <code>config.toml</code> 之类的文件。</li>
+<li>网页内容：只是 <code>hugo-blog/public/</code>内的内容，有了源代码就可以用<code>hugo</code>生成网页内容，但是反之就不可以！</li>
+</ol>
+<p>既然两者有别，就要分开管理，我把它们放在同一个repository里，分成2个branch。源代码就放在了<code>master</code>里，网页内容就放在<code>publish</code>上了。</p>
+<h3 id="step-4-github-settings">Step 4 Github Settings</h3>
+<p>这个时候网页上应该是没有内容的，因为github pages需要设置一下指定deploy的branch，在repository的<code>Settings</code>里，拉到下面看到<code>GitHub Pages</code>，改一下Source branch就可以了：
+<img src="/images/001/1.png" alt="image"></p>
+<blockquote>
+<p>需要在博文里插入图片的话，假设图片位于 <code>static/images/001/1.png</code>，就写上<code>![image](/images/001/1.png)</code></p>
+<p>如果是插入link的话，就写 <code>[link_name](https://...)</code> 即可，外部链接记得加<code>https://</code>，不然会被当作本地的某个文件位置。</p>
+</blockquote>
+<p>这些步骤做完就可以了，当然这种修改然后发布的方式太麻烦了，切branch也很累，所以就有了Step 5:</p>
+<h3 id="step-5-github-actions">Step 5 Github Actions</h3>
+<p>我们配置一下Github actions，它能自动化部署流程。参考资料:</p>
+<blockquote>
+<p><a href="https://segmentfault.com/a/1190000021815477">https://segmentfault.com/a/1190000021815477</a></p>
+</blockquote>
+<p>需要注意，因为源代码和网页内容在同一个repository里，就不用在github上折腾secret key之类的了，直接修改一下 <code>hugo-blog/.github/workflows/deploy.yml</code> (这个是template里自带的) 即可：</p>
+<ol>
+<li><code>personal_token: ${{ secrets.GITHUB_TOKEN }}</code></li>
+<li><code>publish_dir: ./public</code></li>
+<li><code>publish_branch: publish</code></li>
+<li>将 <code>depth</code> 改成 <code>fetch-depth</code>  (不然build的时候会报错)</li>
+</ol>
+<p>这样就完成了，从此以后，写一篇新文章的步骤就变成：</p>
+<ol>
+<li><code>hugo new post/article.md</code></li>
+<li>修改位于<code>content/post/article.md</code>的博客文章</li>
+<li>add, commit, 把源代码push到<code>master</code></li>
+</ol>
+<p>这样就可以了，不必切branch然后push网页内容了。</p>
+<h3 id="step-6-其他">Step 6 其他</h3>
+<p>更多内容请参考<a href="https://tom0727.github.io/post/001-hugo-tutorial/" target="_blank">tom0727的搭建指南</a></p>
+
+    </div>
+
+    <div class="post-copyright">
+  <p class="copyright-item">
+    <span class="item-title">Author</span>
+    <span class="item-content">leesun1729</span>
+  </p>
+  <p class="copyright-item">
+    <span class="item-title">LastMod</span>
+    <span class="item-content">
+        <span title="2024-01-20 21:11:35 &#43;0800 &#43;0800">2024-01-20</span>
+        <a href="https://github.com/leesun1729/hugo-blog/commit/99b6d4ebc3487a2435c4b8200c7b8ade6cc12557" title="first commit" target="_blank">(99b6d4e)</a>
+        ，<a href="https://github.com/leesun1729/hugo-blog/commits/master/content/post/001-Hugo%e5%8d%9a%e5%ae%a2%e6%90%ad%e5%bb%ba%e8%ae%b0.md" target="_blank">更新历史</a>
+    </span>
+  </p>
+  
+  <p class="copyright-item">
+    <span class="item-title">License</span>
+    <span class="item-content"><a rel="license noopener" href="https://creativecommons.org/licenses/by-sa/4.0/deed.zh" target="_blank">CC BY-SA 4.0</a></span>
+  </p>
+</div>
+<footer class="post-footer">
+      <div class="post-tags">
+          <a href="/tags/hugo/">hugo</a>
+          <a href="/tags/%E5%8D%9A%E5%AE%A2/">博客</a>
+          </div>
+      <nav class="post-nav">
+        
+        
+      </nav>
+    </footer>
+  </article>
+        </div>
+        
+
+  
+
+  
+  <div class="comments">
+    <div class="loading post">
+      <img src="/img/spinner.svg">
+      <p class="post-content">
+        评论正在加载中...如果评论较长时间无法加载，你可以
+        <a href='https://github.com/leesun1729/blog-comments/issues?q=is%3Aissue+is%3Aopen+"Hugo%e5%8d%9a%e5%ae%a2%e6%90%ad%e5%bb%ba%e8%ae%b0 - leesun1729%e7%9a%84%e5%8d%9a%e5%ae%a2"' target="_blank">搜索对应的 issue</a>
+        或者
+        <a href="https://github.com/leesun1729/blog-comments/issues/new?title=Hugo%e5%8d%9a%e5%ae%a2%e6%90%ad%e5%bb%ba%e8%ae%b0 - leesun1729%e7%9a%84%e5%8d%9a%e5%ae%a2" target="_blank">新建一个 issue</a>
+        。
+      </p>
+    </div>
+    <script src="https://utteranc.es/client.js"
+            repo="leesun1729/blog-comments"
+            issue-term="title"
+            theme="github-light"
+            crossorigin="anonymous"
+            async>
+    </script>
+    <noscript>请启用 JavaScript 来查看评论。</a></noscript>
+  </div>
+
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="social-links">
+      <a href="mailto:leesun1729@gmail.com" class="iconfont icon-email" title="email" target="_blank"></a>
+      <a href="https://github.com/leesun1729" class="iconfont icon-github" title="github" target="_blank"></a>
+      <a href="https://space.bilibili.com/leesun1729" class="iconfont icon-bilibili" title="bilibili" target="_blank"></a>
+  <a href="https://leesun1729.github.io/index.xml" type="application/rss+xml" class="iconfont icon-rss" title="rss"></a>
+</div>
+
+<div class="copyright">
+  <span class="power-by">
+    Powered by <a class="hexo-link" href="https://gohugo.io" target="_blank">Hugo</a>
+  </span>
+  <span class="division">|</span>
+  <span class="theme-info">
+    Theme - 
+    <a class="theme-link" href="https://github.com/ouuan/hugo-theme-even" target="_blank">Even</a>
+  </span>
+
+  <div class="busuanzi-footer">
+    <span id="busuanzi_container_site_pv"> site pv: <span id="busuanzi_value_site_pv"><img src="/img/spinner.svg" alt="spinner.svg"/></span> </span>
+      <span class="division">|</span>
+    <span id="busuanzi_container_site_uv"> site uv: <span id="busuanzi_value_site_uv"><img src="/img/spinner.svg" alt="spinner.svg"/></span> </span>
+  </div>
+
+  <span class="copyright-year">
+    &copy; 
+    2018 - 
+    2024
+    <span class="heart">
+      <a class="iconfont icon-github" title="source code" href="https://github.com/leesun1729/hugo-blog" target="_blank"></a>
+    </span> 
+    <span class="author">leesun1729</span>
+  </span>
+</div>
+
+    </footer>
+
+    <div class="back-to-top" id="back-to-top">
+      <i class="iconfont icon-up"></i>
+    </div>
+  </div>
+  <script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release/build/highlight.min.js"></script>
+  <link href="https://cdn.jsdelivr.net/npm/highlight.js/styles/tomorrow.min.css" rel="stylesheet"/>
+  <script>hljs.configure({tabReplace: '    '});</script>
+<script src="https://cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/slideout@1/dist/slideout.min.js" crossorigin="anonymous"></script>
+
+
+
+
+
+
+<script type="text/javascript" src="/js/main.min.959fe0c07c3b2fcb923fb17e40bdcbf406ad5c8b8543391a2abc1728f469d080.js"></script>
+  <script type="text/javascript">
+    window.MathJax = {
+      tex: {
+        inlineMath: [['$','$'], ['\\(','\\)']],
+        }
+    };
+  </script>
+  <script async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" crossorigin="anonymous"></script>
+
+
+<script type="application/javascript">
+var doNotTrack = false;
+if (!doNotTrack) {
+	window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
+	ga('create', 'UA-leesun1729', 'auto');
+	ga('set', 'anonymizeIp', true);
+	ga('send', 'pageview');
+}
+</script>
+<script async src='https://www.google-analytics.com/analytics.js'></script>
+
+
+<script id="baidu_push">
+  (function(){
+    if (window.location.hostname === 'localhost') return;
+    var bp = document.createElement('script'); bp.async = true;
+    var curProtocol = window.location.protocol.split(':')[0];
+    if (curProtocol === 'https') {
+      bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';
+    }
+    else {
+      bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+    }
+    var s = document.getElementsByTagName("script")[0];
+    s.parentNode.insertBefore(bp, s);
+  })();
+</script>
+
+
+
+
+</body>
+</html>
