@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <title>003 C&#43;&#43;运算符重载 - leesun1729&#39;s blog</title>
+  <meta name="renderer" content="webkit" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+<meta name="theme-color" content="#f8f5ec" />
+<meta name="msapplication-navbutton-color" content="#f8f5ec">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="#f8f5ec">
+
+
+<meta name="author" content="leesun1729" /><meta name="description" content="内部实现 priority_queue 在 C&#43;&#43; 标准模板库 (STL) 中是一个容器适配器，它提供了优先队列的功能。它允许用户从集合中高效地添加新元素、移除最大元素（或根据提供的比较函数" /><meta name="keywords" content="leesun1729, blog" />
+
+
+<meta name="baidu-site-verification" content="leesun1729" />
+<meta name="google-site-verification" content="leesun1729" />
+
+
+<meta name="generator" content="Hugo 0.80.0 with theme even" />
+
+
+<link rel="canonical" href="https://leesun1729.github.io/post/003-c&#43;&#43;%E8%BF%90%E7%AE%97%E7%AC%A6%E9%87%8D%E8%BD%BD/" />
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+<link rel="manifest" href="/manifest.json">
+<link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5">
+
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+<link href="/sass/main.min.299b56866ca7e5e86584d6353e1e1a12be9d049f05d134ced7e689b415569dc5.css" rel="stylesheet">
+
+
+
+
+
+<meta property="og:title" content="003 C&#43;&#43;运算符重载" />
+<meta property="og:description" content="内部实现 priority_queue 在 C&#43;&#43; 标准模板库 (STL) 中是一个容器适配器，它提供了优先队列的功能。它允许用户从集合中高效地添加新元素、移除最大元素（或根据提供的比较函数" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://leesun1729.github.io/post/003-c&#43;&#43;%E8%BF%90%E7%AE%97%E7%AC%A6%E9%87%8D%E8%BD%BD/" />
+<meta property="article:published_time" content="2024-01-20T21:50:09+08:00" />
+<meta property="article:modified_time" content="2024-01-20T21:51:22+08:00" />
+<meta itemprop="name" content="003 C&#43;&#43;运算符重载">
+<meta itemprop="description" content="内部实现 priority_queue 在 C&#43;&#43; 标准模板库 (STL) 中是一个容器适配器，它提供了优先队列的功能。它允许用户从集合中高效地添加新元素、移除最大元素（或根据提供的比较函数">
+<meta itemprop="datePublished" content="2024-01-20T21:50:09+08:00" />
+<meta itemprop="dateModified" content="2024-01-20T21:51:22+08:00" />
+<meta itemprop="wordCount" content="2725">
+
+
+
+<meta itemprop="keywords" content="优先队列,运算符重载," />
+<meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="003 C&#43;&#43;运算符重载"/>
+<meta name="twitter:description" content="内部实现 priority_queue 在 C&#43;&#43; 标准模板库 (STL) 中是一个容器适配器，它提供了优先队列的功能。它允许用户从集合中高效地添加新元素、移除最大元素（或根据提供的比较函数"/>
+
+<!--[if lte IE 9]>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/classlist/1.1.20170427/classList.min.js"></script>
+<![endif]-->
+
+<!--[if lt IE 9]>
+  <script src="https://cdn.jsdelivr.net/npm/html5shiv@3.7.3/dist/html5shiv.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/respond.js@1.4.2/dest/respond.min.js"></script>
+<![endif]-->
+
+</head>
+<body>
+  <div id="mobile-navbar" class="mobile-navbar">
+  <div class="mobile-header-logo">
+    <a href="/" class="logo">leesun1729&#39;s blog</a>
+  </div>
+  <div class="mobile-navbar-icon">
+    <span></span>
+    <span></span>
+    <span></span>
+  </div>
+</div>
+<nav id="mobile-menu" class="mobile-menu slideout-menu">
+  <ul class="mobile-menu-list">
+    <a href="/">
+        <li class="mobile-menu-item">主页</li>
+      </a><a href="/post/">
+        <li class="mobile-menu-item">归档</li>
+      </a><a href="/tags/">
+        <li class="mobile-menu-item">标签</li>
+      </a><a href="/categories/">
+        <li class="mobile-menu-item">分类</li>
+      </a><a href="/about/">
+        <li class="mobile-menu-item">关于</li>
+      </a><a href="/search/">
+        <li class="mobile-menu-item">搜索</li>
+      </a>
+  </ul>
+
+  
+
+
+</nav>
+
+  <div class="container" id="mobile-panel">
+    <header id="header" class="header">
+        <div class="logo-wrapper">
+  <a href="/" class="logo">leesun1729&#39;s blog</a>
+</div>
+
+
+
+
+
+<nav class="site-navbar">
+  <ul id="menu" class="menu">
+    <li class="menu-item">
+        <a class="menu-item-link" href="/">主页</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/post/">归档</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/tags/">标签</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/categories/">分类</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/about/">关于</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/search/">搜索</a>
+      </li>
+  </ul>
+</nav>
+
+    </header>
+
+    <main id="main" class="main">
+      <div class="content-wrapper">
+        <div id="content" class="content">
+          <article class="post">
+    
+    <header class="post-header">
+      <h1 class="post-title">003 C&#43;&#43;运算符重载</h1>
+
+      <div class="post-meta">
+        <span class="post-time" title="2024-01-20 21:50:09 &#43;0800 &#43;0800"> 2024-01-20 </span>
+        <div class="post-category">
+            <a href="/categories/c&#43;&#43;/"> C&#43;&#43; </a>
+            </div>
+        <span id="busuanzi_container_page_pv" class="more-meta"> <span id="busuanzi_value_page_pv"><img src="/img/spinner.svg" alt="spinner.svg"/></span> times read </span>
+      </div>
+    </header>
+
+    
+<div class="post-toc" id="post-toc">
+  <h2 class="post-toc-title">Contents</h2>
+  <div class="post-toc-content">
+    <nav id="TableOfContents">
+  <ul>
+    <li>
+      <ul>
+        <li><a href="#内部实现"><strong>内部实现</strong></a>
+          <ul>
+            <li><a href="#优先队列基本操作--用法">优先队列基本操作 / 用法</a></li>
+            <li><a href="#关于优先队列重载运算符">关于优先队列重载运算符</a></li>
+            <li><a href="#结构体内部">结构体内部</a></li>
+            <li><a href="#结构体外部">结构体外部</a></li>
+            <li><a href="#函数自定义排序规则可以出现在sort排序中">函数自定义排序规则，可以出现在<code>sort</code>排序中</a></li>
+            <li><a href="#函数自定义排序规则可以直接出现在sort排序中">函数自定义排序规则，可以直接出现在<code>sort</code>排序中</a></li>
+          </ul>
+        </li>
+      </ul>
+    </li>
+  </ul>
+</nav>
+  </div>
+</div>
+    <div class="post-content">
+      <h2 id="内部实现"><strong>内部实现</strong></h2>
+<p><code>priority_queue</code> 在 C++ 标准模板库 (STL) 中是一个容器适配器，它提供了优先队列的功能。它允许用户从集合中高效地添加新元素、移除最大元素（或根据提供的比较函数决定的“顶部”元素），以及得到顶部元素的值而不移除它。它不是一个完整的容器类，而是一个构建在某个实际容器之上的适配器，默认情况下，底层容器通常是<code>std::vector</code>。它的内部实现是基于堆数据结构的。</p>
+<p><code>priority_queue</code>关键概念和实现的概述：</p>
+<ol>
+<li><strong>底层容器</strong>:
+<code>priority_queue</code> 使用一个可随机访问的容器作为其底层数据结构，并在此容器上实现一个堆。默认容器是<code>std::vector</code>，但你可以使用任何可随机访问的容器，比如<code>std::deque</code>。你不能直接操作这个容器，因为<code>priority_queue</code>仅公开了与队列相关的接口。</li>
+<li><strong>堆操作</strong>:
+内部实现中的核心是堆操作算法，比如<code>std::make_heap</code>, <code>std::push_heap</code>, 和 <code>std::pop_heap</code>，这些算法定义在 <code>&lt;algorithm&gt;</code> 头文件中。当你添加或删除元素时，<code>priority_queue</code> 使用这些算法保持元素的正确排序。
+<ul>
+<li><code>std::make_heap</code>: 将底层容器中的元素构建成一个堆，这通常在构造<code>priority_queue</code>时调用一次。</li>
+<li><code>std::push_heap</code>: 当新元素被添加到底层容器的末尾时，这个算法调整元素来维持堆的性质。</li>
+<li><code>std::pop_heap</code>: 当顶部元素被移除时，这个算法将堆底的元素移到顶部，然后重排堆以保持堆的顺序。</li>
+</ul>
+</li>
+<li><strong>堆的性质</strong>:
+自堆是一个完全二叉树，一般用数组来表示。对一个最大堆来说，每个节点的值都大于或等于其子节点的值。对于最小堆（通过提供<code>std::greater</code>比较函数或其他方式来实现），则正好相反，每个节点的值都小于或等于其子节点的值。</li>
+<li><strong>访问顶部元素</strong>:
+由于堆的性质，堆顶的元素总是位于底层容器的<code>begin()</code>位置，<code>priority_queue</code>的<code>top()</code>方法就是返回这个位置的元素。</li>
+<li><strong>添加和删除元素</strong>:
+<ul>
+<li>添加元素：调用<code>push()</code>方法，则元素被添加到底层容器的末尾（这是由于底层容器通常是<code>std::vector</code>），然后算法<code>std::push_heap</code>被调用，以重新排列元素维持堆的顺序。</li>
+<li>删除元素：调用<code>pop()</code>方法，<code>std::pop_heap</code>先被调用，并将顶部元素与底部元素交换，然后从容器中移除末尾的元素（之前的堆顶），最后保持堆的性质。</li>
+</ul>
+</li>
+<li><strong>比较器函数</strong>:
+<code>priority_queue</code> 允许用户提供一个可选的比较函数来自定义元素的优先级。如果不提供，将使用<code>std::less</code>来建立一个最大堆。提供<code>std::greater</code>作为比较器会建立一个最小堆。</li>
+</ol>
+<p><code>priority_queue:</code>  O( 1 ) 获取最大（或最小）元素，并以 O(logn) 添加和移除元素</p>
+<h3 id="优先队列基本操作--用法">优先队列基本操作 / 用法</h3>
+<pre><code class="language-cpp">q.empty(); 队列为空返回1
+q.pop();   出队
+q.push();  入队
+q.top();   返回队列中优先级最高的元素
+q.size();  返回队列中元素的个数
+</code></pre>
+<pre><code class="language-cpp">// 默认优先队列 priority_queue 是最大堆
+priority_queue&lt;int&gt; q;
+q.push(1);   // q : 1
+q.push(2);   // q : 2 , 1
+q.push(3);   // q : 3 , 2 , 1
+cout &lt;&lt; q.top() &lt;&lt; '\n'; // 3
+q.pop();
+cout &lt;&lt; q.top() &lt;&lt; '\n'; // 2
+q.pop();
+cout &lt;&lt; q.top() &lt;&lt; '\n'; // 1
+</code></pre>
+<pre><code class="language-cpp">//定义优先级队列q，less表示按照递减(从大到小)的顺序插入元素，与默认情况相同
+priority_queue&lt;int,vector&lt;int&gt;,less&lt;int&gt;&gt; q;
+
+//定义优先级队列q，greater表示按照递增（从小到大）的顺序插入元素
+priority_queue&lt;int,vector&lt;int&gt;,greater&lt;int&gt;&gt; q;
+</code></pre>
+<h3 id="关于优先队列重载运算符">关于优先队列重载运算符</h3>
+<pre><code class="language-cpp">struct point{    
+    int x;    
+    int y;    
+    int times;    
+    friend bool operator &lt; (point a, point b)    
+    {    
+        return a.times &gt; b.times;    //重载小于号使得小的先出队列    
+    }    
+};
+
+// 默认情况下，队列中应按从大到小排序
+priority_queue&lt;point&gt; q;
+
+// 在此处定义一个优先队列priority_queue&lt;point&gt; q;
+// 如果要按照以times进行从小到大排列，操作如上。进行重载 &lt; 操作符。
+// 意思是如果a.times &gt; b.times成立，那么结构体point a &lt; point b成立。
+// 由于优先队列是按照从大到小排列，所以结构体b会排列到a之前，然而b.times是最小的，
+// 所以实现了按照times的从小到大排序
+</code></pre>
+<h3 id="结构体内部">结构体内部</h3>
+<p>方式一</p>
+<pre><code class="language-cpp">struct Point {
+	int x, y;
+  // 为两个结构体参数，结构体调用一定要写上friend
+	friend bool operator &lt; (Point a, Point b) {
+        if(a.x == b.x)
+            return a.y &lt; b.y;
+		return a.x &lt; b.x;   // 按x从小到大排
+	}
+};
+</code></pre>
+<p>方式二</p>
+<pre><code class="language-cpp">struct Point {
+    int x, y;
+		// 直接传入一个参数，不必要写friend
+    bool operator &lt; (const Point &amp;a) const {
+        if(x == a.x)
+            return y &lt; a.y;
+        return x &lt; a.x;   // 按x升序排列
+    }
+};
+</code></pre>
+<ul>
+<li>
+<p><strong>Notion</strong></p>
+<p>优先队列在内部通常使用堆（heap）数据结构，而最常见的形式是最大堆和最小堆。在C++的标准库实现中，<code>std::priority_queue</code> 默认为一个最大堆。这意味着队列的顶部（即队列的<code>top()</code>方法返回的元素）是所有元素中“最大”的元素。更具体地说，如果没有指明比较方式，优先队列使用<code>std::less</code>类型作为内部比较对象，该对象使用元素类型的<code>&lt;</code>运算符来决定元素的顺序。</p>
+<p>那么为何重载<code>&lt;</code>而不是<code>&gt;</code>？在C++中，重载<code>&lt;</code>运算符有一些传统和实际的原因：</p>
+<ol>
+<li><strong>符合排序习惯</strong>：通常，排序算法和容器使用<code>&lt;</code>运算符来确定顺序，列表或数组的“自然排序”通常是升序。</li>
+<li><strong>简洁的默认行为</strong>：重载<code>&lt;</code>运算符使得用户不需要指定额外的比较函数就能直接使用标准库的容器和算法，如<code>std::sort</code>, <code>std::set</code>, <code>std::map</code>等。</li>
+<li><strong>兼容性</strong>：对于标准库中的容器，默认情况下都是使用<code>&lt;</code>来排序的。因此，为了统一，重载<code>&lt;</code>可以使自定义类型与这些容器无缝配合。</li>
+<li><strong>最小化重载的需求</strong>：在C++中，如果你重载了<code>&lt;</code>运算符，那么你可以用<code>std::less</code>(默认)和<code>std::greater</code>这两个标准库提供的比较函数对象来创建最小堆和最大堆。而如果你只重载了<code>&gt;</code>运算符，你不能直接使用<code>std::less</code>，因为它依赖<code>&lt;</code>运算符。</li>
+</ol>
+<p>对于<code>std::priority_queue</code>来说，如果你想要改变排序行为创建一个最小堆（小的元素优先），你可以这样重载<code>&lt;</code>：</p>
+<pre><code class="language-cpp">bool operator&lt;(const node &amp;other) const {
+    return val &gt; other.val; // 对于优先队列来说，这样会让小值优先
+}
+</code></pre>
+<p>或者，你可以使用一个自定义的比较类型：</p>
+<pre><code class="language-cpp">struct CompareNode {
+    bool operator()(const node&amp; n1, const node&amp; n2) {
+        return n1.val &gt; n2.val; // 也是小值优先
+    }
+};
+  
+std::priority_queue&lt;node, std::vector&lt;node&gt;, CompareNode&gt; queue;
+</code></pre>
+<p>这种做法的一个好处是，代码的意图非常清晰 —— 你看到比较函数时就能立刻知道队列是如何排序的。而且，它使得类型的常规<code>&lt;</code>运算符保持按照字面“小于”的意义，这有助于保持代码直观和一致。</p>
+</li>
+</ul>
+<h3 id="结构体外部">结构体外部</h3>
+<pre><code class="language-cpp">//定义的比较结构体
+//注意：cmp是个结构体 
+struct cmp {//自定义排序规则 
+	bool operator()(const Point&amp; a,const Point&amp; b) {
+        if(a.x == b.x)
+            return a.y &lt; b.y;
+		return a.x &lt; b.x; //将小于号比较规则替换为结构体x比较规则
+	}//如果要升序改变不等号方向就好
+};
+
+//初始化定义
+priority_queue&lt;Point,vector&lt;Point&gt;, cmp&gt; q;
+</code></pre>
+<h3 id="函数自定义排序规则可以出现在sort排序中">函数自定义排序规则，可以出现在<code>sort</code>排序中</h3>
+<pre><code class="language-cpp">struct Point {
+    int x, y;
+}p[1005];
+
+bool cmp(Point a, Point b) {
+    if(a.x == b.x)
+        return a.y &lt; b.y;
+    return a.x &lt; b.x;
+}
+sort(p + 1, p + 1 + 1000, cmp);
+</code></pre>
+<h3 id="函数自定义排序规则可以直接出现在sort排序中">函数自定义排序规则，可以直接出现在<code>sort</code>排序中</h3>
+<pre><code class="language-cpp">struct Point {
+		int x, y;
+}p[1005];
+
+// 方式一
+sort(p + 1, p + 1 + 1000, [](const Point &amp;p1, const Point &amp;p2){
+		return p1.x &lt; p2.x;
+});
+
+// 方式二， [&amp;]：取地址符，作用是引用sort之外的其他变量，在函数比较中，
+// 如果需要用到sort之外的变量可使用[&amp;]来直接使用
+sort(p + 1, p + 1 + 1000, [&amp;](const Point &amp;p1, const Point &amp;p2){
+		return p1.x &lt; p2.x;
+});
+
+const int N = 1005;
+std::vector&lt;Point&gt; P(N);
+
+// STL容器的两种写法
+sort(P.begin(), P.end(), [](const Point &amp;p1, const Point &amp;p2){
+		return p1.x &lt; p2.x;
+});
+
+sort(begin(P), end(P), [](const Point &amp;p1, const Point &amp;p2){
+		return p1.x &lt; p2.x;
+});
+</code></pre>
+
+    </div>
+
+    <div class="post-copyright">
+  <p class="copyright-item">
+    <span class="item-title">Author</span>
+    <span class="item-content">leesun1729</span>
+  </p>
+  <p class="copyright-item">
+    <span class="item-title">LastMod</span>
+    <span class="item-content">
+        <span title="2024-01-20 21:51:22 &#43;0800 &#43;0800">2024-01-20</span>
+        <a href="https://github.com/leesun1729/hugo-blog/commit/d5b5e9785ff15e3768398f55952f885f53a98b14" title="add" target="_blank">(d5b5e97)</a>
+        ，<a href="https://github.com/leesun1729/hugo-blog/commits/master/content/post/003-C&#43;&#43;%e8%bf%90%e7%ae%97%e7%ac%a6%e9%87%8d%e8%bd%bd.md" target="_blank">更新历史</a>
+    </span>
+  </p>
+  
+  <p class="copyright-item">
+    <span class="item-title">License</span>
+    <span class="item-content"><a rel="license noopener" href="https://creativecommons.org/licenses/by-sa/4.0/deed.zh" target="_blank">CC BY-SA 4.0</a></span>
+  </p>
+</div>
+<footer class="post-footer">
+      <div class="post-tags">
+          <a href="/tags/%E4%BC%98%E5%85%88%E9%98%9F%E5%88%97/">优先队列</a>
+          <a href="/tags/%E8%BF%90%E7%AE%97%E7%AC%A6%E9%87%8D%E8%BD%BD/">运算符重载</a>
+          </div>
+      <nav class="post-nav">
+        
+        <a class="next" href="/post/002-sublimt-text4/">
+            <span class="next-text nav-default">002 Sublimt Text4</span>
+            <span class="next-text nav-mobile">Next</span>
+            <i class="iconfont icon-right"></i>
+          </a>
+      </nav>
+    </footer>
+  </article>
+        </div>
+        
+
+  
+
+  
+  <div class="comments">
+    <div class="loading post">
+      <img src="/img/spinner.svg">
+      <p class="post-content">
+        评论正在加载中...如果评论较长时间无法加载，你可以
+        <a href='https://github.com/leesun1729/leesun1729.github.io/issues?q=is%3Aissue+is%3Aopen+"003%20C%2b%2b%e8%bf%90%e7%ae%97%e7%ac%a6%e9%87%8d%e8%bd%bd - leesun1729%27s%20blog"' target="_blank">搜索对应的 issue</a>
+        或者
+        <a href="https://github.com/leesun1729/leesun1729.github.io/issues/new?title=003%20C%2b%2b%e8%bf%90%e7%ae%97%e7%ac%a6%e9%87%8d%e8%bd%bd - leesun1729%27s%20blog" target="_blank">新建一个 issue</a>
+        。
+      </p>
+    </div>
+    <script src="https://utteranc.es/client.js"
+            repo="leesun1729/leesun1729.github.io"
+            issue-term="title"
+            theme="github-light"
+            crossorigin="anonymous"
+            async>
+    </script>
+    <noscript>请启用 JavaScript 来查看评论。</a></noscript>
+  </div>
+
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="social-links">
+      <a href="mailto:leesun1729@gmail.com" class="iconfont icon-email" title="email" target="_blank"></a>
+      <a href="https://github.com/leesun1729" class="iconfont icon-github" title="github" target="_blank"></a>
+  <a href="https://leesun1729.github.io/index.xml" type="application/rss+xml" class="iconfont icon-rss" title="rss"></a>
+</div>
+
+<div class="copyright">
+  <span class="power-by">
+    Powered by <a class="hexo-link" href="https://gohugo.io" target="_blank">Hugo</a>
+  </span>
+  <span class="division">|</span>
+  <span class="theme-info">
+    Theme - 
+    <a class="theme-link" href="https://github.com/ouuan/hugo-theme-even" target="_blank">Even</a>
+  </span>
+
+  <div class="busuanzi-footer">
+    <span id="busuanzi_container_site_pv"> site pv: <span id="busuanzi_value_site_pv"><img src="/img/spinner.svg" alt="spinner.svg"/></span> </span>
+      <span class="division">|</span>
+    <span id="busuanzi_container_site_uv"> site uv: <span id="busuanzi_value_site_uv"><img src="/img/spinner.svg" alt="spinner.svg"/></span> </span>
+  </div>
+
+  <span class="copyright-year">
+    &copy; 
+    2024
+    <span class="heart">
+      <a class="iconfont icon-github" title="source code" href="https://github.com/leesun1729/hugo-blog" target="_blank"></a>
+    </span> 
+    <span class="author">leesun1729</span>
+  </span>
+</div>
+
+    </footer>
+
+    <div class="back-to-top" id="back-to-top">
+      <i class="iconfont icon-up"></i>
+    </div>
+  </div>
+  <script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release/build/highlight.min.js"></script>
+  <link href="https://cdn.jsdelivr.net/npm/highlight.js/styles/tomorrow.min.css" rel="stylesheet"/>
+  <script>hljs.configure({tabReplace: '    '});</script>
+<script src="https://cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/slideout@1/dist/slideout.min.js" crossorigin="anonymous"></script>
+
+
+
+
+
+
+<script type="text/javascript" src="/js/main.min.959fe0c07c3b2fcb923fb17e40bdcbf406ad5c8b8543391a2abc1728f469d080.js"></script>
+  <script type="text/javascript">
+    window.MathJax = {
+      tex: {
+        inlineMath: [['$','$'], ['\\(','\\)']],
+        }
+    };
+  </script>
+  <script async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" crossorigin="anonymous"></script>
+
+
+<script type="application/javascript">
+var doNotTrack = false;
+if (!doNotTrack) {
+	window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
+	ga('create', 'UA-leesun1729', 'auto');
+	ga('set', 'anonymizeIp', true);
+	ga('send', 'pageview');
+}
+</script>
+<script async src='https://www.google-analytics.com/analytics.js'></script>
+
+
+<script id="baidu_push">
+  (function(){
+    if (window.location.hostname === 'localhost') return;
+    var bp = document.createElement('script'); bp.async = true;
+    var curProtocol = window.location.protocol.split(':')[0];
+    if (curProtocol === 'https') {
+      bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';
+    }
+    else {
+      bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+    }
+    var s = document.getElementsByTagName("script")[0];
+    s.parentNode.insertBefore(bp, s);
+  })();
+</script>
+
+
+
+
+</body>
+</html>
