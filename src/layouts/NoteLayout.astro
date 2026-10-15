@@ -1,0 +1,129 @@
+---
+import BaseLayout from './BaseLayout.astro';
+import Toc from '../components/Toc.astro';
+import { formatDate, isoDate, cleanTags, type Lang } from '../lib/site';
+import type { MarkdownHeading } from 'astro';
+
+interface Props {
+  lang: Lang;
+  title: string;
+  description?: string;
+  pathname: string;
+  date: Date;
+  updated?: Date;
+  tags?: string[];
+  summary?: string;
+  headings?: MarkdownHeading[];
+  /** Reading time in minutes, computed by the caller from the raw body. */
+  minutes?: number;
+  /** Position within the notes collection, e.g. "03 / 06". */
+  index?: string;
+}
+
+const {
+  lang,
+  title,
+  description,
+  pathname,
+  date,
+  updated,
+  tags = [],
+  summary,
+  headings = [],
+  minutes,
+  index,
+} = Astro.props;
+
+const tagList = cleanTags(tags);
+const railLabel = lang === 'zh' ? '本页目录' : 'On this page';
+---
+
+<BaseLayout
+  lang={lang}
+  title={title}
+  description={description ?? summary}
+  pathname={pathname}
+  ogType="article"
+  publishedTime={date}
+>
+  <article class="sheet note">
+    <aside class="rail">
+      <ol>
+        {index && <li>{index}</li>}
+        <li><time datetime={isoDate(date)}>{formatDate(date, lang)}</time></li>
+        {updated && (
+          <li>
+            {lang === 'zh' ? '修订 ' : 'rev. '}
+            <time datetime={isoDate(updated)}>{formatDate(updated, lang)}</time>
+          </li>
+        )}
+        {minutes && <li>{lang === 'zh' ? `约 ${minutes} 分钟` : `${minutes} min read`}</li>}
+      </ol>
+
+      {
+        tagList.length > 0 && (
+          <ul class="tags rail-tags">
+            {tagList.map((t) => (
+              <li>{t}</li>
+            ))}
+          </ul>
+        )
+      }
+
+      <Toc headings={headings} label={railLabel} />
+    </aside>
+
+    <div class="prose" data-pagefind-body>
+      <header class="note-head">
+        <h1>{title}</h1>
+        {summary && <p class="lede">{summary}</p>}
+      </header>
+      <slot />
+    </div>
+  </article>
+</BaseLayout>
+
+<style>
+  .note-head {
+    margin-bottom: 2.25rem;
+    padding-bottom: 1.25rem;
+    border-bottom: 1px solid var(--rule);
+  }
+
+  .note-head h1 {
+    margin-bottom: 0.5rem;
+  }
+
+  /* The lede is a summary, not prose — no 首行缩进. */
+  .lede {
+    text-indent: 0;
+    margin: 0;
+    font-size: var(--step-1);
+    line-height: 1.7;
+    color: var(--ink-muted);
+    text-wrap: pretty;
+  }
+
+  .rail-tags {
+    margin-top: 1.5rem;
+    flex-direction: column;
+    gap: 0.3rem;
+  }
+
+  .rail :global(.toc) {
+    margin-top: 1.5rem;
+  }
+
+  @media (max-width: 60rem) {
+    .rail-tags {
+      margin-top: 0;
+      flex-direction: row;
+      gap: 0.25rem 1.25rem;
+    }
+
+    .rail :global(.toc) {
+      margin-top: 0;
+      width: 100%;
+    }
+  }
+</style>

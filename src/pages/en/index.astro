@@ -1,0 +1,196 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import PasteWindow from '../../components/PasteWindow.astro';
+import { getCollection } from 'astro:content';
+import { SITE, formatDate, isoDate, cleanTags } from '../../lib/site';
+
+const notes = (await getCollection('notes', ({ data }) => !data.draft)).sort(
+  (a, b) => b.data.date.valueOf() - a.data.date.valueOf(),
+);
+
+const projects = (await getCollection('projects')).sort((a, b) => a.data.order - b.data.order);
+const paste =
+  projects.find((p) => p.id.startsWith('paste/') && p.id.endsWith('/en')) ??
+  projects.find((p) => p.id.startsWith('paste/'));
+
+const recent = notes.slice(0, 4);
+---
+
+<BaseLayout
+  lang="en"
+  title={SITE.name.en}
+  description={SITE.description.en}
+  pathname="/en/"
+  bareTitle
+>
+  <section class="hero">
+    <h1 class="hero-title">Kept Plot</h1>
+    <p class="hero-sub">
+      A small plot of {SITE.author}'s internet, kept by hand.<br />
+      Algorithm notes, a macOS app called Paste, and occasional writing.
+    </p>
+  </section>
+
+  <section class="band" aria-labelledby="paste-heading">
+    <h2 id="paste-heading" class="band-heading">Project</h2>
+    {
+      paste ? (
+        <a class="feature" href="/en/projects/paste/">
+          <PasteWindow
+            lang="en"
+            title={paste.data.title}
+            tagline={paste.data.tagline}
+            status={paste.data.status}
+            stack={paste.data.stack}
+            links={paste.data.links}
+          />
+        </a>
+      ) : (
+        <p class="empty">The Paste project entry is not written yet.</p>
+      )
+    }
+  </section>
+
+  <section class="band" aria-labelledby="notes-heading">
+    <h2 id="notes-heading" class="band-heading">Recent notes</h2>
+    {
+      recent.length > 0 ? (
+        <ol class="note-list">
+          {recent.map((n) => {
+            const tags = cleanTags(n.data.tags);
+            return (
+              <li>
+                <a href={`/notes/${n.id}/`} hreflang="zh-CN" lang="zh-CN">
+                  <span class="n-title">{n.data.title}</span>
+                  <time class="n-date" datetime={isoDate(n.data.date)}>
+                    {formatDate(n.data.date, 'en')}
+                  </time>
+                  {n.data.summary && <span class="n-summary">{n.data.summary}</span>}
+                  {tags.length > 0 && <span class="n-tags">{tags.join(' / ')}</span>}
+                </a>
+              </li>
+            );
+          })}
+        </ol>
+      ) : (
+        <p class="empty">No notes yet.</p>
+      )
+    }
+    <p class="more">
+      <a href="/en/notes/">All notes</a> — written in Chinese, listed here for reference.
+    </p>
+  </section>
+</BaseLayout>
+
+<style>
+  .hero {
+    padding-block: 3.5rem 2.5rem;
+    border-bottom: 1px solid var(--rule);
+  }
+
+  .hero-title {
+    font-size: var(--step-3);
+    margin: 0 0 0.75rem;
+  }
+
+  .hero-sub {
+    margin: 0;
+    font-size: var(--step-1);
+    line-height: 1.8;
+    max-width: 26em;
+    color: var(--ink-muted);
+  }
+
+  .band {
+    padding-block: 2.5rem;
+    border-bottom: 1px solid var(--rule);
+  }
+
+  .band:last-of-type {
+    border-bottom: 0;
+  }
+
+  .band-heading {
+    font-size: var(--step--1);
+    font-family: var(--font-mono);
+    font-weight: 400;
+    letter-spacing: 0.06em;
+    margin: 0 0 1.25rem;
+    color: var(--ink-faint);
+  }
+
+  .feature {
+    display: block;
+    text-decoration: none;
+    max-width: 34rem;
+  }
+
+  .feature:hover {
+    color: inherit;
+  }
+
+  .note-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: 1.5rem;
+  }
+
+  .note-list a {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 0.25rem 1.5rem;
+    text-decoration: none;
+    align-items: baseline;
+  }
+
+  .n-title {
+    font-size: var(--step-1);
+    font-weight: 600;
+  }
+
+  .note-list a:hover .n-title {
+    color: var(--seal);
+  }
+
+  .n-date {
+    font-family: var(--font-mono);
+    font-size: var(--step--1);
+    color: var(--ink-faint);
+    white-space: nowrap;
+  }
+
+  .n-summary {
+    grid-column: 1 / -1;
+    color: var(--ink-muted);
+    text-wrap: pretty;
+  }
+
+  .n-tags {
+    grid-column: 1 / -1;
+    font-family: var(--font-mono);
+    font-size: var(--step--1);
+    color: var(--ink-faint);
+  }
+
+  .more {
+    margin: 1.75rem 0 0;
+    font-family: var(--font-mono);
+    font-size: var(--step--1);
+  }
+
+  .empty {
+    color: var(--ink-faint);
+  }
+
+  @media (max-width: 34rem) {
+    .note-list a {
+      grid-template-columns: 1fr;
+    }
+
+    .n-date {
+      order: -1;
+    }
+  }
+</style>

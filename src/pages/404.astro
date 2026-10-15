@@ -1,0 +1,48 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+---
+
+<BaseLayout
+  lang="zh"
+  title="页面不存在"
+  description="没有找到这个页面。"
+  pathname="/404/"
+  noindex
+>
+  <div class="sheet">
+    <aside class="rail">
+      <ol>
+        <li>404</li>
+      </ol>
+    </aside>
+
+    <div class="prose">
+      <header class="page-head">
+        <h1>这里没有东西</h1>
+      </header>
+
+      <p>
+        你要找的页面不在这里。可能是链接写错了，也可能是这个页面被我删掉了。
+      </p>
+
+      <p>
+        如果是从搜索引擎或者旧链接过来的，那些文章大多还在，只是换了地址：
+        以前的 <code>/post/</code> 目录现在叫<a href="/notes/">笔记</a>。
+      </p>
+
+      <ul>
+        <li><a href="/">回到首页</a></li>
+        <li><a href="/notes/">全部笔记</a></li>
+        <li><a href="/projects/">项目</a></li>
+      </ul>
+    </div>
+  </div>
+</BaseLayout>
+
+<style>
+  .page-head {
+    margin-bottom: 2rem;
+    padding-bottom: 1.25rem;
+    border-bottom: 1px solid var(--rule);
+  }
+</style>

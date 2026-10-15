@@ -1,0 +1,61 @@
+---
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import { SITE } from '../../../lib/site';
+---
+
+<BaseLayout
+  lang="en"
+  title="About"
+  description="leesun — M.Eng. candidate in Software Engineering at USTC, working on LLM applications, agents and RAG."
+  pathname="/en/about/"
+>
+  <div class="sheet">
+    <aside class="rail">
+      <ol>
+        <li>leesun</li>
+        <li>USTC</li>
+      </ol>
+    </aside>
+
+    <div class="prose">
+      <header class="page-head">
+        <h1>About</h1>
+      </header>
+
+      <p>
+        I'm leesun. I did my B.Eng. in Computer Science at Shantou University (STU), and I'm now
+        an M.Eng. candidate in Software Engineering at USTC, working on LLM applications, agents
+        and RAG. I write code, read papers, and keep algorithm notes here.
+      </p>
+
+      <p>
+        The site is called 自留地 — "the plot you keep for yourself." No recommendation feed, no
+        ads, no chasing whatever is trending. Only the things I want to come back to.
+      </p>
+
+      <h2>What I'm working on</h2>
+
+      <p>
+        Right now, LLM applications: wiring retrieval, tool use and multi-step reasoning into
+        systems that actually run rather than staying at the demo stage. I also maintain
+        <a href="/en/projects/paste/">Paste</a>, a native macOS clipboard manager — my answer to
+        the question of how light a small utility should be.
+      </p>
+
+      <h2>Contact</h2>
+
+      <ul>
+        <li>Email: <a href={`mailto:${SITE.email}`}>{SITE.email}</a></li>
+        <li>GitHub: <a href={SITE.github} rel="me noreferrer">github.com/leesun1729</a></li>
+      </ul>
+    </div>
+  </div>
+</BaseLayout>
+
+<style>
+  .page-head {
+    margin-bottom: 2rem;
+    padding-bottom: 1.25rem;
+    border-bottom: 1px solid var(--rule);
+  }
+</style>

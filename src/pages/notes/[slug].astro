@@ -1,0 +1,43 @@
+---
+import NoteLayout from '../../layouts/NoteLayout.astro';
+import { getCollection, render } from 'astro:content';
+
+export async function getStaticPaths() {
+  const notes = await getCollection('notes', ({ data }) => !data.draft);
+  const ordered = notes.sort((a, b) => a.data.date.valueOf() - b.data.date.valueOf());
+
+  return notes.map((entry) => {
+    const position = ordered.findIndex((n) => n.id === entry.id) + 1;
+    return {
+      params: { slug: entry.id },
+      props: {
+        entry,
+        index: `${String(position).padStart(2, '0')} / ${String(notes.length).padStart(2, '0')}`,
+      },
+    };
+  });
+}
+
+const { entry, index } = Astro.props;
+const { Content, headings } = await render(entry);
+
+/* ~350 CJK glyphs/min is a reasonable pace for technical Chinese prose. */
+const plain = entry.body ?? '';
+const minutes = Math.max(1, Math.round(plain.replace(/\s+/g, '').length / 350));
+---
+
+<NoteLayout
+  lang="zh"
+  title={entry.data.title}
+  description={entry.data.summary}
+  pathname={`/notes/${entry.id}/`}
+  date={entry.data.date}
+  updated={entry.data.updated}
+  tags={entry.data.tags}
+  summary={entry.data.summary}
+  headings={headings}
+  minutes={minutes}
+  index={index}
+>
+  <Content />
+</NoteLayout>

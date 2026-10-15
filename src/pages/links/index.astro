@@ -1,0 +1,49 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { SITE } from '../../lib/site';
+---
+
+<BaseLayout
+  lang="zh"
+  title="友链"
+  description="自留地的友情链接。"
+  pathname="/links/"
+>
+  <div class="sheet">
+    <aside class="rail">
+      <ol>
+        <li>0 个链接</li>
+      </ol>
+    </aside>
+
+    <div class="prose">
+      <header class="page-head">
+        <h1>友链</h1>
+      </header>
+
+      <p>
+        这里本来想放一些常读的博客和朋友的主页，但一直没来得及整理。与其放一排已经打不开的链接，
+        不如先空着。
+      </p>
+
+      <h2>想交换友链</h2>
+
+      <p>
+        如果你的站点也是自己写东西的地方——不限于技术，写什么都可以——欢迎发邮件告诉我，
+        附上站点地址和一句话简介。我会认真读一遍再决定加不加。
+      </p>
+
+      <ul>
+        <li>邮箱：<a href={`mailto:${SITE.email}?subject=友链`}>{SITE.email}</a></li>
+      </ul>
+    </div>
+  </div>
+</BaseLayout>
+
+<style>
+  .page-head {
+    margin-bottom: 2rem;
+    padding-bottom: 1.25rem;
+    border-bottom: 1px solid var(--rule);
+  }
+</style>

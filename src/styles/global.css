@@ -1,0 +1,418 @@
+/* ==========================================================================
+   自留地 — design system
+   Tokens, CJK typesetting rules, and prose styling.
+   ========================================================================== */
+
+:root {
+  /* --- palette (6) ------------------------------------------------------ */
+  --paper: #f5f4f0; /* page: warm white, deliberately not cream */
+  --ink: #16181a; /* graphite that reads as black; never tinted near-black */
+  --grid: #e2e0d7; /* 8px notebook ruling */
+  --rule: #c9c6ba; /* hairlines, borders, disabled */
+  --seal: #b3352b; /* 印章 vermilion — signal only, never decoration */
+  --frame: #1b1d1f; /* macOS window bezel, used by Paste alone */
+
+  /* Secondary text. These are real colors, not `opacity` on --ink: opacity
+     composites toward the paper and quietly drops below AA (0.55 opacity is
+     3.9:1). Named tokens keep every muted string measurable and compliant. */
+  --ink-muted: #555756; /* 6.6:1 on --paper */
+  --ink-faint: #6f7070; /* 4.5:1 on --paper — the floor for small meta text */
+
+  /* --- type ------------------------------------------------------------- */
+  /* Zero webfont bytes: the CJK stack is whatever the OS already ships.
+     The old site shipped a 23MB SourceHanSerifSC; this is the correction. */
+  --font-cjk: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Hiragino Sans GB',
+    'Microsoft YaHei', 'Noto Sans CJK SC', 'Source Han Sans SC', 'WenQuanYi Micro Hei',
+    system-ui, sans-serif;
+  --font-mono: ui-monospace, 'SF Mono', SFMono-Regular, Menlo, Consolas,
+    'Liberation Mono', monospace;
+
+  /* --- layout ----------------------------------------------------------- */
+  --measure: 40em; /* ≈38 CJK glyphs per line */
+  --rail: 9rem; /* marginalia column */
+  --gap: 2rem;
+
+  --step--1: 0.8125rem;
+  --step-0: 1.0625rem;
+  --step-1: 1.3125rem;
+  --step-2: 1.75rem;
+  --step-3: 2.5rem;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  /* 0.25em between Han and Latin/numerals. Chromium 120+ implements this
+     natively; elsewhere the .han-latin spans emitted by src/lib/han.ts carry
+     the same spacing, so mixed-script rhythm is identical everywhere. */
+  text-autospace: normal;
+  -webkit-text-size-adjust: 100%;
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  background-color: var(--paper);
+  /* The 8px ruling is the page's only texture. It is a grid, not a wash:
+     it never gradients, and it disappears behind every surface that should
+     read as opaque (code, the Paste window, form controls). */
+  background-image: linear-gradient(var(--grid) 1px, transparent 1px),
+    linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+  background-size: 8px 8px;
+  background-position: -1px -1px;
+  color: var(--ink);
+  font-family: var(--font-cjk);
+  font-size: var(--step-0);
+  line-height: 1.85;
+  /* Chinese line breaking: never start a line with a closing bracket,
+     never end one with an opening bracket. */
+  line-break: strict;
+  overflow-wrap: break-word;
+  text-spacing-trim: space-first;
+  font-kerning: normal;
+}
+
+/* --- links ---------------------------------------------------------------- */
+
+a {
+  color: inherit;
+  text-decoration-color: var(--rule);
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.2em;
+}
+
+a:hover {
+  text-decoration-color: var(--seal);
+  color: var(--seal);
+}
+
+:focus-visible {
+  outline: 2px solid var(--seal);
+  outline-offset: 3px;
+  border-radius: 1px;
+}
+
+::selection {
+  background: var(--seal);
+  color: var(--paper);
+}
+
+/* --- the Latin-in-CJK spacer (see src/lib/han.ts) ------------------------- */
+
+.han-latin {
+  margin-inline: 0.125em;
+}
+
+/* --- layout shell --------------------------------------------------------- */
+
+.wrap {
+  max-width: calc(var(--rail) + var(--measure) + var(--gap) + 3rem);
+  margin-inline: auto;
+  padding-inline: 1.5rem;
+}
+
+/* Asymmetric two-column: marginalia rail + prose measure, left-anchored so
+   the slack collects on the right where it reads as a margin, not as a void. */
+.sheet {
+  display: grid;
+  grid-template-columns: var(--rail) minmax(0, var(--measure));
+  gap: var(--gap);
+  align-items: start;
+  padding-block: 3rem 5rem;
+}
+
+.sheet > .rail {
+  position: sticky;
+  top: 5rem;
+}
+
+.rail {
+  font-family: var(--font-mono);
+  font-size: var(--step--1);
+  line-height: 1.6;
+  color: var(--ink-faint);
+}
+
+.rail ol,
+.rail ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.rail li + li {
+  margin-top: 0.35rem;
+}
+
+/* --- headings ------------------------------------------------------------- */
+
+h1,
+h2,
+h3,
+h4 {
+  font-weight: 600;
+  line-height: 1.35;
+  letter-spacing: 0.01em;
+  text-wrap: balance;
+}
+
+h1 {
+  font-size: var(--step-3);
+  margin: 0 0 0.6em;
+  letter-spacing: -0.01em;
+}
+
+h2 {
+  font-size: var(--step-2);
+  margin: 2.2em 0 0.7em;
+}
+
+h3 {
+  font-size: var(--step-1);
+  margin: 1.8em 0 0.6em;
+}
+
+h4 {
+  font-size: var(--step-0);
+  margin: 1.6em 0 0.5em;
+}
+
+/* --- rules & meta --------------------------------------------------------- */
+
+.rule {
+  border: 0;
+  border-top: 1px solid var(--rule);
+  margin: 2.5rem 0;
+}
+
+.meta {
+  font-family: var(--font-mono);
+  font-size: var(--step--1);
+  line-height: 1.7;
+  color: var(--ink-faint);
+}
+
+.tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem 0.9rem;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  font-family: var(--font-mono);
+  font-size: var(--step--1);
+}
+
+.tags a {
+  text-decoration: none;
+  border-bottom: 1px solid var(--rule);
+}
+
+.tags a:hover {
+  border-bottom-color: var(--seal);
+}
+
+/* ==========================================================================
+   Prose — the Chinese reading conventions live here
+   ========================================================================== */
+
+.prose {
+  min-width: 0;
+}
+
+/* 首行缩进 2em, the Chinese book convention. Applied ONLY to running prose:
+   lists, code, blockquotes, captions, tables and figures are excluded by
+   scoping to direct <p> children. */
+.prose > p {
+  text-indent: 2em;
+  margin: 0 0 0.85em;
+}
+
+/* A paragraph that is nothing but an image is a figure, not prose. */
+.prose > p:has(> img:only-child) {
+  text-indent: 0;
+  text-align: center;
+}
+
+.prose ul,
+.prose ol {
+  margin: 0 0 1.2em;
+  padding-left: 1.6em;
+}
+
+.prose li {
+  margin-bottom: 0.35em;
+}
+
+.prose li::marker {
+  color: var(--seal);
+}
+
+.prose blockquote {
+  margin: 1.5em 0;
+  padding: 0.1em 0 0.1em 1.2em;
+  border-left: 2px solid var(--seal);
+  color: var(--ink-muted);
+}
+
+.prose blockquote > p {
+  text-indent: 0;
+}
+
+.prose img {
+  max-width: 100%;
+  height: auto;
+  display: block;
+  margin: 1.6em auto;
+}
+
+.prose figcaption,
+.prose .caption {
+  text-indent: 0;
+  font-family: var(--font-mono);
+  font-size: var(--step--1);
+  color: var(--ink-faint);
+  text-align: center;
+}
+
+/* --- code ----------------------------------------------------------------- */
+
+.prose code,
+.prose kbd {
+  font-family: var(--font-mono);
+  font-size: 0.92em;
+}
+
+.prose :not(pre) > code {
+  background: #fff;
+  border: 1px solid var(--rule);
+  padding: 0.05em 0.35em;
+}
+
+.prose pre {
+  /* Code is the one surface that reads as a screen: opaque white, no ruling. */
+  background: #fff;
+  border: 1px solid var(--rule);
+  padding: 1rem 1.15rem;
+  margin: 1.6em 0;
+  overflow-x: auto;
+  font-size: var(--step--1);
+  line-height: 1.7;
+  tab-size: 4;
+}
+
+.prose pre code {
+  background: none;
+  border: 0;
+  padding: 0;
+  font-size: inherit;
+}
+
+/* --- details / summary (22 of these in the migrated notes) ---------------- */
+
+.prose details {
+  margin: 1.4em 0;
+  border: 1px solid var(--rule);
+  background: #fff;
+  padding: 0.7rem 1rem;
+}
+
+.prose summary {
+  cursor: pointer;
+  font-weight: 600;
+  margin: -0.7rem -1rem;
+  padding: 0.7rem 1rem;
+}
+
+.prose summary:hover {
+  color: var(--seal);
+}
+
+.prose details[open] > summary {
+  border-bottom: 1px solid var(--rule);
+  margin-bottom: 0.8rem;
+}
+
+.prose details > *:last-child {
+  margin-bottom: 0;
+}
+
+/* --- tables --------------------------------------------------------------- */
+
+.prose table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 1.6em 0;
+  font-size: var(--step--1);
+}
+
+.prose th,
+.prose td {
+  border-bottom: 1px solid var(--rule);
+  padding: 0.5em 0.7em;
+  text-align: left;
+}
+
+.prose th {
+  border-bottom-color: var(--ink);
+  font-weight: 600;
+}
+
+/* ==========================================================================
+   Mobile: the rail unrolls into a meta line above the text
+   ========================================================================== */
+
+@media (max-width: 60rem) {
+  .sheet {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 1.5rem;
+    padding-block: 1.75rem 4rem;
+  }
+
+  .sheet > .rail {
+    position: static;
+  }
+
+  .rail {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.25rem 1.25rem;
+    border-bottom: 1px solid var(--rule);
+    padding-bottom: 0.75rem;
+  }
+
+  .rail ol,
+  .rail ul {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.25rem 1.25rem;
+  }
+
+  .rail li + li {
+    margin-top: 0;
+  }
+
+  :root {
+    --step-3: 1.9rem;
+    --step-2: 1.45rem;
+    --step-1: 1.2rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

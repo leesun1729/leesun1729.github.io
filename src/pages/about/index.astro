@@ -1,0 +1,58 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { SITE } from '../../lib/site';
+---
+
+<BaseLayout
+  lang="zh"
+  title="关于"
+  description="leesun：中国科学技术大学软件工程硕士在读，方向是 LLM 应用、智能体与 RAG。"
+  pathname="/about/"
+>
+  <div class="sheet">
+    <aside class="rail">
+      <ol>
+        <li>leesun</li>
+        <li>USTC</li>
+      </ol>
+    </aside>
+
+    <div class="prose">
+      <header class="page-head">
+        <h1>关于</h1>
+      </header>
+
+      <p>
+        我是 leesun。本科在汕头大学（STU）读计算机，现在在中国科学技术大学（USTC）读软件工程硕士，方向是
+        LLM 应用、智能体与 RAG。日常写代码、读论文，也写一点算法笔记放在这里。
+      </p>
+
+      <p>
+        这个站点叫「自留地」，取的是农民留给自己种的那一小块地的意思。上面不放推荐算法，不放广告，也不追热点，
+        只放自己愿意回头看的东西。
+      </p>
+
+      <h2>在做什么</h2>
+
+      <p>
+        目前在学 LLM 应用方向：把检索、工具调用和多步推理串成能真正跑起来的系统，而不是只停留在 demo 阶段。
+        同时维护 <a href="/projects/paste/">Paste</a>，一个原生 macOS 剪切板管理器——它是我对「小工具应该多轻」这个问题的一次回答。
+      </p>
+
+      <h2>联系</h2>
+
+      <ul>
+        <li>邮箱：<a href={`mailto:${SITE.email}`}>{SITE.email}</a></li>
+        <li>GitHub：<a href={SITE.github} rel="me noreferrer">github.com/leesun1729</a></li>
+      </ul>
+    </div>
+  </div>
+</BaseLayout>
+
+<style>
+  .page-head {
+    margin-bottom: 2rem;
+    padding-bottom: 1.25rem;
+    border-bottom: 1px solid var(--rule);
+  }
+</style>

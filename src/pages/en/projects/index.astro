@@ -1,0 +1,106 @@
+---
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import PasteWindow from '../../../components/PasteWindow.astro';
+import { getCollection } from 'astro:content';
+import { formatDate, isoDate } from '../../../lib/site';
+
+const all = await getCollection('projects');
+const projects = all
+  .filter((p) => p.id.endsWith('/en'))
+  .sort((a, b) => a.data.order - b.data.order || b.data.date.valueOf() - a.data.date.valueOf());
+---
+
+<BaseLayout
+  lang="en"
+  title="Projects"
+  description="Software by leesun. Currently one: Paste, a native macOS clipboard manager."
+  pathname="/en/projects/"
+>
+  <div class="sheet">
+    <aside class="rail">
+      <ol>
+        <li>{projects.length} project{projects.length === 1 ? '' : 's'}</li>
+      </ol>
+    </aside>
+
+    <div>
+      <header class="page-head">
+        <h1>Projects</h1>
+        <p class="lede">Things I build and still maintain. There are few of them, so each one gets finished.</p>
+      </header>
+
+      {
+        projects.length > 0 ? (
+          <ul class="project-list">
+            {projects.map((p) => (
+              <li>
+                <a class="project-card" href={`/en/projects/${p.id.split('/')[0]}/`}>
+                  <PasteWindow
+                    lang="en"
+                    title={p.data.title}
+                    tagline={p.data.tagline}
+                    status={p.data.status}
+                    stack={p.data.stack}
+                    links={p.data.links}
+                  />
+                  <p class="project-meta">
+                    <time datetime={isoDate(p.data.date)}>{formatDate(p.data.date, 'en')}</time>
+                    {p.data.status && <span>{p.data.status}</span>}
+                  </p>
+                </a>
+              </li>
+            ))}
+          </ul>
+        ) : (
+          <p class="empty">No projects yet.</p>
+        )
+      }
+    </div>
+  </div>
+</BaseLayout>
+
+<style>
+  .page-head {
+    margin-bottom: 2.5rem;
+    padding-bottom: 1.25rem;
+    border-bottom: 1px solid var(--rule);
+  }
+
+  .page-head h1 {
+    margin-bottom: 0.5rem;
+  }
+
+  .lede {
+    margin: 0;
+    font-size: var(--step-1);
+    line-height: 1.7;
+    color: var(--ink-muted);
+    max-width: 30em;
+  }
+
+  .project-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: 3rem;
+  }
+
+  .project-card {
+    display: block;
+    text-decoration: none;
+  }
+
+  .project-meta {
+    margin: 0.85rem 0 0;
+    display: flex;
+    gap: 1.25rem;
+    font-family: var(--font-mono);
+    font-size: var(--step--1);
+    color: var(--ink-faint);
+  }
+
+  .empty {
+    color: var(--ink-faint);
+  }
+</style>

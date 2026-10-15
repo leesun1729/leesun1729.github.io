@@ -1,0 +1,168 @@
+---
+import { SITE, NAV, localeTag, counterpart, type Lang } from '../lib/site';
+
+interface Props {
+  lang: Lang;
+  pathname: string;
+}
+
+const { lang, pathname } = Astro.props;
+const alt = counterpart(pathname);
+const home = lang === 'zh' ? '/' : '/en/';
+const items = NAV[lang];
+
+const isActive = (href: string) =>
+  href === home ? pathname === home : pathname.startsWith(href);
+
+const altLabel = alt.lang === 'en' ? 'English' : '中文';
+const altShort = alt.lang === 'en' ? 'EN' : '中';
+---
+
+<header class="site-head">
+  <div class="wrap head-inner">
+    <a class="brand" href={home}>
+      <span class="brand-mark" aria-hidden="true"></span>
+      <span class="brand-name">{SITE.name[lang]}</span>
+    </a>
+
+    <nav class="site-nav" aria-label={lang === 'zh' ? '主导航' : 'Main'}>
+      <ul>
+        {
+          items.map((item) => (
+            <li>
+              <a href={item.href} aria-current={isActive(item.href) ? 'page' : undefined}>
+                {item.label}
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </nav>
+
+    <a
+      class="lang-switch"
+      href={alt.href}
+      hreflang={localeTag[alt.lang]}
+      lang={localeTag[alt.lang]}
+      title={alt.exact ? altLabel : `${altLabel} (${SITE.name[alt.lang]})`}
+    >
+      <span aria-hidden="true">{altShort}</span>
+      <span class="sr-only">{altLabel}</span>
+    </a>
+  </div>
+</header>
+
+<style>
+  .site-head {
+    border-bottom: 1px solid var(--rule);
+    background: color-mix(in srgb, var(--paper) 88%, transparent);
+    backdrop-filter: blur(8px);
+    position: sticky;
+    top: 0;
+    z-index: 20;
+  }
+
+  .head-inner {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    min-height: 3.5rem;
+  }
+
+  .brand {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.55rem;
+    font-weight: 600;
+    font-size: var(--step-1);
+    letter-spacing: 0.02em;
+    text-decoration: none;
+    margin-right: auto;
+  }
+
+  /* The seal: a filled square is the site's one recurring glyph, and it is the
+     only place the accent appears at rest. */
+  .brand-mark {
+    width: 0.6rem;
+    height: 0.6rem;
+    background: var(--seal);
+    display: block;
+    flex: none;
+  }
+
+  .brand:hover .brand-name {
+    color: var(--seal);
+  }
+
+  .site-nav ul {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.25rem 1.25rem;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    font-size: var(--step--1);
+  }
+
+  .site-nav a {
+    text-decoration: none;
+    padding-block: 0.35rem;
+    border-bottom: 2px solid transparent;
+  }
+
+  .site-nav a:hover {
+    border-bottom-color: var(--rule);
+    color: var(--ink);
+  }
+
+  .site-nav a[aria-current='page'] {
+    border-bottom-color: var(--seal);
+  }
+
+  .lang-switch {
+    font-family: var(--font-mono);
+    font-size: var(--step--1);
+    text-decoration: none;
+    border: 1px solid var(--rule);
+    padding: 0.15rem 0.5rem;
+    line-height: 1.5;
+    flex: none;
+  }
+
+  .lang-switch:hover {
+    border-color: var(--seal);
+    color: var(--seal);
+  }
+
+  .sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+
+  @media (max-width: 40rem) {
+    .head-inner {
+      flex-wrap: wrap;
+      padding-block: 0.6rem;
+      row-gap: 0.25rem;
+    }
+
+    .brand {
+      font-size: var(--step-0);
+    }
+
+    .site-nav {
+      order: 3;
+      width: 100%;
+    }
+
+    .site-nav ul {
+      gap: 0.15rem 1rem;
+    }
+  }
+</style>

@@ -1,0 +1,11 @@
+# Hugo leftovers
+*/_gen/
+trash/
+
+# Dependencies and Astro build output
+node_modules/
+dist/
+.astro/
+
+# npm cache lives inside the repo because ~/.npm is not writable in this env
+.npm-cache/

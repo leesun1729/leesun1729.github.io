@@ -1,0 +1,108 @@
+---
+import '../styles/global.css';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import { SITE, localeTag, counterpart, type Lang } from '../lib/site';
+
+interface Props {
+  lang: Lang;
+  title: string;
+  description?: string;
+  /** Path of this page, used for canonical + hreflang + nav state. */
+  pathname: string;
+  /** Omit the site name suffix (used by the home page, which leads with it). */
+  bareTitle?: boolean;
+  /** og:type — 'article' for note and project detail pages. */
+  ogType?: 'website' | 'article';
+  publishedTime?: Date;
+  noindex?: boolean;
+}
+
+const {
+  lang,
+  title,
+  description = SITE.description[lang],
+  pathname,
+  bareTitle = false,
+  ogType = 'website',
+  publishedTime,
+  noindex = false,
+} = Astro.props;
+
+const fullTitle = bareTitle ? title : `${title} · ${SITE.name[lang]}`;
+const canonical = new URL(pathname, SITE.url).href;
+const alt = counterpart(pathname);
+const altUrl = new URL(alt.href, SITE.url).href;
+---
+
+<!doctype html>
+<html lang={localeTag[lang]}>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{fullTitle}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonical} />
+
+    {
+      noindex ? (
+        <meta name="robots" content="noindex" />
+      ) : (
+        <>
+          <link rel="alternate" hreflang={localeTag[lang]} href={canonical} />
+          <link rel="alternate" hreflang={localeTag[alt.lang]} href={altUrl} />
+          <link rel="alternate" hreflang="x-default" href={new URL('/', SITE.url).href} />
+        </>
+      )
+    }
+
+    <meta property="og:type" content={ogType} />
+    <meta property="og:site_name" content={SITE.name[lang]} />
+    <meta property="og:title" content={fullTitle} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:locale" content={localeTag[lang].replace('-', '_')} />
+    <meta name="twitter:card" content="summary" />
+    {publishedTime && <meta property="article:published_time" content={publishedTime.toISOString()} />}
+
+    <meta name="theme-color" content="#f5f4f0" />
+    <meta name="color-scheme" content="light" />
+    <link
+      rel="icon"
+      href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Crect width='16' height='16' fill='%23f5f4f0'/%3E%3Crect x='4' y='4' width='8' height='8' fill='%23b3352b'/%3E%3C/svg%3E"
+    />
+
+    <script>
+      import '../scripts/han.ts';
+    </script>
+  </head>
+
+  <body>
+    <a class="skip" href="#main">{lang === 'zh' ? '跳到正文' : 'Skip to content'}</a>
+    <Header lang={lang} pathname={pathname} />
+    <main id="main" class="wrap">
+      <slot />
+    </main>
+    <Footer lang={lang} />
+  </body>
+</html>
+
+<style>
+  .skip {
+    position: absolute;
+    left: -9999px;
+    top: 0;
+    z-index: 50;
+    background: var(--ink);
+    color: var(--paper);
+    padding: 0.6rem 1rem;
+    font-family: var(--font-mono);
+    font-size: var(--step--1);
+    text-decoration: none;
+  }
+
+  .skip:focus {
+    left: 0.5rem;
+    top: 0.5rem;
+  }
+</style>

@@ -1,0 +1,186 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { loadRanking, labelFor, share } from '../../lib/ranking';
+import { formatDate } from '../../lib/site';
+
+const { entries, generatedAt, source, site } = loadRanking();
+const max = entries.reduce((m, e) => Math.max(m, e.count), 0);
+const hasData = entries.length > 0;
+---
+
+<BaseLayout
+  lang="zh"
+  title="榜单"
+  description="站内页面浏览量排行，数据来自 GoatCounter。"
+  pathname="/ranking/"
+>
+  <div class="sheet">
+    <aside class="rail">
+      <ol>
+        <li>{hasData ? `${entries.length} 个页面` : '暂无数据'}</li>
+        {generatedAt && (
+          <li>
+            <time datetime={generatedAt.slice(0, 10)}>{formatDate(new Date(generatedAt), 'zh')}</time>
+          </li>
+        )}
+        {source && <li>{source}</li>}
+      </ol>
+    </aside>
+
+    <div>
+      <header class="page-head">
+        <h1>榜单</h1>
+        <p class="lede">按页面浏览量排序。数字来自 GoatCounter，不追踪个人身份。</p>
+      </header>
+
+      {
+        hasData ? (
+          <ol class="rank-list">
+            {entries.map((e, i) => (
+              <li class="rank-row">
+                <span class="rank-num">{String(i + 1).padStart(2, '0')}</span>
+                <span class="rank-body">
+                  <a class="rank-link" href={e.path}>
+                    {labelFor(e)}
+                  </a>
+                  <span class="rank-bar" aria-hidden="true">
+                    <span style={`width:${(share(e.count, max) * 100).toFixed(1)}%`} />
+                  </span>
+                </span>
+                <span class="rank-count">{e.count.toLocaleString('zh-CN')}</span>
+              </li>
+            ))}
+          </ol>
+        ) : (
+          /* The shipped state: the pipeline has never produced a successful run,
+             so the page explains itself instead of showing an empty table. */
+          <div class="empty-state">
+            <p class="empty-title">还没有可用的数据。</p>
+            <p>
+              榜单由 <code>scripts/fetch-ranking.mjs</code> 从 GoatCounter 拉取，结果写入
+              <code>src/data/ranking.json</code>。目前这个文件里
+              <code>entries</code> 为空数组，说明还没有一次成功的抓取——通常是
+              <code>GOATCOUNTER_SITE</code> 或 <code>GOATCOUNTER_TOKEN</code> 还没配置。
+            </p>
+            <p>
+              在此之前，可以先去<a href="/notes/">笔记</a>和<a href="/projects/">项目</a>看看。
+            </p>
+            {site && (
+              <p class="empty-meta">
+                数据源：<a href={site} rel="noreferrer">{site}</a>
+              </p>
+            )}
+          </div>
+        )
+      }
+    </div>
+  </div>
+</BaseLayout>
+
+<style>
+  .page-head {
+    margin-bottom: 2.5rem;
+    padding-bottom: 1.25rem;
+    border-bottom: 1px solid var(--rule);
+  }
+
+  .page-head h1 {
+    margin-bottom: 0.5rem;
+  }
+
+  .lede {
+    margin: 0;
+    font-size: var(--step-1);
+    line-height: 1.7;
+    color: var(--ink-muted);
+    max-width: 30em;
+  }
+
+  .rank-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: 0.15rem;
+  }
+
+  .rank-row {
+    display: grid;
+    grid-template-columns: 2.25rem 1fr auto;
+    gap: 0.75rem;
+    align-items: baseline;
+    padding-block: 0.5rem;
+    border-bottom: 1px solid var(--rule);
+  }
+
+  .rank-num {
+    font-family: var(--font-mono);
+    font-size: var(--step--1);
+    color: var(--seal);
+  }
+
+  .rank-body {
+    min-width: 0;
+  }
+
+  .rank-link {
+    text-decoration: none;
+  }
+
+  .rank-link:hover {
+    color: var(--seal);
+  }
+
+  /* Bar length is real data, not decoration: it is the count, scaled to the top row. */
+  .rank-bar {
+    display: block;
+    height: 2px;
+    background: var(--grid);
+    margin-top: 0.4rem;
+  }
+
+  .rank-bar > span {
+    display: block;
+    height: 100%;
+    background: var(--seal);
+  }
+
+  .rank-count {
+    font-family: var(--font-mono);
+    font-size: var(--step--1);
+    color: var(--ink-faint);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .empty-state {
+    border: 1px solid var(--rule);
+    background: #fff;
+    padding: 1.25rem 1.4rem;
+    max-width: 34em;
+  }
+
+  .empty-title {
+    margin-top: 0;
+    font-weight: 600;
+  }
+
+  .empty-state p:last-child {
+    margin-bottom: 0;
+  }
+
+  .empty-meta {
+    font-family: var(--font-mono);
+    font-size: var(--step--1);
+    color: var(--ink-faint);
+  }
+
+  @media (max-width: 34rem) {
+    .rank-row {
+      grid-template-columns: 2.25rem 1fr;
+    }
+
+    .rank-count {
+      grid-column: 2;
+    }
+  }
+</style>

@@ -1,0 +1,76 @@
+---
+import { SITE, type Lang } from '../lib/site';
+
+interface Props {
+  lang: Lang;
+}
+
+const { lang } = Astro.props;
+const year = new Date().getFullYear();
+const years = year > SITE.startYear ? `${SITE.startYear}–${year}` : `${SITE.startYear}`;
+---
+
+<footer class="site-foot">
+  <div class="wrap foot-inner">
+    <p class="foot-line">
+      <span class="seal-dot" aria-hidden="true"></span>
+      {SITE.name[lang]} · {SITE.author} · {years}
+    </p>
+    <p class="foot-line">
+      <a href={`mailto:${SITE.email}`}>{SITE.email}</a>
+      <a href={SITE.github} rel="me noreferrer">GitHub</a>
+      <a href={lang === 'zh' ? '/en/' : '/'}>{lang === 'zh' ? 'English' : '中文'}</a>
+    </p>
+    <p class="foot-note">
+      {lang === 'zh'
+        ? '正文使用系统中文黑体渲染，不加载任何网络字体。'
+        : 'Body text is set in the system CJK face. No webfont is loaded.'}
+    </p>
+  </div>
+</footer>
+
+<style>
+  .site-foot {
+    border-top: 1px solid var(--rule);
+    margin-top: 2rem;
+    padding-block: 2rem 3rem;
+  }
+
+  .foot-inner {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+  }
+
+  .foot-line {
+    margin: 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.35rem 1.25rem;
+    font-family: var(--font-mono);
+    font-size: var(--step--1);
+    align-items: center;
+  }
+
+  .seal-dot {
+    width: 0.5rem;
+    height: 0.5rem;
+    background: var(--seal);
+    display: inline-block;
+  }
+
+  .foot-note {
+    margin: 0.6rem 0 0;
+    font-size: var(--step--1);
+    color: var(--ink-faint);
+    max-width: 34em;
+  }
+
+  @media (max-width: 40rem) {
+    .foot-line {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 0.2rem;
+    }
+  }
+</style>

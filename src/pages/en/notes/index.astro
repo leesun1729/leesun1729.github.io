@@ -1,0 +1,162 @@
+---
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import { getCollection } from 'astro:content';
+import { formatDate, isoDate, cleanTags } from '../../../lib/site';
+
+const notes = (await getCollection('notes', ({ data }) => !data.draft)).sort(
+  (a, b) => b.data.date.valueOf() - a.data.date.valueOf(),
+);
+
+const tagSet = new Set<string>();
+for (const n of notes) for (const t of cleanTags(n.data.tags)) tagSet.add(t);
+const tags = [...tagSet].sort((a, b) => a.localeCompare(b, 'zh'));
+---
+
+<BaseLayout
+  lang="en"
+  title="Notes"
+  description="Algorithm and C++ notes, written in Chinese."
+  pathname="/en/notes/"
+>
+  <div class="sheet">
+    <aside class="rail">
+      <ol>
+        <li>{notes.length} notes</li>
+        <li>{tags.length} tags</li>
+      </ol>
+      {
+        tags.length > 0 && (
+          <ul class="rail-tags">
+            {tags.map((t) => (
+              <li>{t}</li>
+            ))}
+          </ul>
+        )
+      }
+    </aside>
+
+    <div>
+      <header class="page-head">
+        <h1>Notes</h1>
+        <p class="lede">
+          Algorithm and C++ notes from 2024. They are written in Chinese — the detail pages
+          exist in Chinese only, so every title below links to the original.
+        </p>
+      </header>
+
+      {
+        notes.length > 0 ? (
+          <ol class="note-list">
+            {notes.map((n, i) => {
+              const t = cleanTags(n.data.tags);
+              return (
+                <li class="note-item">
+                  <a href={`/notes/${n.id}/`} hreflang="zh-CN" lang="zh-CN">
+                    <span class="n-index">{String(i + 1).padStart(2, '0')}</span>
+                    <span class="n-title">{n.data.title}</span>
+                    <time class="n-date" datetime={isoDate(n.data.date)}>
+                      {formatDate(n.data.date, 'en')}
+                    </time>
+                    {n.data.summary && <span class="n-summary">{n.data.summary}</span>}
+                    {t.length > 0 && <span class="n-tags">{t.join(' / ')}</span>}
+                  </a>
+                </li>
+              );
+            })}
+          </ol>
+        ) : (
+          <p class="empty">No notes yet.</p>
+        )
+      }
+    </div>
+  </div>
+</BaseLayout>
+
+<style>
+  .page-head {
+    margin-bottom: 2.5rem;
+    padding-bottom: 1.25rem;
+    border-bottom: 1px solid var(--rule);
+  }
+
+  .page-head h1 {
+    margin-bottom: 0.5rem;
+  }
+
+  .lede {
+    margin: 0;
+    font-size: var(--step-1);
+    line-height: 1.7;
+    color: var(--ink-muted);
+    max-width: 30em;
+  }
+
+  .note-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: 2rem;
+  }
+
+  .note-item a {
+    display: grid;
+    grid-template-columns: 2.25rem 1fr auto;
+    gap: 0.3rem 0.75rem;
+    align-items: baseline;
+    text-decoration: none;
+  }
+
+  .n-index {
+    font-family: var(--font-mono);
+    font-size: var(--step--1);
+    color: var(--seal);
+  }
+
+  .n-title {
+    font-size: var(--step-1);
+    font-weight: 600;
+  }
+
+  .note-item a:hover .n-title {
+    color: var(--seal);
+  }
+
+  .n-date {
+    font-family: var(--font-mono);
+    font-size: var(--step--1);
+    color: var(--ink-faint);
+    white-space: nowrap;
+  }
+
+  .n-summary,
+  .n-tags {
+    grid-column: 2 / -1;
+  }
+
+  .n-summary {
+    color: var(--ink-muted);
+    text-wrap: pretty;
+  }
+
+  .n-tags {
+    font-family: var(--font-mono);
+    font-size: var(--step--1);
+    color: var(--ink-faint);
+  }
+
+  .empty {
+    color: var(--ink-faint);
+  }
+
+  @media (max-width: 40rem) {
+    .note-item a {
+      grid-template-columns: 2.25rem 1fr;
+    }
+
+    .n-date {
+      grid-column: 2 / -1;
+      order: -1;
+    }
+  }
+</style>

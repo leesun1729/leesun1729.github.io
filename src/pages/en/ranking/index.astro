@@ -1,0 +1,184 @@
+---
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import { loadRanking, labelFor, share } from '../../../lib/ranking';
+import { formatDate } from '../../../lib/site';
+
+const { entries, generatedAt, source, site } = loadRanking();
+const max = entries.reduce((m, e) => Math.max(m, e.count), 0);
+const hasData = entries.length > 0;
+---
+
+<BaseLayout
+  lang="en"
+  title="Ranking"
+  description="Most-viewed pages on this site, counted by GoatCounter."
+  pathname="/en/ranking/"
+>
+  <div class="sheet">
+    <aside class="rail">
+      <ol>
+        <li>{hasData ? `${entries.length} pages` : 'no data yet'}</li>
+        {generatedAt && (
+          <li>
+            <time datetime={generatedAt.slice(0, 10)}>{formatDate(new Date(generatedAt), 'en')}</time>
+          </li>
+        )}
+        {source && <li>{source}</li>}
+      </ol>
+    </aside>
+
+    <div>
+      <header class="page-head">
+        <h1>Ranking</h1>
+        <p class="lede">Pages ordered by view count, counted by GoatCounter. No personal tracking.</p>
+      </header>
+
+      {
+        hasData ? (
+          <ol class="rank-list">
+            {entries.map((e, i) => (
+              <li class="rank-row">
+                <span class="rank-num">{String(i + 1).padStart(2, '0')}</span>
+                <span class="rank-body">
+                  <a class="rank-link" href={e.path} hreflang={e.path.startsWith('/notes/') ? 'zh-CN' : undefined}>
+                    {labelFor(e)}
+                  </a>
+                  <span class="rank-bar" aria-hidden="true">
+                    <span style={`width:${(share(e.count, max) * 100).toFixed(1)}%`} />
+                  </span>
+                </span>
+                <span class="rank-count">{e.count.toLocaleString('en-US')}</span>
+              </li>
+            ))}
+          </ol>
+        ) : (
+          <div class="empty-state">
+            <p class="empty-title">No data yet.</p>
+            <p>
+              This page is filled by <code>scripts/fetch-ranking.mjs</code>, which pulls counts from
+              GoatCounter into <code>src/data/ranking.json</code>. That file currently ships with an
+              empty <code>entries</code> array, meaning no fetch has succeeded yet — usually because
+              <code>GOATCOUNTER_SITE</code> or <code>GOATCOUNTER_TOKEN</code> is not configured.
+            </p>
+            <p>
+              In the meantime, the <a href="/en/notes/">notes</a> and
+              <a href="/en/projects/">projects</a> are the place to start.
+            </p>
+            {site && (
+              <p class="empty-meta">
+                Source: <a href={site} rel="noreferrer">{site}</a>
+              </p>
+            )}
+          </div>
+        )
+      }
+    </div>
+  </div>
+</BaseLayout>
+
+<style>
+  .page-head {
+    margin-bottom: 2.5rem;
+    padding-bottom: 1.25rem;
+    border-bottom: 1px solid var(--rule);
+  }
+
+  .page-head h1 {
+    margin-bottom: 0.5rem;
+  }
+
+  .lede {
+    margin: 0;
+    font-size: var(--step-1);
+    line-height: 1.7;
+    color: var(--ink-muted);
+    max-width: 30em;
+  }
+
+  .rank-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: 0.15rem;
+  }
+
+  .rank-row {
+    display: grid;
+    grid-template-columns: 2.25rem 1fr auto;
+    gap: 0.75rem;
+    align-items: baseline;
+    padding-block: 0.5rem;
+    border-bottom: 1px solid var(--rule);
+  }
+
+  .rank-num {
+    font-family: var(--font-mono);
+    font-size: var(--step--1);
+    color: var(--seal);
+  }
+
+  .rank-body {
+    min-width: 0;
+  }
+
+  .rank-link {
+    text-decoration: none;
+  }
+
+  .rank-link:hover {
+    color: var(--seal);
+  }
+
+  .rank-bar {
+    display: block;
+    height: 2px;
+    background: var(--grid);
+    margin-top: 0.4rem;
+  }
+
+  .rank-bar > span {
+    display: block;
+    height: 100%;
+    background: var(--seal);
+  }
+
+  .rank-count {
+    font-family: var(--font-mono);
+    font-size: var(--step--1);
+    color: var(--ink-faint);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .empty-state {
+    border: 1px solid var(--rule);
+    background: #fff;
+    padding: 1.25rem 1.4rem;
+    max-width: 34em;
+  }
+
+  .empty-title {
+    margin-top: 0;
+    font-weight: 600;
+  }
+
+  .empty-state p:last-child {
+    margin-bottom: 0;
+  }
+
+  .empty-meta {
+    font-family: var(--font-mono);
+    font-size: var(--step--1);
+    color: var(--ink-faint);
+  }
+
+  @media (max-width: 34rem) {
+    .rank-row {
+      grid-template-columns: 2.25rem 1fr;
+    }
+
+    .rank-count {
+      grid-column: 2;
+    }
+  }
+</style>

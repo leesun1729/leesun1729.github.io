@@ -1,0 +1,46 @@
+name: Update Ranking
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '17 3 1 * *'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: update-ranking
+  cancel-in-progress: false
+
+jobs:
+  update-ranking:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: master
+          fetch-depth: 0
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22.19'
+
+      - name: Fetch ranking data
+        env:
+          GOATCOUNTER_SITE: ${{ secrets.GOATCOUNTER_SITE }}
+          GOATCOUNTER_TOKEN: ${{ secrets.GOATCOUNTER_TOKEN }}
+        run: node scripts/fetch-ranking.mjs
+
+      - name: Commit and push if changed
+        run: |
+          if git diff --quiet -- src/data/ranking.json; then
+            echo "src/data/ranking.json unchanged, nothing to commit"
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add src/data/ranking.json
+          git commit -m "chore: update click ranking"
+          git push origin HEAD:master

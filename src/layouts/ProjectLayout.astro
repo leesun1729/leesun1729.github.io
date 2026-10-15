@@ -1,0 +1,145 @@
+---
+import BaseLayout from './BaseLayout.astro';
+import { formatDate, isoDate, type Lang } from '../lib/site';
+
+interface ProjectLinks {
+  repo?: string;
+  release?: string;
+  demo?: string;
+}
+
+interface Props {
+  lang: Lang;
+  title: string;
+  tagline: string;
+  description?: string;
+  pathname: string;
+  date: Date;
+  stack?: string[];
+  status?: string;
+  links?: ProjectLinks;
+}
+
+const {
+  lang,
+  title,
+  tagline,
+  description,
+  pathname,
+  date,
+  stack = [],
+  status,
+  links = {},
+} = Astro.props;
+
+const linkLabels: Record<keyof ProjectLinks, Record<Lang, string>> = {
+  repo: { zh: '源码仓库', en: 'Source' },
+  release: { zh: '下载', en: 'Download' },
+  demo: { zh: '在线演示', en: 'Demo' },
+};
+
+const entries = (Object.keys(linkLabels) as (keyof ProjectLinks)[])
+  .filter((k) => links[k])
+  .map((k) => ({ key: k, href: links[k] as string, label: linkLabels[k][lang] }));
+---
+
+<BaseLayout
+  lang={lang}
+  title={title}
+  description={description ?? tagline}
+  pathname={pathname}
+  ogType="article"
+  publishedTime={date}
+>
+  <article class="sheet project">
+    <aside class="rail">
+      <ol>
+        <li><time datetime={isoDate(date)}>{formatDate(date, lang)}</time></li>
+        {status && <li>{status}</li>}
+      </ol>
+
+      {
+        stack.length > 0 && (
+          <ul class="rail-tags">
+            {stack.map((s) => (
+              <li>{s}</li>
+            ))}
+          </ul>
+        )
+      }
+
+      {
+        entries.length > 0 && (
+          <ul class="rail-links">
+            {entries.map((e) => (
+              <li>
+                <a href={e.href} rel="noreferrer">
+                  {e.label}
+                </a>
+              </li>
+            ))}
+          </ul>
+        )
+      }
+    </aside>
+
+    <div class="prose">
+      <header class="project-head">
+        <h1>{title}</h1>
+        <p class="tagline">{tagline}</p>
+      </header>
+      <slot />
+    </div>
+  </article>
+</BaseLayout>
+
+<style>
+  .project-head {
+    margin-bottom: 2rem;
+    padding-bottom: 1.25rem;
+    border-bottom: 1px solid var(--rule);
+  }
+
+  .project-head h1 {
+    margin-bottom: 0.35rem;
+  }
+
+  .tagline {
+    text-indent: 0;
+    margin: 0;
+    font-size: var(--step-1);
+    line-height: 1.7;
+    color: var(--ink-muted);
+    text-wrap: pretty;
+  }
+
+  .rail-tags,
+  .rail-links {
+    margin-top: 1.5rem;
+    flex-direction: column;
+    gap: 0.3rem;
+  }
+
+  .rail-links {
+    list-style: none;
+    padding: 0;
+  }
+
+  .rail-links a {
+    text-decoration: none;
+    border-bottom: 1px solid var(--rule);
+  }
+
+  .rail-links a:hover {
+    border-bottom-color: var(--seal);
+  }
+
+  @media (max-width: 60rem) {
+    .rail-tags,
+    .rail-links {
+      margin-top: 0;
+      flex-direction: row;
+      gap: 0.25rem 1.25rem;
+    }
+  }
+</style>

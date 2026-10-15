@@ -1,0 +1,186 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { getCollection } from 'astro:content';
+import { formatDate, isoDate, cleanTags } from '../../lib/site';
+
+const notes = (await getCollection('notes', ({ data }) => !data.draft)).sort(
+  (a, b) => b.data.date.valueOf() - a.data.date.valueOf(),
+);
+
+/* Every tag on the site, with the notes filed under it — built from real data
+   so an empty or whitespace-only tag never becomes a filter. */
+const tagMap = new Map<string, typeof notes>();
+for (const n of notes) {
+  for (const t of cleanTags(n.data.tags)) {
+    if (!tagMap.has(t)) tagMap.set(t, []);
+    tagMap.get(t)!.push(n);
+  }
+}
+const tags = [...tagMap.entries()].sort((a, b) => b[1].length - a[1].length || a[0].localeCompare(b[0], 'zh'));
+
+const total = notes.length;
+---
+
+<BaseLayout
+  lang="zh"
+  title="笔记"
+  description="算法与 C++ 学习笔记：珂朵莉树、SCC、字典树、运算符重载等。"
+  pathname="/notes/"
+>
+  <div class="sheet">
+    <aside class="rail">
+      <ol>
+        <li>{total} 篇</li>
+        <li>{tags.length} 个标签</li>
+      </ol>
+      {
+        tags.length > 0 && (
+          <ul class="rail-tags">
+            {tags.map(([t, list]) => (
+              <li>
+                {t} <span class="count">{list.length}</span>
+              </li>
+            ))}
+          </ul>
+        )
+      }
+    </aside>
+
+    <div>
+      <header class="page-head">
+        <h1>笔记</h1>
+        <p class="lede">
+          算法竞赛与 C++ 的学习笔记，最初写于 2024 年。按时间倒序排列。
+        </p>
+      </header>
+
+      {
+        notes.length > 0 ? (
+          <ol class="note-list">
+            {notes.map((n, i) => {
+              const t = cleanTags(n.data.tags);
+              return (
+                <li class="note-item">
+                  <a href={`/notes/${n.id}/`}>
+                    <span class="n-index">{String(i + 1).padStart(2, '0')}</span>
+                    <span class="n-title">{n.data.title}</span>
+                    <time class="n-date" datetime={isoDate(n.data.date)}>
+                      {formatDate(n.data.date, 'zh')}
+                    </time>
+                    {n.data.summary && <span class="n-summary">{n.data.summary}</span>}
+                    {t.length > 0 && (
+                      <span class="n-tags">
+                        {t.map((tag) => (
+                          <span class="n-tag">{tag}</span>
+                        ))}
+                      </span>
+                    )}
+                  </a>
+                </li>
+              );
+            })}
+          </ol>
+        ) : (
+          <p class="empty">还没有笔记。</p>
+        )
+      }
+    </div>
+  </div>
+</BaseLayout>
+
+<style>
+  .page-head {
+    margin-bottom: 2.5rem;
+    padding-bottom: 1.25rem;
+    border-bottom: 1px solid var(--rule);
+  }
+
+  .page-head h1 {
+    margin-bottom: 0.5rem;
+  }
+
+  .lede {
+    margin: 0;
+    font-size: var(--step-1);
+    line-height: 1.7;
+    color: var(--ink-muted);
+    max-width: 30em;
+  }
+
+  .note-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: 2rem;
+  }
+
+  .note-item a {
+    display: grid;
+    grid-template-columns: 2.25rem 1fr auto;
+    gap: 0.3rem 0.75rem;
+    align-items: baseline;
+    text-decoration: none;
+  }
+
+  /* The index is a genuine sequence marker: the list is chronological. */
+  .n-index {
+    font-family: var(--font-mono);
+    font-size: var(--step--1);
+    color: var(--seal);
+  }
+
+  .n-title {
+    font-size: var(--step-1);
+    font-weight: 600;
+  }
+
+  .note-item a:hover .n-title {
+    color: var(--seal);
+  }
+
+  .n-date {
+    font-family: var(--font-mono);
+    font-size: var(--step--1);
+    color: var(--ink-faint);
+    white-space: nowrap;
+  }
+
+  .n-summary,
+  .n-tags {
+    grid-column: 2 / -1;
+  }
+
+  .n-summary {
+    color: var(--ink-muted);
+    text-wrap: pretty;
+  }
+
+  .n-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem 0.75rem;
+    font-family: var(--font-mono);
+    font-size: var(--step--1);
+    color: var(--ink-faint);
+  }
+
+  .count {
+    color: var(--ink-faint);
+  }
+
+  .empty {
+    color: var(--ink-faint);
+  }
+
+  @media (max-width: 40rem) {
+    .note-item a {
+      grid-template-columns: 2.25rem 1fr;
+    }
+
+    .n-date {
+      grid-column: 2 / -1;
+      order: -1;
+    }
+  }
+</style>

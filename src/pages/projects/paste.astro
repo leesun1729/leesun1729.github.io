@@ -1,0 +1,33 @@
+---
+import ProjectLayout from '../../layouts/ProjectLayout.astro';
+import PasteWindow from '../../components/PasteWindow.astro';
+import { getEntry, render } from 'astro:content';
+
+const entry = await getEntry('projects', 'paste/zh');
+if (!entry) {
+  throw new Error('Missing content entry: src/content/projects/paste/zh.md');
+}
+
+const { Content } = await render(entry);
+---
+
+<ProjectLayout
+  lang="zh"
+  title={entry.data.title}
+  tagline={entry.data.tagline}
+  description={entry.data.tagline}
+  pathname="/projects/paste/"
+  date={entry.data.date}
+  stack={entry.data.stack}
+  status={entry.data.status}
+  links={entry.data.links}
+>
+  <PasteWindow
+    lang="zh"
+    title={entry.data.title}
+    tagline={entry.data.tagline}
+    status={entry.data.status}
+    compact
+  />
+  <Content />
+</ProjectLayout>
