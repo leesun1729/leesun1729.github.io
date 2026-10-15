@@ -14,85 +14,99 @@ const hasData = entries.length > 0;
   description="Most-viewed pages on this site, counted by GoatCounter."
   pathname="/en/ranking/"
 >
-  <div class="sheet">
-    <aside class="rail">
-      <ol>
-        <li>{hasData ? `${entries.length} pages` : 'no data yet'}</li>
+  <div class="container">
+    <header class="page-head">
+      <h1>Ranking</h1>
+      <p class="lede">Pages ordered by view count, counted by GoatCounter. No personal tracking.</p>
+      <p class="page-meta">
+        {hasData ? `${entries.length} pages` : 'no data yet'}
+        {source && <span class="sep"> · </span>}
+        {source && <span>{source}</span>}
+        {generatedAt && <span class="sep"> · </span>}
         {generatedAt && (
-          <li>
-            <time datetime={generatedAt.slice(0, 10)}>{formatDate(new Date(generatedAt), 'en')}</time>
-          </li>
+          <time datetime={generatedAt.slice(0, 10)}>{formatDate(new Date(generatedAt), 'en')}</time>
         )}
-        {source && <li>{source}</li>}
-      </ol>
-    </aside>
+      </p>
+    </header>
 
-    <div>
-      <header class="page-head">
-        <h1>Ranking</h1>
-        <p class="lede">Pages ordered by view count, counted by GoatCounter. No personal tracking.</p>
-      </header>
-
-      {
-        hasData ? (
-          <ol class="rank-list">
-            {entries.map((e, i) => (
-              <li class="rank-row">
-                <span class="rank-num">{String(i + 1).padStart(2, '0')}</span>
-                <span class="rank-body">
-                  <a class="rank-link" href={e.path} hreflang={e.path.startsWith('/notes/') ? 'zh-CN' : undefined}>
-                    {labelFor(e)}
-                  </a>
-                  <span class="rank-bar" aria-hidden="true">
-                    <span style={`width:${(share(e.count, max) * 100).toFixed(1)}%`} />
-                  </span>
+    {
+      hasData ? (
+        <ol class="rank-list">
+          {entries.map((e, i) => (
+            <li class="rank-row">
+              <span class="rank-num">{String(i + 1).padStart(2, '0')}</span>
+              <span class="rank-body">
+                <a
+                  class="rank-link"
+                  href={e.path}
+                  hreflang={e.path.startsWith('/notes/') ? 'zh-CN' : undefined}
+                >
+                  {labelFor(e)}
+                </a>
+                <span class="rank-bar" aria-hidden="true">
+                  <span style={`width:${(share(e.count, max) * 100).toFixed(1)}%`} />
                 </span>
-                <span class="rank-count">{e.count.toLocaleString('en-US')}</span>
-              </li>
-            ))}
-          </ol>
-        ) : (
-          <div class="empty-state">
-            <p class="empty-title">No data yet.</p>
-            <p>
-              This page is filled by <code>scripts/fetch-ranking.mjs</code>, which pulls counts from
-              GoatCounter into <code>src/data/ranking.json</code>. That file currently ships with an
-              empty <code>entries</code> array, meaning no fetch has succeeded yet — usually because
-              <code>GOATCOUNTER_SITE</code> or <code>GOATCOUNTER_TOKEN</code> is not configured.
+              </span>
+              <span class="rank-count">{e.count.toLocaleString('en-US')}</span>
+            </li>
+          ))}
+        </ol>
+      ) : (
+        <div class="empty-state prose">
+          <p class="empty-title">No data yet.</p>
+          <p>
+            This page is filled by <code>scripts/fetch-ranking.mjs</code>, which pulls counts from
+            GoatCounter into <code>src/data/ranking.json</code>. That file currently ships with an
+            empty <code>entries</code> array, meaning no fetch has succeeded yet — usually because
+            <code>GOATCOUNTER_SITE</code> or <code>GOATCOUNTER_TOKEN</code> is not configured.
+          </p>
+          <p>
+            In the meantime, the <a href="/en/notes/">notes</a> and
+            <a href="/en/projects/">projects</a> are the place to start.
+          </p>
+          {site && (
+            <p class="empty-meta">
+              Source: <a href={site} rel="noreferrer">{site}</a>
             </p>
-            <p>
-              In the meantime, the <a href="/en/notes/">notes</a> and
-              <a href="/en/projects/">projects</a> are the place to start.
-            </p>
-            {site && (
-              <p class="empty-meta">
-                Source: <a href={site} rel="noreferrer">{site}</a>
-              </p>
-            )}
-          </div>
-        )
-      }
-    </div>
+          )}
+        </div>
+      )
+    }
   </div>
 </BaseLayout>
 
 <style>
+  /* global.css ships .wrap (896px, centered) and BaseLayout applies it to
+     <main>. The promised .container utility was not implemented there, so
+     pages that need it define it locally rather than editing global.css. */
+
   .page-head {
-    margin-bottom: 2.5rem;
-    padding-bottom: 1.25rem;
-    border-bottom: 1px solid var(--rule);
+    padding-block: 28px;
   }
 
   .page-head h1 {
-    margin-bottom: 0.5rem;
+    margin: 0 0 12px;
+    font-size: 36px;
+    font-weight: 700;
+    line-height: 1.15;
+    letter-spacing: -0.025em;
   }
 
   .lede {
+    margin: 0 0 12px;
+    max-width: 34em;
+    font-size: 17px;
+    line-height: 1.6;
+    color: var(--muted, #525252);
+    text-wrap: pretty;
+  }
+
+  .page-meta {
     margin: 0;
-    font-size: var(--step-1);
-    line-height: 1.7;
-    color: var(--ink-muted);
-    max-width: 30em;
+    font-size: 12px;
+    font-weight: 500;
+    line-height: 1.5;
+    color: var(--meta, #262626);
   }
 
   .rank-list {
@@ -100,7 +114,7 @@ const hasData = entries.length > 0;
     margin: 0;
     padding: 0;
     display: grid;
-    gap: 0.15rem;
+    gap: 0;
   }
 
   .rank-row {
@@ -108,14 +122,15 @@ const hasData = entries.length > 0;
     grid-template-columns: 2.25rem 1fr auto;
     gap: 0.75rem;
     align-items: baseline;
-    padding-block: 0.5rem;
-    border-bottom: 1px solid var(--rule);
+    padding-block: 14px;
+    border-bottom: 1px dashed var(--line, #d4d4d4);
   }
 
   .rank-num {
-    font-family: var(--font-mono);
-    font-size: var(--step--1);
-    color: var(--seal);
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--muted, #525252);
+    font-variant-numeric: tabular-nums;
   }
 
   .rank-body {
@@ -126,40 +141,41 @@ const hasData = entries.length > 0;
     text-decoration: none;
   }
 
-  .rank-link:hover {
-    color: var(--seal);
-  }
-
   .rank-bar {
     display: block;
     height: 2px;
-    background: var(--grid);
-    margin-top: 0.4rem;
+    background: var(--line, #d4d4d4);
+    margin-top: 8px;
   }
 
   .rank-bar > span {
     display: block;
     height: 100%;
-    background: var(--seal);
+    background: var(--fg, #000);
   }
 
   .rank-count {
-    font-family: var(--font-mono);
-    font-size: var(--step--1);
-    color: var(--ink-faint);
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--meta, #262626);
     font-variant-numeric: tabular-nums;
   }
 
   .empty-state {
-    border: 1px solid var(--rule);
-    background: #fff;
-    padding: 1.25rem 1.4rem;
-    max-width: 34em;
+    max-width: 40em;
+    padding: 20px 24px;
+    border: 1px dashed var(--line, #d4d4d4);
+    border-radius: 1rem;
   }
 
   .empty-title {
     margin-top: 0;
-    font-weight: 600;
+    font-weight: 700;
+    text-indent: 0;
+  }
+
+  .empty-state p {
+    text-indent: 0;
   }
 
   .empty-state p:last-child {
@@ -167,9 +183,15 @@ const hasData = entries.length > 0;
   }
 
   .empty-meta {
-    font-family: var(--font-mono);
-    font-size: var(--step--1);
-    color: var(--ink-faint);
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--muted, #525252);
+  }
+
+  @media (min-width: 768px) {
+    .page-head h1 {
+      font-size: 48px;
+    }
   }
 
   @media (max-width: 34rem) {

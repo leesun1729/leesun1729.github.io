@@ -97,7 +97,7 @@ const entries = (Object.keys(linkLabels) as (keyof ProjectLinks)[])
   .project-head {
     margin-bottom: 2rem;
     padding-bottom: 1.25rem;
-    border-bottom: 1px solid var(--rule);
+    border-bottom: 1px solid var(--line);
   }
 
   .project-head h1 {
@@ -109,7 +109,7 @@ const entries = (Object.keys(linkLabels) as (keyof ProjectLinks)[])
     margin: 0;
     font-size: var(--step-1);
     line-height: 1.7;
-    color: var(--ink-muted);
+    color: var(--muted);
     text-wrap: pretty;
   }
 
@@ -127,11 +127,11 @@ const entries = (Object.keys(linkLabels) as (keyof ProjectLinks)[])
 
   .rail-links a {
     text-decoration: none;
-    border-bottom: 1px solid var(--rule);
+    border-bottom: 1px solid var(--line);
   }
 
   .rail-links a:hover {
-    border-bottom-color: var(--seal);
+    border-bottom-color: var(--fg);
   }
 
   @media (max-width: 60rem) {

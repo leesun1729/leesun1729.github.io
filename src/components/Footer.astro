@@ -12,10 +12,7 @@ const years = year > SITE.startYear ? `${SITE.startYear}–${year}` : `${SITE.st
 
 <footer class="site-foot">
   <div class="wrap foot-inner">
-    <p class="foot-line">
-      <span class="seal-dot" aria-hidden="true"></span>
-      {SITE.name[lang]} · {SITE.author} · {years}
-    </p>
+    <p class="foot-line foot-id">{SITE.name[lang]} · {SITE.author} · {years}</p>
     <p class="foot-line">
       <a href={`mailto:${SITE.email}`}>{SITE.email}</a>
       <a href={SITE.github} rel="me noreferrer">GitHub</a>
@@ -31,7 +28,7 @@ const years = year > SITE.startYear ? `${SITE.startYear}–${year}` : `${SITE.st
 
 <style>
   .site-foot {
-    border-top: 1px solid var(--rule);
+    border-top: 1px solid var(--line);
     margin-top: 2rem;
     padding-block: 2rem 3rem;
   }
@@ -46,23 +43,35 @@ const years = year > SITE.startYear ? `${SITE.startYear}–${year}` : `${SITE.st
     margin: 0;
     display: flex;
     flex-wrap: wrap;
-    gap: 0.35rem 1.25rem;
-    font-family: var(--font-mono);
-    font-size: var(--step--1);
     align-items: center;
+    gap: 0.35rem 1.25rem;
+    font-size: 12px;
+    font-weight: 500;
+    line-height: 1.5;
+    color: var(--meta);
   }
 
-  .seal-dot {
-    width: 0.5rem;
-    height: 0.5rem;
-    background: var(--seal);
-    display: inline-block;
+  .foot-id {
+    color: var(--fg);
+    font-weight: 700;
+  }
+
+  .foot-line a {
+    color: var(--meta);
+    text-decoration: underline;
+    text-decoration-style: dashed;
+    text-underline-offset: 4px;
+  }
+
+  .foot-line a:hover {
+    color: var(--fg);
   }
 
   .foot-note {
     margin: 0.6rem 0 0;
-    font-size: var(--step--1);
-    color: var(--ink-faint);
+    font-size: 12px;
+    line-height: 1.5;
+    color: var(--muted);
     max-width: 34em;
   }
 

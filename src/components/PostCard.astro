@@ -1,0 +1,205 @@
+---
+import ArrowIcon from './ArrowIcon.astro';
+
+export interface Props {
+  /** Card title. Required. */
+  title: string;
+  /** Destination of the card. Required. */
+  href: string;
+  /** Optional summary, clamped to 3 lines. Omit and the block is not rendered. */
+  summary?: string;
+  /** Optional, already formatted for display (e.g. "2024 年 05 月 01 日"). */
+  date?: string;
+  category?: string;
+  categoryHref?: string;
+  tags?: { label: string; href: string }[];
+}
+
+const { title, href, summary, date, category, categoryHref, tags = [] } = Astro.props;
+
+/* The meta line is "date · category · #tags". Built as a list so the separator
+   is emitted only *between* two rendered parts: a card with a date alone has
+   no dangling dot, and a card with no meta at all renders no paragraph. */
+const meta: { value: string; href?: string }[] = [];
+if (date) meta.push({ value: date });
+if (category) meta.push({ value: category, href: categoryHref });
+const hasMeta = meta.length > 0 || tags.length > 0;
+---
+
+<article class="card" data-post-link={href} tabindex="0">
+  <span class="card-sheet card-sheet--fill" aria-hidden="true"></span>
+  <span class="card-sheet card-sheet--frame" aria-hidden="true"></span>
+
+  <div class="card-body">
+    <h3 class="card-title">
+      <a class="card-link" href={href}>
+        <span class="card-title-text">{title}</span>
+        <ArrowIcon />
+      </a>
+    </h3>
+
+    {summary && <p class="card-summary">{summary}</p>}
+
+    {
+      hasMeta && (
+        <p class="card-meta">
+          {meta.map((part, i) => (
+            <>
+              {i > 0 && <span class="card-sep" aria-hidden="true"> · </span>}
+              {part.href ? <a href={part.href}>{part.value}</a> : <span>{part.value}</span>}
+            </>
+          ))}
+          {meta.length > 0 && tags.length > 0 && (
+            <span class="card-sep" aria-hidden="true"> · </span>
+          )}
+          {tags.map((tag, i) => (
+            <>
+              {i > 0 && <span class="card-sep" aria-hidden="true"> </span>}
+              <a class="card-tag" href={tag.href}>#{tag.label}</a>
+            </>
+          ))}
+        </p>
+      )
+    }
+  </div>
+</article>
+
+<style>
+  /* Spec §4 — two sheets plus a content layer. Default: the sheets coincide.
+     Hover/focus: they slide apart by 1px in opposite directions. */
+  .card {
+    position: relative;
+    border: 1px dashed transparent; /* placeholder: keeps layout stable */
+    border-radius: 1rem;
+    padding: 20px 24px;
+    cursor: pointer;
+  }
+
+  @media (min-width: 768px) {
+    .card {
+      padding: 28px;
+    }
+  }
+
+  .card-sheet {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    border: 1px dashed var(--line);
+    border-radius: 1rem;
+    transition: transform 0.3s ease-out;
+  }
+
+  .card-sheet--fill {
+    z-index: 20;
+    background: var(--bg);
+  }
+
+  .card-sheet--frame {
+    z-index: 10;
+  }
+
+  .card-body {
+    position: relative;
+    z-index: 30;
+    transition: transform 0.3s ease-out;
+  }
+
+  .card:hover .card-sheet--fill,
+  .card:focus-visible .card-sheet--fill,
+  .card:has(.card-link:focus-visible) .card-sheet--fill,
+  .card:hover .card-body,
+  .card:focus-visible .card-body,
+  .card:has(.card-link:focus-visible) .card-body {
+    transform: translate(-1px, -1px);
+  }
+
+  .card:hover .card-sheet--frame,
+  .card:focus-visible .card-sheet--frame,
+  .card:has(.card-link:focus-visible) .card-sheet--frame {
+    transform: translate(1px, 1px);
+  }
+
+  /* The card itself carries tabindex="0" for parity with the reference; its
+     ring must be visible, and the inner anchor keeps its own. */
+  .card:focus-visible {
+    outline: 2px solid var(--fg);
+    outline-offset: 3px;
+  }
+
+  .card-title {
+    margin: 0;
+    font-size: 18px;
+    font-weight: 700;
+    line-height: 1.25;
+    letter-spacing: -0.025em;
+  }
+
+  @media (min-width: 768px) {
+    .card-title {
+      font-size: 20px;
+    }
+  }
+
+  .card-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    color: var(--fg);
+    text-decoration: none;
+  }
+
+  .card:hover .card-link,
+  .card:focus-visible .card-link,
+  .card:has(.card-link:focus-visible) .card-link {
+    text-decoration: underline;
+    text-decoration-style: dashed;
+    text-underline-offset: 4px;
+  }
+
+  .card-link:focus-visible {
+    outline: 2px solid var(--fg);
+    outline-offset: 3px;
+    border-radius: 2px;
+  }
+
+  .card-summary {
+    margin: 0.6rem 0 0;
+    font-size: 14px;
+    font-weight: 400;
+    line-height: 1.6;
+    color: var(--muted);
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 3;
+    line-clamp: 3;
+    overflow: hidden;
+  }
+
+  .card-meta {
+    margin: 0.75rem 0 0;
+    font-size: 12px;
+    font-weight: 500;
+    line-height: 1.5;
+    color: var(--meta);
+  }
+
+  .card-meta a {
+    color: var(--meta);
+    text-decoration: underline;
+    text-decoration-style: dashed;
+    text-underline-offset: 4px;
+  }
+
+  .card-meta a:hover {
+    color: var(--fg);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .card-sheet,
+    .card-body {
+      transition: none;
+    }
+  }
+</style>

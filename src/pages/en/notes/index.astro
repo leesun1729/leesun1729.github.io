@@ -1,15 +1,22 @@
 ---
 import BaseLayout from '../../../layouts/BaseLayout.astro';
+import PostCard from '../../../components/PostCard.astro';
 import { getCollection } from 'astro:content';
-import { formatDate, isoDate, cleanTags } from '../../../lib/site';
+import { formatDate, cleanTags } from '../../../lib/site';
+
+const asDate = (d: Date | string) => (d instanceof Date ? d : new Date(d));
 
 const notes = (await getCollection('notes', ({ data }) => !data.draft)).sort(
-  (a, b) => b.data.date.valueOf() - a.data.date.valueOf(),
+  (a, b) => asDate(b.data.date).valueOf() - asDate(a.data.date).valueOf(),
 );
 
 const tagSet = new Set<string>();
 for (const n of notes) for (const t of cleanTags(n.data.tags)) tagSet.add(t);
 const tags = [...tagSet].sort((a, b) => a.localeCompare(b, 'zh'));
+
+/* Note detail pages exist in Chinese only, so both the card link and every
+   chip point at the Chinese original. */
+const tagChips = (t: string[]) => t.map((label) => ({ label, href: '/en/notes/' }));
 ---
 
 <BaseLayout
@@ -18,145 +25,87 @@ const tags = [...tagSet].sort((a, b) => a.localeCompare(b, 'zh'));
   description="Algorithm and C++ notes, written in Chinese."
   pathname="/en/notes/"
 >
-  <div class="sheet">
-    <aside class="rail">
-      <ol>
-        <li>{notes.length} notes</li>
-        <li>{tags.length} tags</li>
-      </ol>
-      {
-        tags.length > 0 && (
-          <ul class="rail-tags">
-            {tags.map((t) => (
-              <li>{t}</li>
-            ))}
-          </ul>
-        )
-      }
-    </aside>
+  <div class="container">
+    <header class="page-head">
+      <h1>Notes</h1>
+      <p class="lede">
+        Algorithm and C++ notes from 2024. They are written in Chinese — the detail pages
+        exist in Chinese only, so every title below links to the original.
+      </p>
+      <p class="page-meta">
+        {notes.length} notes · {tags.length} tags
+        {tags.length > 0 && <span class="tag-line">{tags.join(' / ')}</span>}
+      </p>
+    </header>
 
-    <div>
-      <header class="page-head">
-        <h1>Notes</h1>
-        <p class="lede">
-          Algorithm and C++ notes from 2024. They are written in Chinese — the detail pages
-          exist in Chinese only, so every title below links to the original.
-        </p>
-      </header>
-
-      {
-        notes.length > 0 ? (
-          <ol class="note-list">
-            {notes.map((n, i) => {
-              const t = cleanTags(n.data.tags);
-              return (
-                <li class="note-item">
-                  <a href={`/notes/${n.id}/`} hreflang="zh-CN" lang="zh-CN">
-                    <span class="n-index">{String(i + 1).padStart(2, '0')}</span>
-                    <span class="n-title">{n.data.title}</span>
-                    <time class="n-date" datetime={isoDate(n.data.date)}>
-                      {formatDate(n.data.date, 'en')}
-                    </time>
-                    {n.data.summary && <span class="n-summary">{n.data.summary}</span>}
-                    {t.length > 0 && <span class="n-tags">{t.join(' / ')}</span>}
-                  </a>
-                </li>
-              );
-            })}
-          </ol>
-        ) : (
-          <p class="empty">No notes yet.</p>
-        )
-      }
-    </div>
+    {
+      notes.length > 0 ? (
+        <div class="card-stack">
+          {notes.map((n) => (
+            <PostCard
+              title={n.data.title}
+              href={`/notes/${n.id}/`}
+              summary={n.data.summary}
+              date={formatDate(asDate(n.data.date), 'en')}
+              tags={tagChips(cleanTags(n.data.tags))}
+            />
+          ))}
+        </div>
+      ) : (
+        <p class="empty">No notes yet.</p>
+      )
+    }
   </div>
 </BaseLayout>
 
 <style>
+  /* global.css ships .wrap (896px, centered) and BaseLayout applies it to
+     <main>. The promised .container utility was not implemented there, so
+     pages that need it define it locally rather than editing global.css. */
+
   .page-head {
-    margin-bottom: 2.5rem;
-    padding-bottom: 1.25rem;
-    border-bottom: 1px solid var(--rule);
+    padding-block: 28px;
   }
 
   .page-head h1 {
-    margin-bottom: 0.5rem;
+    margin: 0 0 12px;
+    font-size: 36px;
+    font-weight: 700;
+    line-height: 1.15;
+    letter-spacing: -0.025em;
   }
 
   .lede {
-    margin: 0;
-    font-size: var(--step-1);
-    line-height: 1.7;
-    color: var(--ink-muted);
-    max-width: 30em;
-  }
-
-  .note-list {
-    list-style: none;
-    margin: 0;
-    padding: 0;
-    display: grid;
-    gap: 2rem;
-  }
-
-  .note-item a {
-    display: grid;
-    grid-template-columns: 2.25rem 1fr auto;
-    gap: 0.3rem 0.75rem;
-    align-items: baseline;
-    text-decoration: none;
-  }
-
-  .n-index {
-    font-family: var(--font-mono);
-    font-size: var(--step--1);
-    color: var(--seal);
-  }
-
-  .n-title {
-    font-size: var(--step-1);
-    font-weight: 600;
-  }
-
-  .note-item a:hover .n-title {
-    color: var(--seal);
-  }
-
-  .n-date {
-    font-family: var(--font-mono);
-    font-size: var(--step--1);
-    color: var(--ink-faint);
-    white-space: nowrap;
-  }
-
-  .n-summary,
-  .n-tags {
-    grid-column: 2 / -1;
-  }
-
-  .n-summary {
-    color: var(--ink-muted);
+    margin: 0 0 12px;
+    max-width: 34em;
+    font-size: 17px;
+    line-height: 1.6;
+    color: var(--muted, #525252);
     text-wrap: pretty;
   }
 
-  .n-tags {
-    font-family: var(--font-mono);
-    font-size: var(--step--1);
-    color: var(--ink-faint);
+  .page-meta {
+    margin: 0;
+    font-size: 12px;
+    font-weight: 500;
+    line-height: 1.5;
+    color: var(--meta, #262626);
+  }
+
+  .tag-line {
+    display: block;
+    margin-top: 4px;
+    color: var(--muted, #525252);
   }
 
   .empty {
-    color: var(--ink-faint);
+    margin: 0;
+    color: var(--muted, #525252);
   }
 
-  @media (max-width: 40rem) {
-    .note-item a {
-      grid-template-columns: 2.25rem 1fr;
-    }
-
-    .n-date {
-      grid-column: 2 / -1;
-      order: -1;
+  @media (min-width: 768px) {
+    .page-head h1 {
+      font-size: 48px;
     }
   }
 </style>

@@ -1,11 +1,13 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
-import PasteWindow from '../../components/PasteWindow.astro';
+import PostCard from '../../components/PostCard.astro';
 import { getCollection } from 'astro:content';
-import { SITE, formatDate, isoDate, cleanTags } from '../../lib/site';
+import { SITE, formatDate, cleanTags } from '../../lib/site';
+
+const asDate = (d: Date | string) => (d instanceof Date ? d : new Date(d));
 
 const notes = (await getCollection('notes', ({ data }) => !data.draft)).sort(
-  (a, b) => b.data.date.valueOf() - a.data.date.valueOf(),
+  (a, b) => asDate(b.data.date).valueOf() - asDate(a.data.date).valueOf(),
 );
 
 const projects = (await getCollection('projects')).sort((a, b) => a.data.order - b.data.order);
@@ -14,6 +16,20 @@ const paste =
   projects.find((p) => p.id.startsWith('paste/'));
 
 const recent = notes.slice(0, 4);
+
+/* Chips are links in the card meta row, but the site ships no per-tag routes
+   (`/tags/*` all redirect to the notes index), so every chip points there. */
+const tagChips = (tags?: string[]) =>
+  cleanTags(tags).map((label) => ({ label, href: '/en/notes/' }));
+
+const LINK_LABELS = { repo: 'Source', release: 'Download', demo: 'Demo' } as const;
+type ProjectLinks = { repo?: string; release?: string; demo?: string };
+const projectLinks = (links: ProjectLinks) =>
+  (Object.keys(LINK_LABELS) as (keyof typeof LINK_LABELS)[])
+    .filter((k) => links[k])
+    .map((k) => ({ label: LINK_LABELS[k], href: links[k] as string }));
+
+const pasteLinks = paste ? projectLinks(paste.data.links) : [];
 ---
 
 <BaseLayout
@@ -23,174 +39,139 @@ const recent = notes.slice(0, 4);
   pathname="/en/"
   bareTitle
 >
-  <section class="hero">
-    <h1 class="hero-title">Kept Plot</h1>
-    <p class="hero-sub">
-      A small plot of {SITE.author}'s internet, kept by hand.<br />
-      Algorithm notes, a macOS app called Paste, and occasional writing.
-    </p>
-  </section>
+  <div class="container">
+    <header class="hero">
+      <h1 class="hero-title">Hi, I'm {SITE.author}</h1>
+      <p class="hero-tagline">{SITE.description.en}</p>
+    </header>
 
-  <section class="band" aria-labelledby="paste-heading">
-    <h2 id="paste-heading" class="band-heading">Project</h2>
-    {
-      paste ? (
-        <a class="feature" href="/en/projects/paste/">
-          <PasteWindow
-            lang="en"
-            title={paste.data.title}
-            tagline={paste.data.tagline}
-            status={paste.data.status}
-            stack={paste.data.stack}
-            links={paste.data.links}
-          />
-        </a>
-      ) : (
-        <p class="empty">The Paste project entry is not written yet.</p>
-      )
-    }
-  </section>
+    <section class="section" aria-labelledby="notes-heading">
+      <h2 id="notes-heading" class="band-heading">Notes</h2>
+      {
+        recent.length > 0 ? (
+          <div class="card-stack">
+            {recent.map((n) => (
+              <PostCard
+                title={n.data.title}
+                href={`/notes/${n.id}/`}
+                summary={n.data.summary}
+                date={formatDate(asDate(n.data.date), 'en')}
+                tags={tagChips(n.data.tags)}
+              />
+            ))}
+          </div>
+        ) : (
+          <p class="empty">No notes yet.</p>
+        )
+      }
+      <p class="more">
+        <a href="/en/notes/">All notes</a> — written in Chinese, listed here for reference.
+      </p>
+    </section>
 
-  <section class="band" aria-labelledby="notes-heading">
-    <h2 id="notes-heading" class="band-heading">Recent notes</h2>
-    {
-      recent.length > 0 ? (
-        <ol class="note-list">
-          {recent.map((n) => {
-            const tags = cleanTags(n.data.tags);
-            return (
-              <li>
-                <a href={`/notes/${n.id}/`} hreflang="zh-CN" lang="zh-CN">
-                  <span class="n-title">{n.data.title}</span>
-                  <time class="n-date" datetime={isoDate(n.data.date)}>
-                    {formatDate(n.data.date, 'en')}
-                  </time>
-                  {n.data.summary && <span class="n-summary">{n.data.summary}</span>}
-                  {tags.length > 0 && <span class="n-tags">{tags.join(' / ')}</span>}
-                </a>
-              </li>
-            );
-          })}
-        </ol>
-      ) : (
-        <p class="empty">No notes yet.</p>
-      )
-    }
-    <p class="more">
-      <a href="/en/notes/">All notes</a> — written in Chinese, listed here for reference.
-    </p>
-  </section>
+    <section class="section" aria-labelledby="projects-heading">
+      <h2 id="projects-heading" class="band-heading">Projects</h2>
+      {
+        paste ? (
+          <div class="project-grid">
+            <div class="project-item">
+              <PostCard
+                title={paste.data.title}
+                href={`/en/projects/${paste.id.split('/')[0]}/`}
+                summary={paste.data.tagline}
+                date={formatDate(asDate(paste.data.date), 'en')}
+                category={paste.data.status}
+              />
+              {pasteLinks.length > 0 && (
+                <p class="project-links">
+                  {pasteLinks.map((l) => (
+                    <a href={l.href} rel="noreferrer">
+                      {l.label}
+                    </a>
+                  ))}
+                </p>
+              )}
+            </div>
+          </div>
+        ) : (
+          <p class="empty">The Paste project entry is not written yet.</p>
+        )
+      }
+    </section>
+  </div>
 </BaseLayout>
 
 <style>
+  /* global.css ships .wrap (896px, centered) and BaseLayout applies it to
+     <main>. The promised .container utility was not implemented there, so
+     pages that need it define it locally rather than editing global.css. */
+
   .hero {
-    padding-block: 3.5rem 2.5rem;
-    border-bottom: 1px solid var(--rule);
+    padding-block: 28px;
   }
 
   .hero-title {
-    font-size: var(--step-3);
-    margin: 0 0 0.75rem;
+    margin: 0 0 12px;
+    font-size: 36px;
+    font-weight: 700;
+    line-height: 1.1;
+    letter-spacing: -0.025em;
   }
 
-  .hero-sub {
+  .hero-tagline {
     margin: 0;
-    font-size: var(--step-1);
-    line-height: 1.8;
-    max-width: 26em;
-    color: var(--ink-muted);
-  }
-
-  .band {
-    padding-block: 2.5rem;
-    border-bottom: 1px solid var(--rule);
-  }
-
-  .band:last-of-type {
-    border-bottom: 0;
-  }
-
-  .band-heading {
-    font-size: var(--step--1);
-    font-family: var(--font-mono);
-    font-weight: 400;
-    letter-spacing: 0.06em;
-    margin: 0 0 1.25rem;
-    color: var(--ink-faint);
-  }
-
-  .feature {
-    display: block;
-    text-decoration: none;
-    max-width: 34rem;
-  }
-
-  .feature:hover {
-    color: inherit;
-  }
-
-  .note-list {
-    list-style: none;
-    margin: 0;
-    padding: 0;
-    display: grid;
-    gap: 1.5rem;
-  }
-
-  .note-list a {
-    display: grid;
-    grid-template-columns: 1fr auto;
-    gap: 0.25rem 1.5rem;
-    text-decoration: none;
-    align-items: baseline;
-  }
-
-  .n-title {
-    font-size: var(--step-1);
-    font-weight: 600;
-  }
-
-  .note-list a:hover .n-title {
-    color: var(--seal);
-  }
-
-  .n-date {
-    font-family: var(--font-mono);
-    font-size: var(--step--1);
-    color: var(--ink-faint);
-    white-space: nowrap;
-  }
-
-  .n-summary {
-    grid-column: 1 / -1;
-    color: var(--ink-muted);
+    max-width: 40em;
+    font-size: 17px;
+    line-height: 1.6;
+    color: var(--muted, #525252);
     text-wrap: pretty;
   }
 
-  .n-tags {
-    grid-column: 1 / -1;
-    font-family: var(--font-mono);
-    font-size: var(--step--1);
-    color: var(--ink-faint);
+  .band-heading {
+    margin: 0 0 20px;
+    font-size: 24px;
+    font-weight: 700;
+    line-height: 40px;
+    letter-spacing: -0.01em;
+  }
+
+  .project-item {
+    display: grid;
+    align-content: start;
+    gap: 12px;
+  }
+
+  .project-links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px 20px;
+    margin: 0;
+    font-size: 12px;
+    font-weight: 500;
+    line-height: 1.5;
+    color: var(--meta, #262626);
+  }
+
+  .project-links a {
+    text-decoration: underline;
+    text-decoration-style: dashed;
+    text-underline-offset: 4px;
   }
 
   .more {
-    margin: 1.75rem 0 0;
-    font-family: var(--font-mono);
-    font-size: var(--step--1);
+    margin: 20px 0 0;
+    font-size: 14px;
   }
 
   .empty {
-    color: var(--ink-faint);
+    margin: 0;
+    color: var(--muted, #525252);
   }
 
-  @media (max-width: 34rem) {
-    .note-list a {
-      grid-template-columns: 1fr;
-    }
-
-    .n-date {
-      order: -1;
+  @media (min-width: 768px) {
+    .hero-title {
+      font-size: 60px;
+      line-height: 60px;
     }
   }
 </style>

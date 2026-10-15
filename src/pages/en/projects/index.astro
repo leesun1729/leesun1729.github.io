@@ -1,13 +1,24 @@
 ---
 import BaseLayout from '../../../layouts/BaseLayout.astro';
-import PasteWindow from '../../../components/PasteWindow.astro';
+import PostCard from '../../../components/PostCard.astro';
 import { getCollection } from 'astro:content';
-import { formatDate, isoDate } from '../../../lib/site';
+import { formatDate } from '../../../lib/site';
+
+const asDate = (d: Date | string) => (d instanceof Date ? d : new Date(d));
 
 const all = await getCollection('projects');
 const projects = all
   .filter((p) => p.id.endsWith('/en'))
-  .sort((a, b) => a.data.order - b.data.order || b.data.date.valueOf() - a.data.date.valueOf());
+  .sort(
+    (a, b) => a.data.order - b.data.order || asDate(b.data.date).valueOf() - asDate(a.data.date).valueOf(),
+  );
+
+const LINK_LABELS = { repo: 'Source', release: 'Download', demo: 'Demo' } as const;
+type ProjectLinks = { repo?: string; release?: string; demo?: string };
+const projectLinks = (links: ProjectLinks) =>
+  (Object.keys(LINK_LABELS) as (keyof typeof LINK_LABELS)[])
+    .filter((k) => links[k])
+    .map((k) => ({ label: LINK_LABELS[k], href: links[k] as string }));
 ---
 
 <BaseLayout
@@ -16,91 +27,114 @@ const projects = all
   description="Software by leesun. Currently one: Paste, a native macOS clipboard manager."
   pathname="/en/projects/"
 >
-  <div class="sheet">
-    <aside class="rail">
-      <ol>
-        <li>{projects.length} project{projects.length === 1 ? '' : 's'}</li>
-      </ol>
-    </aside>
+  <div class="container">
+    <header class="page-head">
+      <h1>Projects</h1>
+      <p class="lede">Things I build and still maintain. There are few of them, so each one gets finished.</p>
+      <p class="page-meta">
+        {projects.length} project{projects.length === 1 ? '' : 's'}
+      </p>
+    </header>
 
-    <div>
-      <header class="page-head">
-        <h1>Projects</h1>
-        <p class="lede">Things I build and still maintain. There are few of them, so each one gets finished.</p>
-      </header>
-
-      {
-        projects.length > 0 ? (
-          <ul class="project-list">
-            {projects.map((p) => (
-              <li>
-                <a class="project-card" href={`/en/projects/${p.id.split('/')[0]}/`}>
-                  <PasteWindow
-                    lang="en"
-                    title={p.data.title}
-                    tagline={p.data.tagline}
-                    status={p.data.status}
-                    stack={p.data.stack}
-                    links={p.data.links}
-                  />
-                  <p class="project-meta">
-                    <time datetime={isoDate(p.data.date)}>{formatDate(p.data.date, 'en')}</time>
-                    {p.data.status && <span>{p.data.status}</span>}
+    {
+      projects.length > 0 ? (
+        <div class="project-grid">
+          {projects.map((p) => {
+            const links = projectLinks(p.data.links);
+            return (
+              <div class="project-item">
+                <PostCard
+                  title={p.data.title}
+                  href={`/en/projects/${p.id.split('/')[0]}/`}
+                  summary={p.data.tagline}
+                  date={formatDate(asDate(p.data.date), 'en')}
+                  category={p.data.status}
+                />
+                {links.length > 0 && (
+                  <p class="project-links">
+                    {links.map((l) => (
+                      <a href={l.href} rel="noreferrer">
+                        {l.label}
+                      </a>
+                    ))}
                   </p>
-                </a>
-              </li>
-            ))}
-          </ul>
-        ) : (
-          <p class="empty">No projects yet.</p>
-        )
-      }
-    </div>
+                )}
+              </div>
+            );
+          })}
+        </div>
+      ) : (
+        <p class="empty">No projects yet.</p>
+      )
+    }
   </div>
 </BaseLayout>
 
 <style>
+  /* global.css ships .wrap (896px, centered) and BaseLayout applies it to
+     <main>. The promised .container utility was not implemented there, so
+     pages that need it define it locally rather than editing global.css. */
+
   .page-head {
-    margin-bottom: 2.5rem;
-    padding-bottom: 1.25rem;
-    border-bottom: 1px solid var(--rule);
+    padding-block: 28px;
   }
 
   .page-head h1 {
-    margin-bottom: 0.5rem;
+    margin: 0 0 12px;
+    font-size: 36px;
+    font-weight: 700;
+    line-height: 1.15;
+    letter-spacing: -0.025em;
   }
 
   .lede {
-    margin: 0;
-    font-size: var(--step-1);
-    line-height: 1.7;
-    color: var(--ink-muted);
-    max-width: 30em;
+    margin: 0 0 12px;
+    max-width: 34em;
+    font-size: 17px;
+    line-height: 1.6;
+    color: var(--muted, #525252);
+    text-wrap: pretty;
   }
 
-  .project-list {
-    list-style: none;
+  .page-meta {
     margin: 0;
-    padding: 0;
+    font-size: 12px;
+    font-weight: 500;
+    line-height: 1.5;
+    color: var(--meta, #262626);
+  }
+
+  .project-item {
     display: grid;
-    gap: 3rem;
+    align-content: start;
+    gap: 12px;
   }
 
-  .project-card {
-    display: block;
-    text-decoration: none;
-  }
-
-  .project-meta {
-    margin: 0.85rem 0 0;
+  .project-links {
     display: flex;
-    gap: 1.25rem;
-    font-family: var(--font-mono);
-    font-size: var(--step--1);
-    color: var(--ink-faint);
+    flex-wrap: wrap;
+    gap: 4px 20px;
+    margin: 0;
+    font-size: 12px;
+    font-weight: 500;
+    line-height: 1.5;
+    color: var(--meta, #262626);
+  }
+
+  .project-links a {
+    text-decoration: underline;
+    text-decoration-style: dashed;
+    text-underline-offset: 4px;
   }
 
   .empty {
-    color: var(--ink-faint);
+    margin: 0;
+    color: var(--muted, #525252);
+  }
+
+  @media (min-width: 768px) {
+    .page-head h1 {
+      font-size: 48px;
+    }
   }
 </style>

@@ -9,14 +9,8 @@ import BaseLayout from '../layouts/BaseLayout.astro';
   pathname="/404/"
   noindex
 >
-  <div class="sheet">
-    <aside class="rail">
-      <ol>
-        <li>404</li>
-      </ol>
-    </aside>
-
-    <div class="prose">
+  <div class="container">
+    <article class="prose">
       <header class="page-head">
         <h1>这里没有东西</h1>
       </header>
@@ -35,14 +29,16 @@ import BaseLayout from '../layouts/BaseLayout.astro';
         <li><a href="/notes/">全部笔记</a></li>
         <li><a href="/projects/">项目</a></li>
       </ul>
-    </div>
+    </article>
   </div>
 </BaseLayout>
 
 <style>
+  /* global.css ships .wrap (896px, centered) and BaseLayout applies it to
+     <main>. The promised .container utility was not implemented there, so
+     pages that need it define it locally rather than editing global.css. */
+
   .page-head {
-    margin-bottom: 2rem;
-    padding-bottom: 1.25rem;
-    border-bottom: 1px solid var(--rule);
+    padding-block: 28px;
   }
 </style>

@@ -1,6 +1,5 @@
 ---
 import ProjectLayout from '../../../layouts/ProjectLayout.astro';
-import PasteWindow from '../../../components/PasteWindow.astro';
 import { getEntry, render } from 'astro:content';
 
 const entry = await getEntry('projects', 'paste/en');
@@ -22,12 +21,5 @@ const { Content } = await render(entry);
   status={entry.data.status}
   links={entry.data.links}
 >
-  <PasteWindow
-    lang="en"
-    title={entry.data.title}
-    tagline={entry.data.tagline}
-    status={entry.data.status}
-    compact
-  />
   <Content />
 </ProjectLayout>

@@ -20,10 +20,7 @@ const altShort = alt.lang === 'en' ? 'EN' : '中';
 
 <header class="site-head">
   <div class="wrap head-inner">
-    <a class="brand" href={home}>
-      <span class="brand-mark" aria-hidden="true"></span>
-      <span class="brand-name">{SITE.name[lang]}</span>
-    </a>
+    <a class="brand" href={home}>{SITE.name[lang]}</a>
 
     <nav class="site-nav" aria-label={lang === 'zh' ? '主导航' : 'Main'}>
       <ul>
@@ -53,107 +50,99 @@ const altShort = alt.lang === 'en' ? 'EN' : '中';
 </header>
 
 <style>
+  /* Spec §3: 80px tall, absolutely positioned (NOT sticky), no background —
+     the page ground shows straight through. */
   .site-head {
-    border-bottom: 1px solid var(--rule);
-    background: color-mix(in srgb, var(--paper) 88%, transparent);
-    backdrop-filter: blur(8px);
-    position: sticky;
+    position: absolute;
     top: 0;
+    left: 0;
+    right: 0;
     z-index: 20;
+    min-height: var(--header-h);
+    background: transparent;
   }
 
   .head-inner {
     display: flex;
     align-items: center;
     gap: 1.5rem;
-    min-height: 3.5rem;
+    min-height: var(--header-h);
   }
 
   .brand {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.55rem;
-    font-weight: 600;
-    font-size: var(--step-1);
-    letter-spacing: 0.02em;
+    font-size: 17px;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+    line-height: 1.5;
+    color: var(--fg);
     text-decoration: none;
     margin-right: auto;
   }
 
-  /* The seal: a filled square is the site's one recurring glyph, and it is the
-     only place the accent appears at rest. */
-  .brand-mark {
-    width: 0.6rem;
-    height: 0.6rem;
-    background: var(--seal);
-    display: block;
-    flex: none;
-  }
-
-  .brand:hover .brand-name {
-    color: var(--seal);
+  .brand:hover {
+    text-decoration: underline;
+    text-decoration-style: dashed;
+    text-underline-offset: 4px;
   }
 
   .site-nav ul {
     display: flex;
     flex-wrap: wrap;
-    gap: 0.25rem 1.25rem;
+    align-items: center;
+    gap: 0.25rem;
     list-style: none;
     margin: 0;
     padding: 0;
-    font-size: var(--step--1);
+    font-size: 14px;
+    font-weight: 500;
+    line-height: 1.5;
   }
 
+  /* Spec §2: nav links carry 12px inline padding. */
   .site-nav a {
+    display: inline-block;
+    padding: 0.25rem 12px;
+    color: var(--meta);
     text-decoration: none;
-    padding-block: 0.35rem;
-    border-bottom: 2px solid transparent;
   }
 
   .site-nav a:hover {
-    border-bottom-color: var(--rule);
-    color: var(--ink);
+    color: var(--fg);
+    text-decoration: underline;
+    text-decoration-style: dashed;
+    text-underline-offset: 4px;
   }
 
   .site-nav a[aria-current='page'] {
-    border-bottom-color: var(--seal);
+    color: var(--fg);
+    font-weight: 700;
   }
 
   .lang-switch {
-    font-family: var(--font-mono);
-    font-size: var(--step--1);
-    text-decoration: none;
-    border: 1px solid var(--rule);
-    padding: 0.15rem 0.5rem;
-    line-height: 1.5;
     flex: none;
+    font-size: 14px;
+    font-weight: 500;
+    line-height: 1.5;
+    color: var(--meta);
+    text-decoration: none;
+    border: 1px dashed var(--line-strong);
+    border-radius: 999px;
+    padding: 0.15rem 0.6rem;
   }
 
   .lang-switch:hover {
-    border-color: var(--seal);
-    color: var(--seal);
+    color: var(--fg);
+    border-color: var(--fg);
   }
 
-  .sr-only {
-    position: absolute;
-    width: 1px;
-    height: 1px;
-    padding: 0;
-    margin: -1px;
-    overflow: hidden;
-    clip-path: inset(50%);
-    white-space: nowrap;
-  }
-
+  /* Below 40rem the five-item nav cannot share one 80px row with the brand,
+     so it drops to a second row; both rows still fit inside --header-h. */
   @media (max-width: 40rem) {
     .head-inner {
       flex-wrap: wrap;
-      padding-block: 0.6rem;
+      align-content: center;
       row-gap: 0.25rem;
-    }
-
-    .brand {
-      font-size: var(--step-0);
+      column-gap: 0.75rem;
     }
 
     .site-nav {
@@ -162,7 +151,12 @@ const altShort = alt.lang === 'en' ? 'EN' : '中';
     }
 
     .site-nav ul {
-      gap: 0.15rem 1rem;
+      gap: 0;
+      font-size: 13px;
+    }
+
+    .site-nav a {
+      padding-inline: 10px;
     }
   }
 </style>
