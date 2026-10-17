@@ -1,5 +1,6 @@
 ---
 import BaseLayout from '../../../layouts/BaseLayout.astro';
+import { ANIME, animePoster } from '../../../lib/anime';
 import { SITE } from '../../../lib/site';
 
 /* Self-introduction: one trait per line, short fragments (the reference's style). */
@@ -23,8 +24,8 @@ const contacts = [
   { label: 'GitHub', href: SITE.github, text: 'github.com/leesun1729', external: true },
 ];
 
-/* Placeholder slots for the anime section. */
-const animeSlots = Array.from({ length: 6 });
+/* The list and its poster lookup live in src/lib/anime.ts, shared with the
+   Chinese page so the two can never drift apart. */
 ---
 
 <BaseLayout
@@ -80,16 +81,34 @@ const animeSlots = Array.from({ length: 6 });
 
       <p>I watch a bit of everything, mostly Chinese animation. The list will fill in.</p>
 
-      <!-- Add anime entries here: replace the "＋" in each <li> with
-           "Title (year) · one short line"; copy an <li> if you need more,
-           delete the extras if you need fewer. -->
-      <ul class="anime-grid" aria-label="Anime placeholders, to be filled in">
+      <!-- Only entries that have a poster are rendered: drop an image named
+           after the show into public/images/anime/ (e.g. 剑来.jpg) and rebuild. -->
+      <ul class="anime-grid" aria-label="Chinese animation list">
         {
-          animeSlots.map(() => (
-            <li class="anime-slot">
-              <span aria-hidden="true">＋</span>
-            </li>
-          ))
+          ANIME.map((a) => ({ a, poster: animePoster(a) }))
+            .filter((x) => x.poster)
+            .map(({ a, poster }) => (
+              <li class="anime-item">
+                <a class="anime-card" href={a.href} rel="noreferrer" target="_blank">
+                  <img
+                    class="anime-poster"
+                    src={poster}
+                    alt={`${a.title} poster`}
+                    width="300"
+                    height="400"
+                    loading="lazy"
+                    decoding="async"
+                  />
+                  <span class="anime-meta">
+                    <span class="anime-title">{a.title}</span>
+                    <span class="anime-sub">
+                      {a.year} · {a.platform}{a.film && ' · Cinema'}
+                    </span>
+                    <span class="anime-note">{a.note.en}</span>
+                  </span>
+                </a>
+              </li>
+            ))
         }
       </ul>
 
@@ -221,39 +240,6 @@ const animeSlots = Array.from({ length: 6 });
     }
   }
 
-  /* --- Anime: placeholder grid, ready for the owner to fill in ---------- */
-
-  .anime-grid {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 0.75rem;
-    list-style: none;
-    margin: 1.2em 0 0;
-    padding: 0;
-  }
-
-  @media (min-width: 768px) {
-    .anime-grid {
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-    }
-  }
-
-  .anime-slot {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    min-height: 4.5rem;
-    margin: 0;
-    border: 1px dashed var(--line);
-    border-radius: 1rem; /* same corner language as .card / .map / .empty-state */
-    /* The "＋" is a glyph, so it takes a text token. --line-strong is a border
-       token and must never colour text (R4 contract §0), and its light value
-       sits under the 3:1 floor for a non-body glyph. --muted matches the
-       neighbouring "to be filled in" note (.map-sub) and clears 4.5:1. */
-    color: var(--muted);
-    font-size: var(--step-1);
-  }
-
   /* --- Contact: platform label + real link ------------------------------ */
 
   .contacts {
@@ -279,7 +265,9 @@ const animeSlots = Array.from({ length: 6 });
     color: var(--meta);
   }
 
+  /* The sticky header is 60px tall; 1.5rem let a jumped-to heading land under
+     it. Match the offset the home page's list anchors already use. */
   h2 {
-    scroll-margin-top: 1.5rem;
+    scroll-margin-top: calc(var(--header-h) + 12px);
   }
 </style>

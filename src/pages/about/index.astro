@@ -1,5 +1,6 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
+import { ANIME, animePoster } from '../../lib/anime';
 import { SITE } from '../../lib/site';
 
 /* 自我介绍：一行一个特征，短句，不写完整句子（参考站点的体例）。 */
@@ -18,8 +19,7 @@ const contacts = [
   { label: 'GitHub', href: SITE.github, text: 'github.com/leesun1729', external: true },
 ];
 
-/* 动漫区占位槽位：业主之后把内容填进去即可。 */
-const animeSlots = Array.from({ length: 6 });
+/* 片单数据与海报探测在 src/lib/anime.ts，中英两页共用同一份。 */
 ---
 
 <BaseLayout
@@ -77,15 +77,34 @@ const animeSlots = Array.from({ length: 6 });
 
       <p>国漫荣光</p>
 
-      <!-- 动漫条目加在这里：把每个 <li> 里的「＋」换成「作品名（年份）· 一句短评」；
-           不够用就复制一个 <li>，用不到就删掉多余的 <li>。 -->
-      <ul class="anime-grid" aria-label="动漫占位，待补充">
+      <!-- 只显示有封面的条目：把海报按片名放进 public/images/anime/（例如
+           剑来.jpg），重新构建即出现；没有封面的条目不再渲染。 -->
+      <ul class="anime-grid" aria-label="国漫片单">
         {
-          animeSlots.map(() => (
-            <li class="anime-slot">
-              <span aria-hidden="true">＋</span>
-            </li>
-          ))
+          ANIME.map((a) => ({ a, poster: animePoster(a) }))
+            .filter((x) => x.poster)
+            .map(({ a, poster }) => (
+              <li class="anime-item">
+                <a class="anime-card" href={a.href} rel="noreferrer" target="_blank">
+                  <img
+                    class="anime-poster"
+                    src={poster}
+                    alt={`${a.title}海报`}
+                    width="300"
+                    height="400"
+                    loading="lazy"
+                    decoding="async"
+                  />
+                  <span class="anime-meta">
+                    <span class="anime-title">{a.title}</span>
+                    <span class="anime-sub">
+                      {a.year} · {a.platform}{a.film && ' · 院线'}
+                    </span>
+                    <span class="anime-note">{a.note.zh}</span>
+                  </span>
+                </a>
+              </li>
+            ))
         }
       </ul>
 
@@ -217,39 +236,6 @@ const animeSlots = Array.from({ length: 6 });
     }
   }
 
-  /* --- 动漫：占位网格，等业主填内容 ----------------------------------- */
-
-  .anime-grid {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 0.75rem;
-    list-style: none;
-    margin: 1.2em 0 0;
-    padding: 0;
-  }
-
-  @media (min-width: 768px) {
-    .anime-grid {
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-    }
-  }
-
-  .anime-slot {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    min-height: 4.5rem;
-    margin: 0;
-    border: 1px dashed var(--line);
-    border-radius: 1rem; /* same corner language as .card / .map / .empty-state */
-    /* The "＋" is a glyph, so it takes a text token. --line-strong is a border
-       token and must never colour text (R4 contract §0), and its light value
-       sits under the 3:1 floor for a non-body glyph. --muted matches the
-       neighbouring "to be filled in" note (.map-sub) and clears 4.5:1. */
-    color: var(--muted);
-    font-size: var(--step-1);
-  }
-
   /* --- 联系：平台标签 + 真实链接 --------------------------------------- */
 
   .contacts {
@@ -275,7 +261,9 @@ const animeSlots = Array.from({ length: 6 });
     color: var(--meta);
   }
 
+  /* The sticky header is 60px tall; 1.5rem let a jumped-to heading land under
+     it. Match the offset the home page's list anchors already use. */
   h2 {
-    scroll-margin-top: 1.5rem;
+    scroll-margin-top: calc(var(--header-h) + 12px);
   }
 </style>
