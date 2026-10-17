@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>VagulaMap - 个人旅行足迹地图</title>
+  <meta name="description" content="VagulaMap 是一款极简通用的个人旅行足迹地图，支持高德地图点位打点与省市版图自动点亮，完美支持 Hexo, Hugo, WordPress, Typecho 等博客系统 iframe 嵌入。">
+  <!-- 核心样式 -->
+  <link href="trip.css" rel="stylesheet">
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    }
+    .mytrip, .mytrip-container {
+      width: 100%;
+      height: 100%;
+    }
+    .mp--container {
+      width: 100%;
+      height: 100%;
+      position: relative;
+    }
+    /* No attribution footer, so the map takes the full height. */
+    #trip {
+      width: 100%;
+      height: 100%;
+    }
+  </style>
+</head>
+<body>
+  <div class="mytrip">
+    <div class="mytrip-container">
+      <section class="mp--container" data-id="travel-trip">
+        <div class="footer--trip" id="trip"></div>
+      </section>
+    </div>
+  </div>
+
+  <script type="text/javascript">
+    // 检测是否为移动端
+    var isMobile = window.innerWidth <= 768;
+    
+    var MARKER_PRO = {
+      zoom: isMobile ? "4.0" : "2.0", // 初始缩放比例
+      maxZoom: "14",
+      minZoom: "2",
+      limit: "9",
+      // 默认地图中心点
+      center: isMobile ? [117.05, 30.52] : [105, 35], 
+      
+      // 💡 高德地图配置
+      key: "023d75fc9fdad4b9f41fda28b406d306",
+      securityJsCode: "b7f38ce56323dca3e7b9bcb6cd76ece7",
+      
+      coordinateSystem: "WGS84",
+      
+      // 💡 核心显示开关
+      lightUpChinaWhole: false,    // 点亮中国整体开关：true 为点亮整体，false 为单独点亮省份城市     
+      styleLight: "amap://styles/whitesmoke", // 白天模式主题样式
+      styleDark: "amap://styles/dark"     // 暗黑模式主题样式
+    };
+  </script>
+
+  <!-- 引入聚类组件 -->
+  <script src="supercluster.min.js" defer></script>
+  <!-- 引入控制脚本（动态加载高德地图） -->
+  <script src="trip.js" defer></script>
+</body>
+</html>

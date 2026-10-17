@@ -1,0 +1,1527 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {
+        "title": "鸡鸣寺 · 南京",
+        "region": "南京",
+        "spot": "鸡鸣寺",
+        "status": "done",
+        "posts": [],
+        "image": [
+          "http://store.is.autonavi.com/query_pic?id=st653d2760-3b45-47e5-ad2c-7a027aea5997&user=search&operate=original"
+        ],
+        "year": [
+          "2025"
+        ]
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          118.79144,
+          32.061419
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "title": "外滩 · 上海",
+        "region": "上海",
+        "spot": "外滩",
+        "status": "done",
+        "posts": [],
+        "image": [
+          "http://store.is.autonavi.com/showpic/b9c402b7d34ea98654cc915e567761dd"
+        ],
+        "year": [
+          "2025"
+        ]
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          121.487667,
+          31.23551
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "title": "时代广场 · 纽约",
+        "region": "纽约",
+        "spot": "时代广场",
+        "status": "wish",
+        "wish_reason": "待定"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -73.9851,
+          40.7589
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "title": "阳朔县 · 阳朔",
+        "region": "阳朔",
+        "spot": "阳朔县",
+        "status": "done",
+        "posts": [],
+        "image": [
+          "https://aos-comment.amap.com/B030507H7M/comment/content_media_external_images_media_100003476_1728349679852_30208964.jpg"
+        ],
+        "year": [
+          "2025"
+        ]
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          110.494187,
+          24.771951
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "title": "象鼻山 · 桂林",
+        "region": "桂林",
+        "spot": "象鼻山",
+        "status": "done",
+        "posts": [],
+        "image": [
+          "http://store.is.autonavi.com/showpic/85083b528216d28f25499ea8872ef850"
+        ],
+        "year": [
+          "2025"
+        ]
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          110.291977,
+          25.270405
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "title": "昆明市 · 昆明",
+        "region": "昆明",
+        "spot": "昆明市",
+        "status": "done",
+        "posts": [],
+        "image": [
+          "http://store.is.autonavi.com/showpic/34db8aeeca519767f2fbd99aea7dad5a"
+        ],
+        "year": [
+          "2025"
+        ]
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          102.786588,
+          24.905666
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "title": "大理市 · 大理",
+        "region": "大理",
+        "spot": "大理市",
+        "status": "done",
+        "posts": [],
+        "image": [
+          "https://store.is.autonavi.com/showpic/21a67863ba2c7ff60000002983348643?type=pic"
+        ],
+        "year": [
+          "2025"
+        ]
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          100.268828,
+          25.701349
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "title": "玉龙雪山国家级风景名胜区 · 丽江",
+        "region": "丽江",
+        "spot": "玉龙雪山国家级风景名胜区",
+        "status": "done",
+        "posts": [],
+        "image": [
+          "http://store.is.autonavi.com/showpic/8fde6fb2316745f771ad7e539f3bdba3"
+        ],
+        "year": [
+          "2025"
+        ]
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          100.257428,
+          27.101549
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "title": "香格里拉市独克宗古城 · 香格里拉",
+        "region": "香格里拉",
+        "spot": "香格里拉市独克宗古城",
+        "status": "done",
+        "posts": [],
+        "image": [
+          "http://store.is.autonavi.com/showpic/3ed98986e4063bc295a4134e34305935"
+        ],
+        "year": [
+          "2025"
+        ]
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          99.70741,
+          27.814017
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "title": "成都市 · 成都",
+        "region": "成都",
+        "spot": "成都市",
+        "status": "done",
+        "posts": [],
+        "image": [
+          "https://aos-comment.amap.com/B001C7WE5S/comment/content_media_external_file_40545_1767501720604_43994986.jpg"
+        ],
+        "year": [
+          "2025"
+        ]
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          104.135657,
+          30.742963
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "title": "故宫博物院 · 北京",
+        "region": "北京",
+        "spot": "故宫博物院",
+        "status": "done",
+        "posts": [],
+        "image": [
+          "http://store.is.autonavi.com/showpic/2f968490d105bb2741e17f90b85c6b79"
+        ],
+        "year": [
+          "2025"
+        ]
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          116.390784,
+          39.916435
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "title": "乐山市 · 乐山",
+        "region": "乐山",
+        "spot": "乐山市",
+        "status": "done",
+        "posts": [],
+        "image": [
+          "http://store.is.autonavi.com/showpic/34c06899361414f774a884d9739ffdc8"
+        ],
+        "year": [
+          "2025"
+        ]
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          103.769183,
+          29.546862
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "title": "汕头市 · 汕头",
+        "region": "汕头",
+        "spot": "汕头市",
+        "status": "done",
+        "posts": [],
+        "image": [
+          "http://store.is.autonavi.com/showpic/8a36fa11b769de658b3e1e698666f506"
+        ],
+        "year": [
+          "2021"
+        ]
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          116.666427,
+          23.356225
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "title": "深圳市 · 深圳",
+        "region": "深圳",
+        "spot": "深圳市",
+        "status": "done",
+        "posts": [],
+        "image": [
+          "http://aos-cdn-image.amap.com/sns/ugccomment/0fa99519-44ae-474d-982c-c24b2e006618.jpg"
+        ],
+        "year": [
+          "2022"
+        ]
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          113.885302,
+          22.530033
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "title": "广州市 · 广州",
+        "region": "广州",
+        "spot": "广州市",
+        "status": "done",
+        "posts": [],
+        "image": [
+          "http://store.is.autonavi.com/showpic/d5b56df50d024cbd33e4e1a16f77d419"
+        ],
+        "year": [
+          "2022"
+        ]
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          113.3191,
+          23.10903
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "title": "香港特别行政区 · 香港",
+        "region": "香港",
+        "spot": "香港特别行政区",
+        "status": "done",
+        "posts": [],
+        "image": [
+          "http://store.is.autonavi.com/showpic/6ca687fea9be829e56d1d9e03b1e690b"
+        ],
+        "year": [
+          "2026"
+        ]
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          114.17127,
+          22.293148
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "title": "梅州市 · 梅州",
+        "region": "梅州",
+        "spot": "梅州市",
+        "status": "done",
+        "posts": [],
+        "image": [
+          "http://store.is.autonavi.com/showpic/0e8de57bb1cbfbc9d192a24bdabac4a5"
+        ],
+        "year": [
+          "2023"
+        ]
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          116.11722,
+          24.291459
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "title": "漳州市 · 漳州",
+        "region": "漳州",
+        "spot": "漳州市",
+        "status": "done",
+        "posts": [],
+        "image": [
+          "http://store.is.autonavi.com/showpic/3166d6215663564e7b98100223765f3c"
+        ],
+        "year": [
+          "2021"
+        ]
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          117.642511,
+          24.518276
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "title": "厦门市 · 厦门",
+        "region": "厦门",
+        "spot": "厦门市",
+        "status": "done",
+        "posts": [],
+        "image": [
+          "http://store.is.autonavi.com/showpic/072e0040d480836f7705f12d93a0a11a"
+        ],
+        "year": [
+          "2024"
+        ]
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          118.083933,
+          24.482274
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "title": "黄山风景区 · 黄山",
+        "region": "黄山",
+        "spot": "黄山风景区",
+        "status": "done",
+        "posts": [],
+        "image": [
+          "http://store.is.autonavi.com/showpic/e82f9f2c5995f5e08d6c5b29943b68ac"
+        ],
+        "year": [
+          "2026"
+        ]
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          118.154844,
+          30.141695
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "title": "合肥市 · 合肥",
+        "region": "合肥",
+        "spot": "合肥市",
+        "status": "done",
+        "posts": [],
+        "image": [
+          "http://store.is.autonavi.com/showpic/09b213318d4b8a7d646442ea4476f8cb"
+        ],
+        "year": [
+          "2026"
+        ]
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          117.221785,
+          31.822566
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "title": "武汉市 · 武汉",
+        "region": "武汉",
+        "spot": "武汉市",
+        "status": "done",
+        "posts": [],
+        "image": [
+          "http://store.is.autonavi.com/showpic/247a33942b295cbc027c91877399a98c"
+        ],
+        "year": [
+          "2019"
+        ]
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          114.299125,
+          30.595765
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "title": "池州市 · 池州",
+        "region": "池州",
+        "spot": "池州市",
+        "status": "done",
+        "posts": [],
+        "image": [
+          "http://store.is.autonavi.com/showpic/1dfd95a33cc18cd5e0d309625f58e71b"
+        ],
+        "year": [
+          "2019"
+        ]
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          117.490209,
+          30.676633
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "title": "义乌市 · 义乌",
+        "region": "义乌",
+        "spot": "义乌市",
+        "status": "done",
+        "posts": [],
+        "image": [
+          "https://aos-comment.amap.com/B02430HRJ9/comment/content_media_external_images_media_100001767_1726628935529_77146656.jpg"
+        ],
+        "year": [
+          "2018"
+        ]
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          120.070942,
+          29.308784
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "title": "蚌埠市 · 蚌埠",
+        "region": "蚌埠",
+        "spot": "蚌埠市",
+        "status": "done",
+        "posts": [],
+        "image": [
+          "http://store.is.autonavi.com/showpic/20853db755aa281e6dec53b10dfd754c"
+        ],
+        "year": [
+          "2003"
+        ]
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          117.382719,
+          32.918526
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "title": "泰安市 · 泰安",
+        "region": "泰安",
+        "spot": "泰安市",
+        "status": "done",
+        "posts": [],
+        "image": [
+          "http://store.is.autonavi.com/showpic/b75c648954f3465f79f76d6dd3f1fb25"
+        ],
+        "year": [
+          "2021"
+        ]
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          117.080397,
+          36.26393
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "title": "青岛站 · 青岛",
+        "region": "青岛",
+        "spot": "青岛站",
+        "status": "done",
+        "posts": [],
+        "image": [
+          "http://store.is.autonavi.com/showpic/43c52933c1769faa59b8ace73c85844d"
+        ],
+        "year": [
+          "2021"
+        ]
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          120.314249,
+          36.061562
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "title": "凤阳县 · 凤阳",
+        "region": "凤阳",
+        "spot": "凤阳县",
+        "status": "done",
+        "posts": [],
+        "image": [
+          "https://store.is.autonavi.com/showpic/cefcbe452e878f3b56b9f051bf1bcc10"
+        ],
+        "year": [
+          "2026"
+        ]
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          117.542047,
+          32.87725
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "title": "高密市 · 高密",
+        "region": "高密",
+        "spot": "高密市",
+        "status": "done",
+        "posts": [],
+        "image": [
+          "https://aos-comment.amap.com/B02180I156/comment/content_media_external_images_media_100002949_1729612001287_13982327.jpg"
+        ],
+        "year": [
+          "2021"
+        ]
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          119.800452,
+          36.365596
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "title": "南昌市 · 南昌",
+        "region": "南昌",
+        "spot": "南昌市",
+        "status": "done",
+        "posts": [],
+        "image": [
+          "http://store.is.autonavi.com/showpic/42067b9e5704c0f762de9ad8fe337f1d"
+        ],
+        "year": [
+          "2015"
+        ]
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          115.853071,
+          28.686306
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "title": "九江市 · 九江",
+        "region": "九江",
+        "spot": "九江市",
+        "status": "done",
+        "posts": [],
+        "image": [
+          "http://store.is.autonavi.com/showpic/1ce272fc9721464983af526a13d407ec"
+        ],
+        "year": [
+          "2015"
+        ]
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          118.107722,
+          29.964338
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "title": "金华市 · 金华",
+        "region": "金华",
+        "spot": "金华市",
+        "status": "done",
+        "posts": [],
+        "image": [
+          "http://store.is.autonavi.com/showpic/1d032848d372da85eb5f76097feb3ff5"
+        ],
+        "year": [
+          "2017"
+        ]
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          119.64256,
+          29.082171
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "title": "东华金座 · 东阳",
+        "region": "东阳",
+        "spot": "东华金座",
+        "status": "done",
+        "posts": [],
+        "image": [
+          "https://aos-comment.amap.com/B02430HRNA/comment/content_media_external_images_media_100002989_1736133237641_99959065.jpg"
+        ],
+        "year": [
+          "2017"
+        ]
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          120.237386,
+          29.292827
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "title": "永康市 · 永康",
+        "region": "永康",
+        "spot": "永康市",
+        "status": "done",
+        "posts": [],
+        "image": [
+          "https://aos-comment.amap.com/B02430HS0I/comment/content_media_external_images_media_100013780_1728656102175_17233146.jpg"
+        ],
+        "year": [
+          "2017"
+        ]
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          120.04268,
+          28.891846
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "title": "东海县 · 东海",
+        "region": "东海",
+        "spot": "东海县",
+        "status": "done",
+        "posts": [],
+        "image": [
+          "https://aos-comment.amap.com/B02060PCHH/comment/content_media_external_images_media_1000045225_ss__1742643169942_53857518.jpg"
+        ],
+        "year": [
+          "2022"
+        ]
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          118.747402,
+          34.543296
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "title": "惠州市 · 惠州",
+        "region": "惠州",
+        "spot": "惠州市",
+        "status": "done",
+        "posts": [],
+        "image": [
+          "http://store.is.autonavi.com/showpic/2b4983b11592ab4fc1b54dd93251274b"
+        ],
+        "year": [
+          "2022"
+        ]
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          114.410619,
+          23.114865
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "title": "南澳岛生态旅游区 · 汕头",
+        "region": "汕头",
+        "spot": "南澳岛生态旅游区",
+        "status": "done",
+        "posts": [],
+        "image": [
+          "http://store.is.autonavi.com/showpic/9cc5347c71fb3c7addad234b691acee2"
+        ],
+        "year": [
+          "2021"
+        ]
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          117.056213,
+          23.436918
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "title": "东山岛 · 漳州",
+        "region": "漳州",
+        "spot": "东山岛",
+        "status": "done",
+        "posts": [],
+        "image": [
+          "http://store.is.autonavi.com/showpic/cca942b55769035dfa99169f9adfee87"
+        ],
+        "year": [
+          "2023"
+        ]
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          117.518363,
+          23.743589
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "title": "巴黎 · 巴黎",
+        "region": "巴黎",
+        "spot": "巴黎",
+        "status": "wish",
+        "posts": [],
+        "image": [],
+        "wish_reason": ""
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          2.353715,
+          48.856642
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "title": "新加坡 · 新加坡",
+        "region": "新加坡",
+        "spot": "新加坡",
+        "status": "wish",
+        "posts": [],
+        "image": [],
+        "wish_reason": ""
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          103.820362,
+          1.303824
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "title": "马尔代夫 · 马尔代夫",
+        "region": "马尔代夫",
+        "spot": "马尔代夫",
+        "status": "wish",
+        "posts": [],
+        "image": [],
+        "wish_reason": ""
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          73.390359,
+          1.962819
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "title": "斯里兰卡 · 斯里兰卡",
+        "region": "斯里兰卡",
+        "spot": "斯里兰卡",
+        "status": "wish",
+        "posts": [],
+        "image": [],
+        "wish_reason": ""
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          80.721258,
+          7.672383
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "title": "新西兰 · 新西兰",
+        "region": "新西兰",
+        "spot": "新西兰",
+        "status": "wish",
+        "posts": [],
+        "image": [],
+        "wish_reason": ""
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          171.045532,
+          -43.67256
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "title": "悉尼 · 悉尼",
+        "region": "悉尼",
+        "spot": "悉尼",
+        "status": "wish",
+        "posts": [],
+        "image": [],
+        "wish_reason": ""
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          151.200623,
+          -33.894257
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "title": "东京 · 东京",
+        "region": "东京",
+        "spot": "东京",
+        "status": "wish",
+        "posts": [],
+        "image": [],
+        "wish_reason": ""
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.830294,
+          35.695253
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "title": "首尔 · 首尔",
+        "region": "首尔",
+        "spot": "首尔",
+        "status": "wish",
+        "posts": [],
+        "image": [],
+        "wish_reason": ""
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          126.969503,
+          37.531836
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "title": "开普敦 · 开普敦",
+        "region": "开普敦",
+        "spot": "开普敦",
+        "status": "wish",
+        "posts": [],
+        "image": [],
+        "wish_reason": ""
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          18.474822,
+          -33.982724
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "title": "开罗 · 开罗",
+        "region": "开罗",
+        "spot": "开罗",
+        "status": "wish",
+        "posts": [],
+        "image": [],
+        "wish_reason": ""
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          31.270337,
+          30.063231
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "title": "拉萨市 · 拉萨",
+        "region": "拉萨",
+        "spot": "拉萨市",
+        "status": "wish",
+        "posts": [],
+        "image": [
+          "http://store.is.autonavi.com/showpic/036680696a75178f764ce2d3d93ba7ad"
+        ],
+        "wish_reason": ""
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          91.118571,
+          29.644755
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "title": "阿勒泰地区 · 阿勒泰",
+        "region": "阿勒泰",
+        "spot": "阿勒泰地区",
+        "status": "wish",
+        "posts": [],
+        "image": [
+          "http://store.is.autonavi.com/showpic/4105142028b50b44168aebb0e638604a"
+        ],
+        "wish_reason": ""
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          88.137901,
+          47.843621
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "title": "九寨沟 · 九寨沟",
+        "region": "九寨沟",
+        "spot": "九寨沟",
+        "status": "wish",
+        "posts": [],
+        "image": [
+          "http://store.is.autonavi.com/showpic/ec73257a74bd2193e4612a0c54ee87e1"
+        ],
+        "wish_reason": ""
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          103.910688,
+          33.144513
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "title": "重庆市 · 重庆",
+        "region": "重庆",
+        "spot": "重庆市",
+        "status": "wish",
+        "posts": [],
+        "image": [
+          "http://store.is.autonavi.com/showpic/3e5c41cec40e35e5675a47a7a326b3f4"
+        ],
+        "wish_reason": ""
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          106.54807,
+          29.565529
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "title": "台北 · 新北",
+        "region": "新北",
+        "spot": "台北",
+        "status": "wish",
+        "posts": [],
+        "image": [],
+        "wish_reason": ""
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          121.499125,
+          25.04774
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "title": "洛杉矶 · 洛杉矶",
+        "region": "洛杉矶",
+        "spot": "洛杉矶",
+        "status": "wish",
+        "posts": [],
+        "image": [],
+        "wish_reason": ""
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -118.223486,
+          34.055656
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "title": "旧金山 · 旧金山",
+        "region": "旧金山",
+        "spot": "旧金山",
+        "status": "wish",
+        "posts": [],
+        "image": [],
+        "wish_reason": ""
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -122.415911,
+          37.771509
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "title": "米兰 · 米兰",
+        "region": "米兰",
+        "spot": "米兰",
+        "status": "wish",
+        "posts": [],
+        "image": [],
+        "wish_reason": ""
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          9.204675,
+          45.478704
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "title": "瑞士 · 瑞士",
+        "region": "瑞士",
+        "spot": "瑞士",
+        "status": "wish",
+        "posts": [],
+        "image": [],
+        "wish_reason": ""
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          8.245459,
+          46.839805
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "title": "佛罗伦萨 · 佛罗伦萨",
+        "region": "佛罗伦萨",
+        "spot": "佛罗伦萨",
+        "status": "wish",
+        "posts": [],
+        "image": [],
+        "wish_reason": ""
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          11.222678,
+          43.77601
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "title": "罗马 · 罗马",
+        "region": "罗马",
+        "spot": "罗马",
+        "status": "wish",
+        "posts": [],
+        "image": [],
+        "wish_reason": ""
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          12.488196,
+          41.900531
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "title": "巴塞罗那 · 巴塞罗那",
+        "region": "巴塞罗那",
+        "spot": "巴塞罗那",
+        "status": "wish",
+        "posts": [],
+        "image": [],
+        "wish_reason": ""
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          2.156761,
+          41.393459
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "title": "马德里 · 马德里",
+        "region": "马德里",
+        "spot": "马德里",
+        "status": "wish",
+        "posts": [],
+        "image": [],
+        "wish_reason": ""
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -3.690931,
+          40.412974
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "title": "雅典 · 雅典",
+        "region": "雅典",
+        "spot": "雅典",
+        "status": "wish",
+        "posts": [],
+        "image": [],
+        "wish_reason": ""
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          23.720742,
+          37.994706
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "title": "瑞典 · 瑞典",
+        "region": "瑞典",
+        "spot": "瑞典",
+        "status": "wish",
+        "posts": [],
+        "image": [],
+        "wish_reason": ""
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          15.247176,
+          61.842435
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "title": "挪威 · 挪威",
+        "region": "挪威",
+        "spot": "挪威",
+        "status": "wish",
+        "posts": [],
+        "image": [],
+        "wish_reason": ""
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          12.432339,
+          64.442193
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "title": "莫斯科 · 莫斯科",
+        "region": "莫斯科",
+        "spot": "莫斯科",
+        "status": "wish",
+        "posts": [],
+        "image": [],
+        "wish_reason": ""
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          37.690628,
+          55.780099
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "title": "夏威夷 · 夏威夷",
+        "region": "夏威夷",
+        "spot": "夏威夷",
+        "status": "wish",
+        "posts": [],
+        "image": [],
+        "wish_reason": ""
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -155.742441,
+          20.059988
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "title": "智利 · 智利",
+        "region": "智利",
+        "spot": "智利",
+        "status": "wish",
+        "posts": [],
+        "image": [],
+        "wish_reason": ""
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -70.642611,
+          -33.497724
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "title": "迪拜 · 迪拜",
+        "region": "迪拜",
+        "spot": "迪拜",
+        "status": "wish",
+        "posts": [],
+        "image": [],
+        "wish_reason": ""
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          55.320854,
+          25.272819
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "title": "冰岛 · 冰岛",
+        "region": "冰岛",
+        "spot": "冰岛",
+        "status": "wish",
+        "posts": [],
+        "image": [],
+        "wish_reason": ""
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -17.922322,
+          64.5379
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "title": "伦敦 · 伦敦",
+        "region": "伦敦",
+        "spot": "伦敦",
+        "status": "wish",
+        "posts": [],
+        "image": [],
+        "wish_reason": ""
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -0.154394,
+          51.509981
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "title": "丹麦 · 丹麦",
+        "region": "丹麦",
+        "spot": "丹麦",
+        "status": "wish",
+        "posts": [],
+        "image": [],
+        "wish_reason": ""
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          9.533584,
+          55.949817
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "title": "维也纳 · 维也纳",
+        "region": "维也纳",
+        "spot": "维也纳",
+        "status": "wish",
+        "posts": [],
+        "image": [],
+        "wish_reason": ""
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          16.350092,
+          48.223747
+        ]
+      }
+    }
+  ]
+}

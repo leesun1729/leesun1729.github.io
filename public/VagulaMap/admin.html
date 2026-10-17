@@ -1,0 +1,1251 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>VagulaMap - 足迹可视化管理后台</title>
+  <link href="trip.css" rel="stylesheet">
+  <style>
+    /* 后台布局专有样式，使用 trip.css 的变量并定制商务简洁、排版紧凑的视觉感 */
+    html, body {
+      margin: 0;
+      padding: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      background-color: var(--bg-body);
+      color: var(--text-primary);
+    }
+    
+    .admin-container {
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+      width: 100%;
+    }
+
+    /* 顶部导航：更矮更紧凑 */
+    .admin-header {
+      height: 48px;
+      padding: 0 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: var(--bg-card);
+      border-bottom: 1px solid var(--border);
+      z-index: 10;
+    }
+    
+    .admin-logo {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+    
+    .admin-logo span:first-child {
+      font-size: 16px;
+    }
+
+    .admin-header-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    /* 按钮：更紧凑、扁平化 */
+    .btn {
+      padding: 5px 12px;
+      font-size: 12px;
+      font-weight: 500;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      border: 1px solid transparent;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      outline: none;
+    }
+
+    .btn-default {
+      background: var(--bg-card);
+      border-color: var(--border);
+      color: var(--text-secondary);
+    }
+    
+    .btn-default:hover {
+      background: var(--bg-hover);
+      color: var(--text-primary);
+      border-color: var(--border-focus);
+    }
+
+    .btn-primary {
+      background: var(--accent);
+      color: #fff;
+    }
+
+    .btn-primary:hover {
+      background: var(--accent-hover);
+      box-shadow: none;
+    }
+
+    .btn-danger {
+      background: transparent;
+      border-color: var(--border);
+      color: var(--color-error);
+    }
+    
+    .btn-danger:hover {
+      background: rgba(239, 68, 68, 0.08);
+      border-color: var(--color-error);
+    }
+
+    /* 主内容区 */
+    .admin-content {
+      flex: 1;
+      display: flex;
+      overflow: hidden;
+      position: relative;
+    }
+
+    /* 左侧边栏：宽度收缩至 300px，界面更加干练 */
+    .admin-sidebar {
+      width: 300px;
+      display: flex;
+      flex-direction: column;
+      border-right: 1px solid var(--border);
+      background: var(--bg-card);
+      overflow: hidden;
+      flex-shrink: 0;
+    }
+
+    .sidebar-search-box {
+      padding: 12px;
+      border-bottom: 1px solid var(--border-light);
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .search-input-wrapper {
+      position: relative;
+    }
+
+    .search-input {
+      width: 100%;
+      box-sizing: border-box;
+      padding: 6px 10px;
+      font-size: 12px;
+      border-radius: 4px;
+      border: 1px solid var(--border);
+      background: var(--bg-body);
+      color: var(--text-primary);
+      transition: all 0.15s;
+    }
+
+    .search-input:focus {
+      outline: none;
+      border-color: var(--accent);
+      box-shadow: none;
+    }
+
+    .spots-list {
+      flex: 1;
+      overflow-y: auto;
+      padding: 8px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    /* 列表卡片：扁平、小间距、去阴影 */
+    .spot-item-card {
+      padding: 8px 10px;
+      border-radius: 4px;
+      background: var(--bg-card);
+      border: 1px solid var(--border-light);
+      cursor: pointer;
+      transition: all 0.15s ease;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .spot-item-card:hover {
+      background: var(--bg-hover);
+      border-color: var(--border);
+      transform: none;
+      box-shadow: none;
+    }
+
+    .spot-item-card.active {
+      border-color: var(--accent);
+      background: rgba(var(--primary-rgb), 0.06);
+    }
+
+    .spot-item-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+    }
+
+    .spot-item-title {
+      font-weight: 600;
+      font-size: 13px;
+      color: var(--text-primary);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 190px;
+    }
+
+    .status-badge {
+      font-size: 10px;
+      font-weight: 500;
+      padding: 1px 5px;
+      border-radius: 2px;
+      text-transform: uppercase;
+      flex-shrink: 0;
+    }
+
+    .status-done { background: rgba(230, 138, 138, 0.12); color: var(--color-macaron-done); }
+    .status-wish { background: rgba(143, 179, 217, 0.12); color: var(--color-macaron-wish); }
+    .status-plan { background: rgba(152, 191, 163, 0.12); color: var(--color-macaron-plan); }
+
+    .spot-item-info {
+      font-size: 11px;
+      color: var(--text-muted);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    /* 右侧工作区 */
+    .admin-workspace {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      background: var(--bg-body);
+    }
+
+    /* 地图容器 */
+    .map-section {
+      height: 35%;
+      min-height: 180px;
+      position: relative;
+      border-bottom: 1px solid var(--border);
+    }
+
+    #admin-map {
+      width: 100%;
+      height: 100%;
+    }
+
+    .map-search-overlay {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      z-index: 100;
+      width: 240px;
+    }
+
+    /* 表单编辑区 */
+    .editor-section {
+      flex: 1;
+      overflow-y: auto;
+      padding: 16px;
+      box-sizing: border-box;
+      background: var(--bg-card);
+    }
+
+    .editor-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .form-group.full-width {
+      grid-column: span 2;
+    }
+
+    .form-label {
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--text-muted);
+    }
+
+    .form-control {
+      padding: 6px 10px;
+      font-size: 12px;
+      border-radius: 4px;
+      border: 1px solid var(--border);
+      background: var(--bg-card);
+      color: var(--text-primary);
+      box-sizing: border-box;
+      width: 100%;
+      transition: all 0.15s;
+    }
+
+    .form-control:focus {
+      outline: none;
+      border-color: var(--accent);
+      box-shadow: none;
+    }
+
+    .form-row {
+      display: flex;
+      gap: 8px;
+    }
+
+    .form-row .form-group {
+      flex: 1;
+    }
+
+    /* 动态关联文章行 */
+    .link-row {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      margin-bottom: 6px;
+    }
+
+    .link-row input {
+      flex: 1;
+    }
+
+    .editor-actions {
+      margin-top: 16px;
+      padding-top: 12px;
+      border-top: 1px solid var(--border-light);
+      display: flex;
+      justify-content: flex-end;
+      gap: 8px;
+    }
+
+    /* 凭证未配置弹窗警告 */
+    .warning-banner {
+      background: rgba(245, 158, 11, 0.08);
+      border: 1px solid rgba(245, 158, 11, 0.2);
+      color: var(--color-warning);
+      padding: 8px 12px;
+      border-radius: 4px;
+      margin-bottom: 12px;
+      font-size: 11px;
+      display: none;
+      line-height: 1.4;
+    }
+    
+    /* 隐藏高德地图的一些无关浮窗组件 */
+    .amap-sug-result {
+      z-index: 9999 !important;
+      border-radius: 4px;
+      border: 1px solid var(--border-light);
+      box-shadow: var(--shadow-sm);
+      font-family: inherit;
+      font-size: 12px;
+    }
+    
+    /* 缩略图预览 */
+    .thumb-preview {
+      width: 48px;
+      height: 32px;
+      border-radius: 2px;
+      object-fit: cover;
+      border: 1px solid var(--border-light);
+      background-color: var(--bg-body);
+    }
+
+    .draft-badge {
+      background: var(--color-warning);
+      color: #fff;
+      font-size: 9px;
+      font-weight: 600;
+      padding: 1px 4px;
+      border-radius: 2px;
+      margin-left: 6px;
+      display: none;
+    }
+
+    .select-flat {
+      appearance: none;
+      -webkit-appearance: none;
+      -moz-appearance: none;
+      background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 8px center;
+      background-size: 12px;
+      padding-right: 24px !important;
+      cursor: pointer;
+    }
+
+    @media (max-width: 768px) {
+      .admin-content {
+        flex-direction: column;
+      }
+      .admin-sidebar {
+        width: 100%;
+        height: 240px;
+        border-right: none;
+        border-bottom: 1px solid var(--border);
+      }
+      .editor-grid {
+        grid-template-columns: 1fr;
+      }
+      .form-group.full-width {
+        grid-column: span 1;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="admin-container">
+    <!-- 顶部状态导航 -->
+    <header class="admin-header">
+      <div class="admin-logo">
+        <span>🌏</span>
+        <span>VagulaMap 足迹编辑后台</span>
+        <span id="draft-status" class="draft-badge">有未保存草稿</span>
+      </div>
+      <div class="admin-header-actions">
+        <input type="file" id="file-import" accept=".json" style="display: none;" />
+        <button class="btn btn-default" onclick="document.getElementById('file-import').click()">
+          📥 导入外部 JSON
+        </button>
+        <button class="btn btn-primary" id="btn-export">
+          💾 导出 markers.json
+        </button>
+      </div>
+    </header>
+
+    <div class="admin-content">
+      <!-- 左侧边栏：足迹列表 -->
+      <aside class="admin-sidebar">
+        <div class="sidebar-search-box">
+          <div class="search-input-wrapper">
+            <input type="text" id="spot-search" class="search-input" placeholder="搜索已去景点或城市..." />
+          </div>
+          <button class="btn btn-primary" style="justify-content: center;" id="btn-add-new">
+            ＋ 新建旅行足迹
+          </button>
+        </div>
+        <div class="spots-list" id="spots-container">
+          <!-- 动态填充打点项目 -->
+        </div>
+      </aside>
+
+      <!-- 右侧工作区：地图定位与表单编辑 -->
+      <main class="admin-workspace">
+        <!-- 上半部分：高德地图定位/坐标拾取 -->
+        <div class="map-section">
+          <!-- 景点检索自动补全悬浮条 -->
+          <div class="map-search-overlay">
+            <input type="text" id="map-search-input" class="search-input" placeholder="🔍 搜索景区以定位并自动填充属性..." />
+          </div>
+          <div id="admin-map"></div>
+        </div>
+
+        <!-- 下半部分：表单内容编辑 -->
+        <div class="editor-section">
+          <div id="config-warning" class="warning-banner"></div>
+          
+          <form id="editor-form" onsubmit="event.preventDefault();">
+            <div class="editor-grid">
+              <!-- 年份、景区、地点放一行 -->
+              <div class="form-group full-width">
+                <div class="form-row">
+                  <div class="form-group" id="group-year" style="flex: 1.2;">
+                    <label class="form-label" for="field-year">旅行年份 (多个用逗号隔开)</label>
+                    <input type="text" id="field-year" class="form-control" placeholder="例如：2024, 2025" />
+                  </div>
+                  <div class="form-group" style="flex: 2;">
+                    <label class="form-label" for="field-spot">景点/地标名称</label>
+                    <input type="text" id="field-spot" class="form-control" placeholder="例如：中山陵" required />
+                  </div>
+                  <div class="form-group" style="flex: 2;">
+                    <label class="form-label" for="field-region">所属城市 (用于高亮版图)</label>
+                    <input type="text" id="field-region" class="form-control" placeholder="写名称即可，例如：南京 (不要带“市”)" required />
+                  </div>
+                </div>
+              </div>
+
+              <!-- 状态、经纬度以及高德搜索自动获取图片，放一行 -->
+              <div class="form-group full-width">
+                <div class="form-row" style="align-items: flex-end; gap: 10px;">
+                  <!-- 旅行状态 -->
+                  <div class="form-group" style="flex: 1.2;">
+                    <label class="form-label" for="field-status">旅行状态</label>
+                    <select id="field-status" class="form-control select-flat">
+                      <option value="done">已去 (Done)</option>
+                      <option value="wish">想去 (Wish)</option>
+                      <option value="plan">计划中 (Plan)</option>
+                    </select>
+                  </div>
+                  
+                  <!-- 经纬度 -->
+                  <div class="form-group" style="flex: 2.2;">
+                    <label class="form-label">坐标定位 [经度, 纬度]</label>
+                    <div class="form-row" style="gap: 4px;">
+                      <input type="number" step="any" id="field-lng" class="form-control" placeholder="经度" required />
+                      <input type="number" step="any" id="field-lat" class="form-control" placeholder="纬度" required />
+                    </div>
+                  </div>
+
+                  <!-- 搜景点获取坐标 -->
+                  <div class="form-group" style="flex: 2.2;">
+                    <label class="form-label" for="field-poi-search">高德 API 搜索获取坐标</label>
+                    <div class="form-row" style="gap: 4px;">
+                      <input type="text" id="field-poi-search" class="form-control" placeholder="输入地名/景点以自动获取坐标..." />
+                      <button type="button" class="btn btn-primary" id="btn-poi-search" style="padding: 0 10px; height: 28px; line-height: 26px; box-sizing: border-box; flex-shrink: 0; font-size: 12px;">检索坐标</button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- 封面图链接 -->
+              <div class="form-group full-width">
+                <label class="form-label" for="field-image">卡片封面图片链接</label>
+                <div class="form-row" style="align-items: center;">
+                  <input type="url" id="field-image" class="form-control" placeholder="https://images.unsplash.com/..." />
+                  <img id="img-preview" src="" class="thumb-preview" alt="预览" style="display: none;" />
+                </div>
+              </div>
+
+              <!-- 附加备注（想去/计划） -->
+              <div class="form-group full-width" id="group-notes" style="display: none;">
+                <label class="form-label" id="label-notes" for="field-notes">理由/计划时间</label>
+                <input type="text" id="field-notes" class="form-control" placeholder="理由或计划时间" />
+              </div>
+
+              <!-- 关联文章 -->
+              <div class="form-group full-width">
+                <label class="form-label">关联博客游记文章</label>
+                <div id="links-container">
+                  <!-- 动态添加文章链接输入行 -->
+                </div>
+                <button type="button" class="btn btn-default" style="margin-top: 6px; width: fit-content;" id="btn-add-link">
+                  ➕ 添加一篇关联文章
+                </button>
+              </div>
+            </div>
+
+            <!-- 操作按钮 -->
+            <div class="editor-actions">
+              <button type="button" class="btn btn-danger" id="btn-delete-spot" style="margin-right: auto; display: none;">
+                🗑️ 删除此足迹
+              </button>
+              <button type="button" class="btn btn-default" id="btn-cancel">取消编辑</button>
+              <button type="submit" class="btn btn-primary" id="btn-save">保存足迹点</button>
+            </div>
+          </form>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <script type="text/javascript">
+    // 辅助函数：HTML 转义以防止 XSS
+    function escapeHtml(str) {
+      if (!str) return "";
+      return String(str)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#39;");
+    }
+
+    // --- 1. 坐标纠偏算法与工具 ---
+    const PI = 3.1415926535897932384626;
+    const a = 6378245.0;
+    const ee = 0.00669342162296594323;
+
+    function outOfChina(lng, lat) {
+      return (lng < 72.004 || lng > 137.8347 || lat < 0.8293 || lat > 55.8271);
+    }
+
+    function transformlat(lng, lat) {
+      let ret = -100.0 + 2.0 * lng + 3.0 * lat + 0.2 * lat * lat + 0.1 * lng * lat + 0.2 * Math.sqrt(Math.abs(lng));
+      ret += (20.0 * Math.sin(6.0 * lng * PI) + 20.0 * Math.sin(2.0 * lng * PI)) * 2.0 / 3.0;
+      ret += (20.0 * Math.sin(lat * PI) + 40.0 * Math.sin(lat / 3.0 * PI)) * 2.0 / 3.0;
+      ret += (160.0 * Math.sin(lat / 12.0 * PI) + 320 * Math.sin(lat * PI / 30.0)) * 2.0 / 3.0;
+      return ret;
+    }
+
+    function transformlng(lng, lat) {
+      let ret = 300.0 + lng + 2.0 * lat + 0.1 * lng * lng + 0.1 * lng * lat + 0.1 * Math.sqrt(Math.abs(lng));
+      ret += (20.0 * Math.sin(6.0 * lng * PI) + 20.0 * Math.sin(2.0 * lng * PI)) * 2.0 / 3.0;
+      ret += (20.0 * Math.sin(lng * PI) + 40.0 * Math.sin(lng / 3.0 * PI)) * 2.0 / 3.0;
+      ret += (150.0 * Math.sin(lng / 12.0 * PI) + 300.0 * Math.sin(lng / 30.0 * PI)) * 2.0 / 3.0;
+      return ret;
+    }
+
+    function wgs84togcj02(lng, lat) {
+      if (outOfChina(lng, lat)) return [lng, lat];
+      let dlat = transformlat(lng - 105.0, lat - 35.0);
+      let dlng = transformlng(lng - 105.0, lat - 35.0);
+      let radlat = lat / 180.0 * PI;
+      let magic = Math.sin(radlat);
+      magic = 1 - ee * magic * magic;
+      let sqrtmagic = Math.sqrt(magic);
+      dlat = (dlat * 180.0) / ((a * (1 - ee)) / (magic * sqrtmagic) * PI);
+      dlng = (dlng * 180.0) / (a / sqrtmagic * Math.cos(radlat) * PI);
+      return [lng + dlng, lat + dlat];
+    }
+
+    function gcj02towgs84(lng, lat) {
+      if (outOfChina(lng, lat)) return [lng, lat];
+      let dlat = transformlat(lng - 105.0, lat - 35.0);
+      let dlng = transformlng(lng - 105.0, lat - 35.0);
+      let radlat = lat / 180.0 * PI;
+      let magic = Math.sin(radlat);
+      magic = 1 - ee * magic * magic;
+      let sqrtmagic = Math.sqrt(magic);
+      dlat = (dlat * 180.0) / ((a * (1 - ee)) / (magic * sqrtmagic) * PI);
+      dlng = (dlng * 180.0) / (a / sqrtmagic * Math.cos(radlat) * PI);
+      return [lng * 2 - (lng + dlng), lat * 2 - (lat + dlat)];
+    }
+
+    // 从 index.html 获取高德 Key
+    async function loadAMapConfig() {
+      try {
+        const response = await fetch("index.html");
+        if (!response.ok) throw new Error();
+        const html = await response.text();
+        const keyMatch = html.match(/key:\s*["']([^"']+)["']/);
+        const securityJsCodeMatch = html.match(/securityJsCode:\s*["']([^"']+)["']/);
+        const coordinateSystemMatch = html.match(/coordinateSystem:\s*["']([^"']+)["']/);
+        return {
+          key: keyMatch ? keyMatch[1] : "",
+          securityJsCode: securityJsCodeMatch ? securityJsCodeMatch[1] : "",
+          coordinateSystem: coordinateSystemMatch ? coordinateSystemMatch[1] : "WGS84"
+        };
+      } catch (err) {
+        return { key: "", securityJsCode: "", coordinateSystem: "WGS84" };
+      }
+    }
+
+    function loadAMapScript(key, securityJsCode) {
+      return new Promise((resolve, reject) => {
+        window._AMapSecurityConfig = { securityJsCode };
+        const script = document.createElement("script");
+        script.type = "text/javascript";
+        script.src = `https://webapi.amap.com/maps?v=2.0&key=${key}&plugin=AMap.ToolBar,AMap.AutoComplete,AMap.PlaceSearch,AMap.Geocoder`;
+        script.onload = () => resolve(window.AMap);
+        script.onerror = () => reject(new Error("高德 SDK 加载失败"));
+        document.head.appendChild(script);
+      });
+    }
+
+    // --- 2. 管理台状态与核心数据流管理 ---
+    let map = null;
+    let geocoder = null;
+    let mapMarker = null;
+    let placeSearch = null;
+    
+    let spotsData = { type: "FeatureCollection", features: [] }; // 主内存数据
+    let selectedSpotIndex = -1; // 当前选中的编辑索引，-1 表示新建
+    let coordinateSystem = "WGS84"; // 地图配置的数据存储坐标系
+    
+    // 初始化数据加载
+    async function initApp() {
+      const config = await loadAMapConfig();
+      const warningBanner = document.getElementById("config-warning");
+      
+      if (!config.key || config.key.includes("您的高德地图")) {
+        warningBanner.style.display = "block";
+        warningBanner.innerText = "⚠️ 警告：检测到 index.html 中未配置高德地图开发 KEY。后台的地图坐标拾取及自动补全将无法工作！请先打开 index.html 配置高德凭证。";
+      }
+      
+      coordinateSystem = config.coordinateSystem;
+      
+      // 加载高德地图
+      try {
+        if (config.key) {
+          const AMap = await loadAMapScript(config.key, config.securityJsCode);
+          initMap(AMap);
+        }
+      } catch (err) {
+        console.error(err);
+      }
+
+      // 加载 JSON 数据（优先使用 localStorage 草稿，没有则拉取本地 markers.json）
+      const draft = localStorage.getItem("vagulamap_admin_draft");
+      if (draft) {
+        try {
+          spotsData = JSON.parse(draft);
+          document.getElementById("draft-status").style.display = "inline-block";
+        } catch (e) {
+          localStorage.removeItem("vagulamap_admin_draft");
+        }
+      }
+      
+      if (spotsData.features.length === 0) {
+        try {
+          const response = await fetch("markers.json");
+          if (response.ok) {
+            spotsData = await response.json();
+          }
+        } catch (e) {
+          // 初始化空数据
+          spotsData = { type: "FeatureCollection", features: [] };
+        }
+      }
+      
+      renderList();
+      resetForm();
+    }
+
+    // 初始化地图
+    function initMap(AMap) {
+      map = new AMap.Map("admin-map", {
+        zoom: 4,
+        center: [105, 35],
+        mapStyle: "amap://styles/normal"
+      });
+
+      map.addControl(new AMap.ToolBar({ position: { top: '10px', right: '10px' } }));
+      geocoder = new AMap.Geocoder();
+      placeSearch = new AMap.PlaceSearch({ map: map });
+
+      // 点击地图拾取坐标
+      map.on("click", (e) => {
+        const lng = e.lnglat.getLng();
+        const lat = e.lnglat.getLat();
+        
+        // 渲染坐标输入框 (若配置是 WGS84，我们需要将点击高德地图获得的 GCJ-02 转换回 WGS84)
+        let displayLng = lng;
+        let displayLat = lat;
+        if (coordinateSystem === "WGS84") {
+          const wgs = gcj02towgs84(lng, lat);
+          displayLng = wgs[0];
+          displayLat = wgs[1];
+        }
+
+        document.getElementById("field-lng").value = displayLng.toFixed(6);
+        document.getElementById("field-lat").value = displayLat.toFixed(6);
+        
+        updateMapMarker(lng, lat);
+        
+        // 逆地理编码获取城市
+        geocoder.getAddress([lng, lat], (status, result) => {
+          if (status === 'complete' && result.regeocode) {
+            const comp = result.regeocode.addressComponent;
+            let city = comp.city || comp.province || "";
+            city = city.replace(/(市|地区|盟|自治州|特别行政区)$/, "");
+            
+            const fieldRegion = document.getElementById("field-region");
+            if (!fieldRegion.value) {
+              fieldRegion.value = city;
+            }
+          }
+        });
+      });
+
+      // 搜索自动补全
+      const auto = new AMap.AutoComplete({ input: "map-search-input" });
+      auto.on("select", (e) => {
+        if (e.poi && e.poi.location) {
+          const lng = e.poi.location.lng;
+          const lat = e.poi.location.lat;
+          
+          map.setZoomAndCenter(14, [lng, lat]);
+          updateMapMarker(lng, lat);
+
+          let displayLng = lng;
+          let displayLat = lat;
+          if (coordinateSystem === "WGS84") {
+            const wgs = gcj02towgs84(lng, lat);
+            displayLng = wgs[0];
+            displayLat = wgs[1];
+          }
+
+          document.getElementById("field-lng").value = displayLng.toFixed(6);
+          document.getElementById("field-lat").value = displayLat.toFixed(6);
+          
+          // 提取景点名字
+          const spotName = e.poi.name;
+          document.getElementById("field-spot").value = spotName;
+
+          // 提取城市
+          let city = e.poi.district || "";
+          // 比如 "江苏省南京市玄武区"，我们提取最后一个 "市" 之前的名称
+          const cityMatch = city.match(/省?([^省]+?市)/);
+          if (cityMatch) {
+            city = cityMatch[1];
+          }
+          city = city.replace(/(市|地区|盟|自治州|特别行政区)$/, "");
+          // 再次过滤去除区名，如果是区则保留前一级
+          if (city.endsWith("区") && city.length > 3) {
+            city = city.substring(0, city.length - 1);
+          }
+          
+          document.getElementById("field-region").value = city;
+        }
+      });
+    }
+
+    // 地图打点同步
+    function updateMapMarker(lng, lat) {
+      if (!map) return;
+      if (mapMarker) {
+        mapMarker.setPosition([lng, lat]);
+      } else {
+        mapMarker = new AMap.Marker({
+          position: [lng, lat],
+          anchor: 'bottom-center'
+        });
+        mapMarker.setMap(map);
+      }
+    }
+
+    // --- 3. 页面渲染逻辑 ---
+    
+    // 渲染左侧足迹打点列表
+    function renderList() {
+      const container = document.getElementById("spots-container");
+      const searchVal = document.getElementById("spot-search").value.toLowerCase();
+      container.innerHTML = "";
+      
+      const features = spotsData.features || [];
+      
+      features.forEach((feat, index) => {
+        const p = feat.properties || {};
+        const title = p.title || "未命名景点";
+        const region = p.region || "";
+        const status = p.status || "done";
+        const year = Array.isArray(p.year) ? p.year.join(", ") : (p.year || "未知");
+        
+        // 搜索过滤
+        if (searchVal && !title.toLowerCase().includes(searchVal) && !region.toLowerCase().includes(searchVal)) {
+          return;
+        }
+        
+        const card = document.createElement("div");
+        card.className = `spot-item-card ${selectedSpotIndex === index ? 'active' : ''}`;
+        card.onclick = () => editSpot(index);
+        
+        let badgeLabel = "已去";
+        if (status === "wish") badgeLabel = "想去";
+        if (status === "plan") badgeLabel = "计划";
+
+        card.innerHTML = `
+          <div class="spot-item-header">
+            <span class="spot-item-title">${escapeHtml(title)}</span>
+            <span class="status-badge status-${status}">${badgeLabel}</span>
+          </div>
+          <div class="spot-item-info">
+            <span>📅 旅行年份: ${escapeHtml(year)}</span>
+            <span>📍 ${escapeHtml(region)}</span>
+          </div>
+        `;
+        
+        container.appendChild(card);
+      });
+      
+      if (container.children.length === 0) {
+        container.innerHTML = `<div style="text-align:center;color:var(--text-muted);font-size:12px;padding:20px 0;">无匹配的足迹点</div>`;
+      }
+    }
+
+    document.getElementById("spot-search").addEventListener("input", renderList);
+
+    // 选中并开始编辑足迹
+    function editSpot(index) {
+      selectedSpotIndex = index;
+      renderList();
+      
+      const feat = spotsData.features[index];
+      const p = feat.properties;
+      const coords = feat.geometry.coordinates;
+      
+      document.getElementById("field-spot").value = p.spot || "";
+      document.getElementById("field-region").value = p.region || "";
+      document.getElementById("field-status").value = p.status || "done";
+      document.getElementById("field-year").value = Array.isArray(p.year) ? p.year.join(", ") : (p.year || "");
+      
+      // 显示存储的原始坐标系经纬度
+      // 注意：由于在 trip.js 中我们将 features.coordinates 统一转成了 GCJ-02。
+      // 但这里我们如果是编辑 markers.json 原始文件，我们需要看它的 coordinateSystem 配置。
+      // 事实上最不易出错的做法是：直接读取备份的原始 _wgsCoords 或原 coordinates 值。
+      // 我们在此后台，根据所声明的坐标系直接展示对应坐标：
+      let lng = coords[0];
+      let lat = coords[1];
+      if (coordinateSystem === "WGS84" && p._wgsCoords) {
+        lng = p._wgsCoords[0];
+        lat = p._wgsCoords[1];
+      }
+      
+      document.getElementById("field-lng").value = lng;
+      document.getElementById("field-lat").value = lat;
+
+      document.getElementById("field-image").value = (Array.isArray(p.image) ? p.image[0] : p.image) || "";
+      
+      // 备注字段切换
+      handleStatusChange();
+      if (p.status === "wish") document.getElementById("field-notes").value = p.wish_reason || "";
+      if (p.status === "plan") document.getElementById("field-notes").value = p.plan_date || "";
+
+      // 预览图展示
+      updateImagePreview();
+
+      // 文章链接渲染
+      renderLinks(p.posts || []);
+
+      // 地图打点定位
+      if (map) {
+        // 定位必须使用高德原生 GCJ-02 坐标
+        let mapLng = lng;
+        let mapLat = lat;
+        if (coordinateSystem === "WGS84") {
+          const gcj = wgs84togcj02(lng, lat);
+          mapLng = gcj[0];
+          mapLat = gcj[1];
+        }
+        map.setZoomAndCenter(10, [mapLng, mapLat]);
+        updateMapMarker(mapLng, mapLat);
+      }
+
+      document.getElementById("btn-delete-spot").style.display = "inline-flex";
+    }
+
+    // 重置表单以创建新足迹
+    function resetForm() {
+      selectedSpotIndex = -1;
+      renderList();
+      
+      document.getElementById("editor-form").reset();
+      document.getElementById("links-container").innerHTML = "";
+      document.getElementById("img-preview").style.display = "none";
+      document.getElementById("btn-delete-spot").style.display = "none";
+      
+      handleStatusChange();
+      
+      if (mapMarker) {
+        mapMarker.setMap(null);
+        mapMarker = null;
+      }
+    }
+
+    document.getElementById("btn-add-new").onclick = resetForm;
+    document.getElementById("btn-cancel").onclick = resetForm;
+
+    // 根据选择状态调整表单选项 (例如 Plan 和 Wish 有不同的输入项)
+    function handleStatusChange() {
+      const status = document.getElementById("field-status").value;
+      const groupNotes = document.getElementById("group-notes");
+      const labelNotes = document.getElementById("label-notes");
+      const fieldNotes = document.getElementById("field-notes");
+      const groupYear = document.getElementById("group-year");
+      
+      if (status === "done") {
+        groupNotes.style.display = "none";
+        groupYear.style.display = "flex";
+      } else if (status === "wish") {
+        groupNotes.style.display = "flex";
+        groupYear.style.display = "none";
+        labelNotes.innerText = "想去的理由 / 期望";
+        fieldNotes.placeholder = "例如：希望看一次浪漫夕阳";
+      } else if (status === "plan") {
+        groupNotes.style.display = "flex";
+        groupYear.style.display = "none";
+        labelNotes.innerText = "计划旅行日期";
+        fieldNotes.placeholder = "例如：2027年春季";
+      }
+    }
+
+    document.getElementById("field-status").onchange = handleStatusChange;
+
+    // 图像预览
+    function updateImagePreview() {
+      const url = document.getElementById("field-image").value.trim();
+      const img = document.getElementById("img-preview");
+      if (url) {
+        img.src = url;
+        img.style.display = "block";
+      } else {
+        img.style.display = "none";
+      }
+    }
+
+    document.getElementById("field-image").addEventListener("input", updateImagePreview);
+
+    // --- 4. 关联文章链接的增减管理 ---
+    function renderLinks(posts) {
+      const container = document.getElementById("links-container");
+      container.innerHTML = "";
+      posts.forEach(post => addLinkRow(post.title, post.permalink));
+    }
+
+    function addLinkRow(title = "", url = "") {
+      const container = document.getElementById("links-container");
+      const row = document.createElement("div");
+      row.className = "link-row";
+      
+      // 当手动添加空白链接行时，预填提示格式作为示例
+      const defaultTitle = title || "示例：金陵寻古：中山陵一日游";
+      const defaultUrl = url || "https://wangdaodao.me/2026/nanjing-trip/";
+
+      row.innerHTML = `
+        <input type="text" class="form-control link-title" placeholder="文章标题" value="${escapeHtml(defaultTitle)}" />
+        <input type="url" class="form-control link-url" placeholder="游记网址 (http/https)" value="${escapeHtml(defaultUrl)}" />
+        <button type="button" class="btn btn-danger" style="padding:8px;" onclick="this.parentNode.remove()">🗑️</button>
+      `;
+      container.appendChild(row);
+    }
+
+    document.getElementById("btn-add-link").onclick = () => addLinkRow();
+
+    // 经纬度后的高德 POI 检索，实现自动获取坐标、景点名与照片封面
+    document.getElementById("btn-poi-search").onclick = () => {
+      const keyword = document.getElementById("field-poi-search").value.trim();
+      if (!keyword) {
+        alert("请输入检索关键词");
+        return;
+      }
+      
+      if (!placeSearch) {
+        alert("高德地图 API 未加载，请先在 index.html 中配置有效 Key");
+        return;
+      }
+
+      const btn = document.getElementById("btn-poi-search");
+      const originalText = btn.innerText;
+      btn.innerText = "检索中...";
+      btn.disabled = true;
+
+      // 使用高德 PlaceSearch 插件搜索景点/POI
+      placeSearch.search(keyword, (status, result) => {
+        btn.innerText = originalText;
+        btn.disabled = false;
+
+        if (status === 'complete' && result.poiList && result.poiList.pois.length > 0) {
+          const pois = result.poiList.pois;
+          
+          // 查找首个含有实景照片的 POI 点
+          let foundPhoto = null;
+          let selectedPoi = null;
+          for (let poi of pois) {
+            if (poi.photos && poi.photos.length > 0 && poi.photos[0].url) {
+              foundPhoto = poi.photos[0].url;
+              selectedPoi = poi;
+              break;
+            }
+          }
+          
+          if (!selectedPoi) {
+            selectedPoi = pois[0]; // 兜底使用首个检索点
+          }
+
+          if (selectedPoi) {
+            // 自动解析高德 GCJ-02 经纬度，并对应系统坐标系进行纠偏转换
+            const lng = selectedPoi.location.lng;
+            const lat = selectedPoi.location.lat;
+            let displayLng = lng;
+            let displayLat = lat;
+            if (coordinateSystem === "WGS84") {
+              const wgs = gcj02towgs84(lng, lat);
+              displayLng = wgs[0];
+              displayLat = wgs[1];
+            }
+            document.getElementById("field-lng").value = displayLng.toFixed(6);
+            document.getElementById("field-lat").value = displayLat.toFixed(6);
+            updateMapMarker(lng, lat);
+            if (map) map.setZoomAndCenter(14, [lng, lat]);
+
+            // 自动同步景点名称与大头针生成
+            if (!document.getElementById("field-spot").value) {
+              document.getElementById("field-spot").value = selectedPoi.name;
+            }
+          }
+
+          if (foundPhoto) {
+            document.getElementById("field-image").value = foundPhoto;
+            updateImagePreview();
+            alert(`成功检索并自动填充景点坐标、地标名称及封面实景图！`);
+          } else {
+            alert(`已成功定位景点坐标，但高德未返回该景点的实景图片。`);
+          }
+        } else {
+          alert("未检索到相关景点，请换个词重试（例如输入具体城市 + 景区名字）。");
+        }
+      });
+    };
+
+    // --- 5. 数据的保存、删除与草稿备份 ---
+    
+    // 表单提交保存
+    document.getElementById("editor-form").onsubmit = (e) => {
+      e.preventDefault();
+      
+      const spot = document.getElementById("field-spot").value.trim();
+      const region = document.getElementById("field-region").value.trim();
+      const title = (spot && region) ? `${spot} · ${region}` : (spot || region);
+      const status = document.getElementById("field-status").value;
+      const yearVal = document.getElementById("field-year").value.trim();
+      const lng = parseFloat(document.getElementById("field-lng").value);
+      const lat = parseFloat(document.getElementById("field-lat").value);
+      const image = document.getElementById("field-image").value.trim();
+      const notes = document.getElementById("field-notes").value.trim();
+      
+      // 解析关联文章
+      const posts = [];
+      const linkRows = document.querySelectorAll(".link-row");
+      linkRows.forEach(row => {
+        const t = row.querySelector(".link-title").value.trim();
+        const u = row.querySelector(".link-url").value.trim();
+        if (t && u) {
+          posts.push({ title: t, permalink: u });
+        }
+      });
+
+      // 组装 Feature
+      const properties = {
+        title,
+        region,
+        spot,
+        status,
+        posts,
+        image: image ? [image] : []
+      };
+
+      if (status === "done") {
+        properties.year = yearVal ? yearVal.split(",").map(s => s.trim()) : [];
+      } else if (status === "wish") {
+        properties.wish_reason = notes;
+      } else if (status === "plan") {
+        properties.plan_date = notes;
+      }
+
+      // 将编辑的坐标保存为基准坐标
+      const coordinates = [lng, lat];
+      
+      const feature = {
+        type: "Feature",
+        properties: properties,
+        geometry: {
+          type: "Point",
+          coordinates: coordinates
+        }
+      };
+
+      // 备份原始 WGS-84 和 GCJ-02，提供给双底座使用
+      if (coordinateSystem === "GCJ02") {
+        feature.properties._gcjCoords = coordinates;
+        feature.properties._wgsCoords = gcj02towgs84(lng, lat);
+      } else {
+        feature.properties._wgsCoords = coordinates;
+        feature.properties._gcjCoords = wgs84togcj02(lng, lat);
+      }
+
+      if (selectedSpotIndex >= 0) {
+        // 编辑已有足迹
+        spotsData.features[selectedSpotIndex] = feature;
+      } else {
+        // 新建足迹
+        spotsData.features.push(feature);
+      }
+
+      saveDraft();
+      resetForm();
+    };
+
+    // 删除当前选中的足迹
+    document.getElementById("btn-delete-spot").onclick = () => {
+      if (selectedSpotIndex >= 0 && confirm("确定要永久删除这个足迹打点吗？")) {
+        spotsData.features.splice(selectedSpotIndex, 1);
+        saveDraft();
+        resetForm();
+      }
+    };
+
+    // 保存草稿到本地存储
+    function saveDraft() {
+      // 移除计算产生的隐藏临时属性以保持 markers.json 洁净
+      const cleanData = JSON.parse(JSON.stringify(spotsData));
+      cleanData.features.forEach(f => {
+        if (f.properties) {
+          delete f.properties._wgsCoords;
+          delete f.properties._gcjCoords;
+          delete f.properties._cachedCountry;
+          delete f.properties._cachedCity;
+        }
+      });
+
+      localStorage.setItem("vagulamap_admin_draft", JSON.stringify(cleanData));
+      document.getElementById("draft-status").style.display = "inline-block";
+      renderList();
+    }
+
+    // --- 6. 数据打包下载与外部数据导入 ---
+    
+    // 导出 file 下载
+    document.getElementById("btn-export").onclick = () => {
+      // 1. 获取干净的 FeatureCollection（去掉内存临时缓存）
+      const cleanData = JSON.parse(JSON.stringify(spotsData));
+      cleanData.features.forEach(f => {
+        if (f.properties) {
+          delete f.properties._wgsCoords;
+          delete f.properties._gcjCoords;
+          delete f.properties._cachedCountry;
+          delete f.properties._cachedCity;
+        }
+      });
+
+      // 2. 转成美化的 JSON 字符串
+      const jsonStr = JSON.stringify(cleanData, null, 2);
+      
+      // 3. 触发浏览器下载
+      const blob = new Blob([jsonStr], { type: "application/json" });
+      const url = URL.createObjectURL(blob);
+      const aLink = document.createElement("a");
+      aLink.href = url;
+      aLink.download = "markers.json";
+      aLink.click();
+      URL.revokeObjectURL(url);
+
+      // 4. 清除本地草稿箱
+      localStorage.removeItem("vagulamap_admin_draft");
+      document.getElementById("draft-status").style.display = "none";
+      alert("导出成功！请用刚下载的 markers.json 替换您项目文件夹中的原文件。");
+    };
+
+    // 导入外部 JSON 文件
+    document.getElementById("file-import").onchange = (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = (evt) => {
+        try {
+          const imported = JSON.parse(evt.target.result);
+          if (imported.type !== "FeatureCollection" || !Array.isArray(imported.features)) {
+            throw new Error("不是标准的 GeoJSON FeatureCollection 格式");
+          }
+          spotsData = imported;
+          saveDraft();
+          resetForm();
+          alert(`成功导入 ${imported.features.length} 个足迹点，已保存为草稿！`);
+        } catch (err) {
+          alert("导入失败，JSON 格式有误：" + err.message);
+        }
+      };
+      reader.readAsText(file);
+    };
+
+    // 启动应用
+    window.onload = initApp;
+  </script>
+</body>
+</html>
