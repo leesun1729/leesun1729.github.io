@@ -1,11 +1,12 @@
 # 自留地
 
-个人站点：算法笔记、项目，以及一些随手写下的东西。
+个人站点：算法文章、项目，以及一些随手写下的东西。
 线上地址 <https://leesun1729.github.io/>
 
 ## 技术栈
 
-[Astro](https://astro.build/) 静态站点，无客户端框架、无 Web 字体。
+[Astro](https://astro.build/) 静态站点，无客户端框架。字体自托管（Google Fonts 在大陆被 DNS 污染），
+按 unicode-range 切片，中文用 Noto Serif SC、西文用 Source Serif 4。
 
 ## 本地开发
 
@@ -20,7 +21,7 @@ npm run preview  # 预览构建结果
 
 ```
 src/
-  content/notes/        笔记（Markdown）
+  content/articles/     文章（Markdown）
   content/projects/     项目介绍，按 <项目名>/<语言>.md 组织
   content.config.ts     内容集合 schema
   layouts/              页面布局
@@ -31,9 +32,9 @@ scripts/fetch-ranking.mjs   从 GoatCounter 拉取榜单数据
 docs/                   内容契约与运维说明
 ```
 
-## 写一篇笔记
+## 写一篇文章
 
-在 `src/content/notes/` 新建 Markdown 文件，文件名即 URL（`trie.md` → `/notes/trie/`）：
+在 `src/content/articles/` 新建 Markdown 文件，文件名即 URL（`trie.md` → `/articles/trie/`）：
 
 ```yaml
 ---
@@ -62,4 +63,5 @@ draft: false
 ## 部署
 
 推送到 `master` 即触发 `.github/workflows/deploy.yml`，构建后发布到 GitHub Pages。
-旧 Hugo 版本的源码保存在 `archive` 分支。
+
+维护细节见 [`docs/维护指南.md`](docs/维护指南.md)。

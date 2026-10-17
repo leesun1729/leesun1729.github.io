@@ -5,12 +5,16 @@
   "type": "module",
   "scripts": {
     "dev": "astro dev",
-    "build": "astro build",
+    "build": "astro build && pagefind --site dist",
     "preview": "astro preview",
-    "astro": "astro"
+    "astro": "astro",
+    "search": "pagefind --site dist",
+    "check:fonts": "node scripts/check-font-coverage.mjs"
   },
   "dependencies": {
     "@astrojs/sitemap": "^3.7.4",
-    "astro": "^7.3.8"
+    "astro": "^7.3.8",
+    "astro-expressive-code": "^0.44.2",
+    "pagefind": "^1.5.2"
   }
 }

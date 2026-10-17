@@ -1,39 +1,45 @@
 import { defineConfig } from 'astro/config';
 import sitemap from '@astrojs/sitemap';
+import expressiveCode from 'astro-expressive-code';
 
 // Old Hugo URLs verified against the live site's sitemap. GitHub Pages serves
 // static files only — there is no server-side catch-all — so every taxonomy and
 // pagination path is enumerated explicitly rather than globbed.
-const NOTE = '/notes/';
+const ARTICLES = '/articles/';
 const redirects = {
-  '/post/': NOTE,
-  '/post/001-hugo博客搭建记/': '/notes/hugo-blog-setup/',
-  '/post/002-sublimt-text4/': '/notes/sublime-text-4/',
-  '/post/003-c++运算符重载/': '/notes/cpp-operator-overload/',
-  '/post/004-scc/': '/notes/scc/',
-  '/post/005-珂朵莉树/': '/notes/chtholly-tree/',
-  '/post/006-字典树/': '/notes/trie/',
+  '/post/': ARTICLES,
+  '/post/001-hugo博客搭建记/': '/articles/hugo-blog-setup/',
+  '/post/002-sublimt-text4/': '/articles/sublime-text-4/',
+  '/post/003-c++运算符重载/': '/articles/cpp-operator-overload/',
+  '/post/004-scc/': '/articles/scc/',
+  '/post/005-珂朵莉树/': '/articles/chtholly-tree/',
+  '/post/006-字典树/': '/articles/trie/',
 
-  '/categories/': NOTE,
-  '/categories/工程/': NOTE,
-  '/categories/算法/': NOTE,
-  '/categories/c++/': NOTE,
+  '/categories/': ARTICLES,
+  '/categories/工程/': ARTICLES,
+  '/categories/算法/': ARTICLES,
+  '/categories/c++/': ARTICLES,
 
-  '/tags/': NOTE,
-  '/tags/优先队列/': NOTE,
-  '/tags/博客/': NOTE,
-  '/tags/珂朵莉树/': NOTE,
-  '/tags/线段树/': NOTE,
-  '/tags/运算符重载/': NOTE,
-  '/tags/fastolympiccode/': NOTE,
-  '/tags/hugo/': NOTE,
-  '/tags/scc/': NOTE,
-  '/tags/sublimt-text4/': NOTE,
-  '/tags/tarjan/': NOTE,
-  '/tags/trie/': NOTE,
+  // Only the bare /tags/ index redirects now. The per-tag redirects that used
+  // to live here (hugo, 珂朵莉树, trie, …) shadowed the real tag pages added
+  // later: a 301 beats a generated page, so those URLs never reached
+  // /tags/<tag>/ and 6 of 11 Chinese tags were unreachable.
+  '/tags/': ARTICLES,
 
-  '/search/': NOTE,
-  '/page/1/': NOTE,
+  '/search/': ARTICLES,
+  '/page/1/': ARTICLES,
+
+  // The collection shipped as `/notes/` before the rename, so those URLs are
+  // already indexed and linked from outside. They are listed one by one for the
+  // same reason as the taxonomy paths above: no server-side wildcard exists.
+  '/notes/': ARTICLES,
+  '/notes/hugo-blog-setup/': '/articles/hugo-blog-setup/',
+  '/notes/sublime-text-4/': '/articles/sublime-text-4/',
+  '/notes/cpp-operator-overload/': '/articles/cpp-operator-overload/',
+  '/notes/scc/': '/articles/scc/',
+  '/notes/chtholly-tree/': '/articles/chtholly-tree/',
+  '/notes/trie/': '/articles/trie/',
+  '/en/notes/': '/en/articles/',
 };
 
 export default defineConfig({
@@ -45,10 +51,62 @@ export default defineConfig({
     locales: ['zh', 'en'],
     routing: { prefixDefaultLocale: false },
   },
-  markdown: {
-    shikiConfig: { theme: 'github-light-default', wrap: true },
-  },
   integrations: [
+    expressiveCode({
+      // A maintained code-rendering module replaces the hand-rolled Shiki
+      // setup: it brings the frame (title bar), line numbers, the copy button
+      // and collapsible sections that the old hand-written CSS had to fake.
+      // Coloured syntax highlighting, light/dark pair. The earlier grayscale
+      // pair (src/lib/shiki-grayscale.mjs) is gone: the site's chrome stays
+      // neutral, but code reads far better with real token colours.
+      // `themeCssSelector` still points the module at this site's own
+      // data-theme attribute — see below.
+      themes: ['github-light', 'github-dark'],
+      // Follow the site's own three-state theme switch. The module defaults to
+      // selecting themes via `[data-theme='<theme name>']`, but this site writes
+      // data-theme="light" | "dark" | "system" on <html>, so the default
+      // selector never matched and the dark token set stayed active in light
+      // mode (dark text on a light ground). Pointing it at the site's attribute
+      // — and at the media query for the 'system' state — is the whole fix.
+      themeCssSelector: (theme) => `[data-theme='${theme.type}']`,
+      useDarkModeMediaQuery: true,
+      // Inline the module's CSS rather than emitting an external stylesheet.
+      // `astro dev` writes a <link href="/_astro/ec.<hash>.css"> but never
+      // serves that route (the asset is only emitted during build), so the
+      // request 404s and every code block loses its layout and token colours
+      // while developing. Inlining removes the dev-only failure entirely.
+      emitExternalStylesheet: false,
+      defaultProps: {
+        wrap: false,
+        // No outer window. The frame (title bar + border + rounded shell) is
+        // what made a block read as a "screenshot of an editor" rather than as
+        // code in the page; the block is now just the code on a tinted ground,
+        // separated from the prose by the ground itself.
+        frame: 'none',
+      },
+      styleOverrides: {
+        // No border and no radius: with `frame: 'none'` there is no window to
+        // outline, so a border would just be a stray rectangle around the code.
+        borderRadius: '0',
+        borderWidth: '0',
+        borderColor: 'transparent',
+        codeBackground: 'var(--code-bg)',
+        frames: {
+          editorBackground: 'var(--code-bg)',
+          terminalBackground: 'var(--code-bg)',
+          frameBoxShadowCssValue: 'none',
+          tooltipSuccessBackground: 'var(--fg)',
+          tooltipSuccessForeground: 'var(--bg)',
+          inlineButtonBackground: 'transparent',
+          inlineButtonForeground: 'var(--muted)',
+          inlineButtonBorder: 'var(--line)',
+        },
+        codeFontFamily: 'var(--font-mono)',
+        codeFontSize: '0.8125rem',
+        codeLineHeight: '1.75',
+        uiFontFamily: 'var(--font-mono)',
+      },
+    }),
     sitemap({
       i18n: { defaultLocale: 'zh', locales: { zh: 'zh-CN', en: 'en' } },
     }),

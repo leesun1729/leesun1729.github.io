@@ -172,3 +172,80 @@
 - 不得引入 Tailwind 或其他 CSS 框架依赖；用原生 CSS 实现上述数值。
 - 不得保留旧版的网格底纹、印章红、macOS 窗口组件（`PasteWindow.astro` 应删除）。
 - 不得新增任何 Web 字体。
+
+---
+
+## 9. 自托管字体（本次新增）
+
+### 为什么必须自托管
+
+Google Fonts 在中国大陆**不可达**（`fonts.googleapis.com` / `fonts.gstatic.com` 被 DNS 污染）。
+因此不能 `<link>` 任何字体 CDN，字体必须从本站同源提供。
+
+### 为什么切片
+
+单个 Noto Serif SC 字重约 1.5 MB；子集到完整 GB2312 仍要 681 KB/字重，两个字重就 1.4 MB。
+所以每个字重切成两片，配 `unicode-range`（Google 自己给 CJK 用的办法）：
+
+| 切片 | 内容 | 大小 | 加载时机 |
+|---|---|---|---|
+| A | 站点实际用到的 873 字 | 133 / 136 KB | 每页都需 |
+| B | GB2312 一级字表其余 3074 字 | 566 / 584 KB | **仅当页面出现这些字才下** |
+
+效果：普通页面只下 **~270 KB**（A 的两字重），而覆盖率仍是完整常用字集，
+以后写新文章不会出现缺字。
+
+### 文件（`public/fonts/`，已提交进仓库）
+
+```
+noto-serif-sc-400-a.woff2    132.6 KB   切片 A
+noto-serif-sc-400-b.woff2    566.0 KB   切片 B
+noto-serif-sc-700-a.woff2    136.3 KB
+noto-serif-sc-700-b.woff2    584.1 KB
+source-serif-4-400.woff2      19.6 KB   Latin
+source-serif-4-700.woff2      21.2 KB
+source-serif-4-400-italic.woff2 19.6 KB
+```
+
+重建：`python3 scripts/build-fonts.py`（需 fontTools + `brotli` CLI；脚本内已处理 macOS 的
+brotli 扩展签名问题）。产物提交进仓库，构建本身不需要网络或 Python。
+
+### 字体分工
+
+- **中文正文**：`Noto Serif SC`（宋体），400 / 700
+- **Latin 正文与标题**：`Source Serif 4`，400 / 700 / 400-italic
+- 两者都是衬线，混排时视觉连续；**等宽仍用系统字体**（代码块不需要 Web 字体）
+
+```css
+--font-serif: 'Source Serif 4', 'Noto Serif SC', ui-serif, Georgia, serif;
+--font-mono:  ui-monospace, 'SF Mono', SFMono-Regular, Menlo, Consolas, monospace;
+```
+
+Latin 在前，让 Source Serif 4 接管西文与数字，中文回落 Noto Serif SC —— 这是混排的正确顺序。
+
+### `unicode-range` 用法
+
+切片 A 与 B 的范围**必须精确对应各自子集**，否则浏览器会下错片或漏字。
+A 覆盖站点用字（含 ASCII 与标点），B 覆盖 GB2312 一级字表剩余部分。
+两片都声明同一 `font-family`，浏览器自动按字符选片。
+
+### 已知例外
+
+`→`（U+2192）在 Noto Serif SC 中**根本不存在**（源字体无此字形）。Paste 页的
+`系统设置 → 隐私与安全性` 会回落到系统字体渲染。这是可接受的，不要试图修。
+
+## 10. 深浅色切换（本次新增）
+
+当前只有 `prefers-color-scheme` 自动跟随，**没有手动开关**。本次要求加手动切换。
+
+要求：
+
+1. 三态：**跟随系统 / 浅色 / 深色**，默认「跟随系统」
+2. 选择持久化到 `localStorage`，键名 `theme`
+3. **不得闪烁**：在 `<head>` 里内联一段阻塞脚本，在首次绘制前把 `data-theme` 写到 `<html>` 上
+4. CSS 改为：`:root` 为浅色；`@media (prefers-color-scheme: dark)` 且未手动选浅色时应用深色；
+   `[data-theme='dark']` / `[data-theme='light']` 强制覆盖
+5. 按钮放在 Header 右侧（语言切换旁），带 `aria-label`，键盘可达，图标随状态变化
+6. `<meta name="theme-color">` 也要跟着切换（已存在，需支持三态）
+
+实现要点：用 `data-theme` 属性而非纯媒体查询，才能让手动选择覆盖系统偏好。

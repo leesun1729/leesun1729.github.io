@@ -9,3 +9,11 @@ dist/
 
 # npm cache lives inside the repo because ~/.npm is not writable in this env
 .npm-cache/
+
+# Vendored Python libs for scripts/build-fonts.py (installed by hand, not a dep)
+.pylibs/
+.pylibs2/
+__pycache__/
+
+# macOS
+.DS_Store
