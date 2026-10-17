@@ -168,6 +168,14 @@ body {
   /* No padding-top: the header is sticky (in flow), so it already reserves
      its own 80px. The old absolute header needed this; keeping it after the
      switch doubled the gap and left the nav floating 80px down the page. */
+  /* Sticky-footer skeleton: a full-height column whose middle row (main)
+     absorbs the slack, so the footer sits at the bottom of the viewport on
+     short pages and at the bottom of the content on long ones. The header is
+     position:sticky, which keeps working as a flex item. */
+  min-height: 100vh;
+  min-height: 100dvh; /* mobile URL bar: dvh tracks the visible viewport */
+  display: flex;
+  flex-direction: column;
   background-color: var(--bg);
   color: var(--fg-body);
   font-family: var(--font-serif);
@@ -179,6 +187,14 @@ body {
   overflow-wrap: break-word;
   text-spacing-trim: space-first;
   font-kerning: normal;
+}
+
+/* The sticky-footer column: main absorbs every pixel the content does not
+   need, which pushes the footer to the bottom even on a nearly empty page
+   (404, short about sections). Long pages are unaffected — main simply stops
+   growing once the content exceeds the viewport. */
+main {
+  flex: 1 0 auto;
 }
 
 /* --- links ---------------------------------------------------------------- */
