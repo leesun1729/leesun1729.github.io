@@ -234,8 +234,15 @@ a:hover {
    `.wrap` is what BaseLayout applies to <main>, so it owns the gutters.
    `.container` is an inner box: every page nests it inside `main.wrap`, so it
    must NOT repeat the padding — doing so doubled the gutter to 56px and
-   squeezed content to 278px on a 390px screen. */
+   squeezed content to 278px on a 390px screen.
+
+   width:100% is load-bearing since the sticky-footer change: <main> is a flex
+   item of body, and an item with auto margins on both sides does NOT stretch —
+   it shrinks to fit its content, so every page got a different width (ranking
+   680px, links 305px, articles 548px…). A definite width restores the
+   intended 100% → capped by max-width → centred by the auto margins. */
 .wrap {
+  width: 100%;
   max-width: var(--container);
   margin-inline: auto;
   padding-inline: var(--gutter);
