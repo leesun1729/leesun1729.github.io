@@ -1,0 +1,162 @@
+---
+import type { Lang } from '../lib/site';
+
+interface Props {
+  lang: Lang;
+}
+
+const { lang } = Astro.props;
+
+/* Three-state cycle: follow system → dark → light → system.
+   The server cannot know the stored choice, so every state-dependent string
+   below is the no-JS / pre-hydration default; the inline script in BaseLayout
+   sets `data-theme` on <html> before first paint, and the script at the bottom
+   of this file keeps the label, title and live region in sync. */
+const label = lang === 'zh' ? '主题：跟随系统（点击切换）' : 'Theme: system (click to change)';
+const hint = lang === 'zh' ? '切换深浅色' : 'Switch colour theme';
+---
+
+<div class="theme-switch">
+  <button
+    type="button"
+    class="theme-toggle"
+    id="theme-toggle"
+    data-theme-toggle
+    data-lang={lang}
+    aria-label={label}
+    title={hint}
+  >
+    <!-- follow system -->
+    <svg class="icon icon--system" viewBox="0 0 24 24" width="16" height="16" aria-hidden="true" focusable="false">
+      <circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="1.8"></circle>
+      <path d="M12 3a9 9 0 0 0 0 18z" fill="currentColor"></path>
+    </svg>
+    <!-- dark -->
+    <svg class="icon icon--dark" viewBox="0 0 24 24" width="16" height="16" aria-hidden="true" focusable="false">
+      <path
+        d="M20 14.5A8.5 8.5 0 0 1 9.5 4a8.5 8.5 0 1 0 10.5 10.5z"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="1.8"
+        stroke-linejoin="round"></path>
+    </svg>
+    <!-- light -->
+    <svg class="icon icon--light" viewBox="0 0 24 24" width="16" height="16" aria-hidden="true" focusable="false">
+      <circle cx="12" cy="12" r="4.2" fill="none" stroke="currentColor" stroke-width="1.8"></circle>
+      <g stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
+        <path d="M12 2.5v2.2M12 19.3v2.2M2.5 12h2.2M19.3 12h2.2"></path>
+        <path d="M5.3 5.3l1.6 1.6M17.1 17.1l1.6 1.6M18.7 5.3l-1.6 1.6M6.9 17.1l-1.6 1.6"></path>
+      </g>
+    </svg>
+  </button>
+  <!-- Separate live region: a status inside the button would be folded into its
+       accessible name, and aria-label already carries the state. -->
+  <span class="sr-only" id="theme-status" role="status" aria-live="polite"></span>
+</div>
+
+<style>
+  .theme-switch {
+    flex: none;
+    display: inline-flex;
+    align-items: center;
+  }
+
+  /* A plain icon button: no border at all. The navbar is flat now, and a
+     dashed circle around a 16px glyph read as a stray card. */
+  .theme-toggle {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    padding: 0;
+    color: var(--muted);
+    background: none;
+    border: 0;
+    border-radius: 0.5rem;
+    cursor: pointer;
+    appearance: none;
+    transition: color 0.15s ease;
+  }
+
+  .theme-toggle:hover {
+    color: var(--fg);
+  }
+
+  /* Keyboard-only ring, same geometry as every other focusable thing on the
+     site (contract §4.4). --fg keeps it visible on both grounds; the font
+     comes from the global `button { font: inherit }` rule, so no family is
+     declared here. */
+  .theme-toggle:focus-visible {
+    outline: 2px solid var(--fg);
+    outline-offset: 3px;
+    color: var(--fg);
+  }
+
+  .icon {
+    display: none;
+  }
+
+  /* Exactly one icon paints. The state lives on <html> and is written by the
+     blocking <head> script, so the first frame is already correct. */
+  :global(html:not([data-theme]) .icon--system),
+  :global(html[data-theme='system'] .icon--system),
+  :global(html[data-theme='dark'] .icon--dark),
+  :global(html[data-theme='light'] .icon--light) {
+    display: block;
+  }
+</style>
+
+<script>
+  type Choice = 'system' | 'light' | 'dark';
+
+  const ORDER: Choice[] = ['system', 'dark', 'light'];
+
+  const STRINGS: Record<string, Record<Choice, string>> = {
+    zh: {
+      system: '主题：跟随系统（点击切换）',
+      dark: '主题：深色（点击切换）',
+      light: '主题：浅色（点击切换）',
+    },
+    en: {
+      system: 'Theme: system (click to change)',
+      dark: 'Theme: dark (click to change)',
+      light: 'Theme: light (click to change)',
+    },
+  };
+
+  interface ThemeEngine {
+    get(): Choice;
+    set(next: Choice): void;
+  }
+
+  const button = document.getElementById('theme-toggle') as HTMLButtonElement | null;
+  const status = document.getElementById('theme-status');
+  const engine = (window as unknown as { __theme?: ThemeEngine }).__theme;
+
+  if (button && engine) {
+    const lang = button.dataset.lang === 'en' ? 'en' : 'zh';
+
+    const paint = (choice: Choice) => {
+      const text = STRINGS[lang][choice];
+      button.setAttribute('aria-label', text);
+      button.title = STRINGS[lang][choice];
+      button.dataset.state = choice;
+      if (status) status.textContent = text;
+    };
+
+    paint(engine.get());
+
+    button.addEventListener('click', () => {
+      const next = ORDER[(ORDER.indexOf(engine.get()) + 1) % ORDER.length];
+      engine.set(next);
+    });
+
+    /* Repaint from the single source of truth rather than from the click, so
+       the label and the icon can never drift out of sync with <html>. */
+    new MutationObserver(() => paint(engine.get())).observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ['data-theme'],
+    });
+  }
+</script>

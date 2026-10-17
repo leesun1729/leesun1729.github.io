@@ -1,0 +1,49 @@
+---
+import ArticleLayout from '../../../layouts/ArticleLayout.astro';
+import { getCollection, render } from 'astro:content';
+
+/* English article detail pages: `/en/articles/<slug>/`.
+   Mirror of src/pages/en/articles/[slug].astro's Chinese counterpart — the
+   only differences are the `/en` prefix, the `/en` id filter and the locale
+   passed down. Keep the two files in step. */
+export async function getStaticPaths() {
+  const all = await getCollection('articles', ({ data }) => !data.draft);
+  const en = all
+    .filter((a) => a.id.endsWith('/en'))
+    .sort((a, b) => a.data.date.valueOf() - b.data.date.valueOf());
+
+  return en.map((entry) => {
+    const position = en.findIndex((n) => n.id === entry.id) + 1;
+    return {
+      params: { slug: entry.id.split('/')[0] },
+      props: {
+        entry,
+        index: `${String(position).padStart(2, '0')} / ${String(en.length).padStart(2, '0')}`,
+      },
+    };
+  });
+}
+
+const { entry, index } = Astro.props;
+const { Content, headings } = await render(entry);
+
+/* English prose runs ~200 words/min. */
+const plain = entry.body ?? '';
+const minutes = Math.max(1, Math.round(plain.trim().split(/\s+/).length / 200));
+---
+
+<ArticleLayout
+  lang="en"
+  title={entry.data.title}
+  description={entry.data.summary}
+  pathname={`/en/articles/${entry.id.split('/')[0]}/`}
+  date={entry.data.date}
+  updated={entry.data.updated}
+  tags={entry.data.tags}
+  summary={entry.data.summary}
+  headings={headings}
+  minutes={minutes}
+  index={index}
+>
+  <Content />
+</ArticleLayout>

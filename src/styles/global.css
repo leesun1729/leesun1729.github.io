@@ -15,17 +15,34 @@
   --line: #d4d4d4; /* dashed borders — never a text colour */
   --line-strong: #a3a3a3; /* secondary dividers — never a text colour */
   --code-bg: #f5f5f5;
+  --shadow-soft: 0 4px 16px rgb(0 0 0 / 0.06);
+
+  /* Faint dashed grid painted on a fixed pseudo-element (see body::before).
+     A 48px SVG tile: right + bottom edge dashed strokes, so tiling draws a
+     full grid. Stroke is black here; the dark blocks swap it to white. */
+  --grid: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='48' height='48'%3E%3Cpath d='M48 0V48M0 48H48' fill='none' stroke='%23000000' stroke-width='1' stroke-dasharray='3 9'/%3E%3C/svg%3E");
 
   /* --- type ------------------------------------------------------------- */
-  /* Zero webfont bytes: the CJK stack is whatever the OS already ships. */
-  --font-sans: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont,
-    'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', 'Noto Sans CJK SC',
-    sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji';
+  /* Spec §9: self-hosted serif everywhere. Latin family FIRST so Source Serif 4
+     takes ASCII/digits and Noto Serif SC catches CJK (the correct mixed-script
+     order). The @font-face rules live in fonts.css, imported by BaseLayout. */
+  --font-serif: 'Source Serif 4', 'Noto Serif SC', ui-serif, Georgia, serif;
+  /* Code stays on the system stack: monospace needs no webfont. */
   --font-mono: ui-monospace, 'SF Mono', SFMono-Regular, Menlo, Consolas, monospace;
+  /* The navbar and other chrome use the system sans: it reads as furniture
+     next to the serif content, matching the reference's UI text. */
+  --font-sans: ui-sans-serif, system-ui, -apple-system, 'Segoe UI', 'PingFang SC',
+    'Microsoft YaHei', sans-serif;
 
   /* --- layout ----------------------------------------------------------- */
-  --header-h: 80px;
-  --container: 896px; /* max-w-4xl */
+  /* The header bar is a little wider than the content column: it overhangs by
+     40px each side, which reads as "floating" without becoming full-bleed.
+     --head-h is its own, shorter, height. --header-h is the scroll offset other
+     rules need (sticky bar + breathing room) and follows --head-h. */
+  --head-w: calc(var(--container) + 80px);
+  --head-h: 60px;
+  --header-h: 60px;
+  --container: 1040px; /* the reference's wider content column */
   --gutter: 28px; /* px-7 */
   --card-gap: 28px; /* space-y-7 */
   --measure: 40em;
@@ -33,15 +50,36 @@
   --gap: 2rem;
 
   /* --- scale ------------------------------------------------------------ */
+  --step--2: 0.6875rem; /* 11px — micro label */
   --step--1: 0.75rem; /* 12px — meta line */
   --step-0: 1.0625rem; /* 17px — prose */
   --step-1: 1.3125rem; /* 21px — lede */
   --step-2: 1.5rem; /* 24px — section heading */
-  --step-3: 3.75rem; /* 60px — page title */
+  /* h1 is ONE continuous ramp, not a jump at a breakpoint. The old pair
+     (36px, then a 60px override at 768px) rendered the home h1 at 60px and the
+     articles-index h1 at 48px — same-level titles, different widths. A clamp is
+     a single interpolated value, so every h1 measures the same at every
+     viewport. 36px at 390px, ~60px at 1440px. */
+  --step-3: clamp(2.75rem, 1.5rem + 3vw, 3.75rem); /* 44px floor, 60px ceiling */
 }
 
+/* ==========================================================================
+   Theme — three states (spec §10)
+   follow system (default) / light / dark.
+   :root carries the light values; system dark applies ONLY while no explicit
+   choice is stored; the two [data-theme] rules force either end regardless of
+   the system. `data-theme` is written on <html> by the blocking inline script
+   in BaseLayout before first paint, so the first frame is already correct.
+   The token values are unchanged from the previous media-only block.
+   ========================================================================== */
+
+:root {
+  color-scheme: light;
+}
+
+/* System dark — skipped the moment a manual choice exists. */
 @media (prefers-color-scheme: dark) {
-  :root {
+  :root:not([data-theme='light']) {
     --bg: #0a0a0a;
     --fg: #fafafa;
     --fg-body: #f5f5f5;
@@ -50,13 +88,54 @@
     --line: #525252;
     --line-strong: #737373;
     --code-bg: #171717;
+    --grid: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='48' height='48'%3E%3Cpath d='M48 0V48M0 48H48' fill='none' stroke='%23ffffff' stroke-width='1' stroke-dasharray='3 9'/%3E%3C/svg%3E");
+    --shadow-soft: 0 4px 16px rgb(0 0 0 / 0.5);
+    color-scheme: dark;
   }
+}
+
+/* Forced dark (identical values to the system-dark block above). */
+[data-theme='dark'] {
+  --bg: #0a0a0a;
+  --fg: #fafafa;
+  --fg-body: #f5f5f5;
+  --muted: #a3a3a3;
+  --meta: #d4d4d4;
+  --line: #525252;
+  --line-strong: #737373;
+  --code-bg: #171717;
+  --grid: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='48' height='48'%3E%3Cpath d='M48 0V48M0 48H48' fill='none' stroke='%23ffffff' stroke-width='1' stroke-dasharray='3 9'/%3E%3C/svg%3E");
+  --shadow-soft: 0 4px 16px rgb(0 0 0 / 0.5);
+  color-scheme: dark;
+}
+
+/* Forced light, overriding a dark system preference. */
+[data-theme='light'] {
+  --bg: #ffffff;
+  --fg: #000000;
+  --fg-body: #171717;
+  --muted: #525252;
+  --meta: #262626;
+  --line: #d4d4d4;
+  --line-strong: #a3a3a3;
+  --code-bg: #f5f5f5;
+  color-scheme: light;
 }
 
 *,
 *::before,
 *::after {
   box-sizing: border-box;
+}
+
+/* Form controls opt out of font inheritance by default, so anything inside one
+   silently falls back to the UA stack — the icon-only theme toggle computed
+   `font-family: Arial` without this rule. */
+button,
+input,
+select,
+textarea {
+  font: inherit;
 }
 
 html {
@@ -68,14 +147,30 @@ html {
   scroll-behavior: smooth;
 }
 
+/* The faint page grid. A fixed full-viewport pseudo-element at ~2% opacity:
+   barely-there in light mode, and its white stroke keeps the same subtlety on
+   the dark ground. z-index -1 puts it above the canvas background (body's own
+   colour propagates to the canvas) but below every element, so cards painted
+   with --bg simply cover it. */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background-image: var(--grid);
+  background-size: 48px 48px;
+  opacity: 0.02;
+}
+
 body {
   margin: 0;
-  /* The header is absolutely positioned (not sticky), so the document itself
-     has to reserve its height. */
-  padding-top: var(--header-h);
+  /* No padding-top: the header is sticky (in flow), so it already reserves
+     its own 80px. The old absolute header needed this; keeping it after the
+     switch doubled the gap and left the nav floating 80px down the page. */
   background-color: var(--bg);
   color: var(--fg-body);
-  font-family: var(--font-sans);
+  font-family: var(--font-serif);
   font-size: var(--step-0);
   line-height: 1.85;
   /* Chinese line breaking: never start a line with a closing bracket,
@@ -130,7 +225,7 @@ a:hover {
   padding-inline: var(--gutter);
 }
 
-@media (min-width: 1024px) {
+@media (min-width: 1100px) {
   .wrap {
     padding-inline: 0;
   }
@@ -145,12 +240,116 @@ a:hover {
    pages previously each carried their own copy (12 duplicates), which risked
    silent divergence. */
 .section {
-  padding-block: 28px;
+  padding-block: 44px;
+}
+
+/* A hairline between the home page's bands (intro / articles / projects).
+   A pseudo-element rather than a border on .section, so the line spans the
+   container exactly instead of inheriting the section's own padding. */
+/* A dashed rule between the home bands with the section title sitting on it
+   in a pill. The rule spans the whole viewport (not just the content column)
+   and fades out towards both edges, so it reads as a seam across the page
+   rather than a box edge. The fade is a mask on the dashed border, which keeps
+   the dash pattern intact instead of trying to fade a border-image. */
+.section--divided {
+  position: relative;
+  margin-top: 28px;
+  padding-top: 0;
+}
+
+.section--divided::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  /* Break out of the content column to the viewport edges. `50% - 50vw` is the
+     distance from the column's edge to the viewport's, at any width. */
+  left: calc(50% - 50vw);
+  width: 100vw;
+  border-top: 1px dashed var(--line-strong);
+  /* Fade out continuously from the centre: fully opaque at 50%, transparent at
+     both edges, with nothing in between held at full strength. A two-stop
+     gradient either side of the midpoint gives a straight ramp, so the line
+     thins gradually and is gone by the viewport edges. */
+  -webkit-mask-image: linear-gradient(
+    to right,
+    transparent 0%,
+    #000 50%,
+    transparent 100%
+  );
+  mask-image: linear-gradient(to right, transparent 0%, #000 50%, transparent 100%);
 }
 
 .card-stack {
   display: grid;
   gap: 28px;
+}
+
+/* The home page lists articles and projects as a card grid rather than a stack:
+   1 column, then 2 at 640px, then 3 at 900px — the reference site's
+   `grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-7`. */
+.card-grid {
+  display: grid;
+  gap: 28px;
+  grid-template-columns: minmax(0, 1fr);
+}
+
+@media (min-width: 640px) {
+  .card-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 900px) {
+  .card-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+/* A row of icon links (the hero's social strip). Icons are inline SVG drawn in
+   currentColor so they inherit the gray ramp and follow the theme. */
+/* The icon row sits under the tagline with a little air above and below, so
+   the hero reads as three separate bands rather than one dense block. */
+.social-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem 1rem;
+  margin: 1.75rem 0 1.25rem;
+  padding: 0;
+  list-style: none;
+}
+
+/* Square, borderless, no rounded box: the icon IS the target. A dashed frame
+   around a 32px hit area read as a stray card and fought the dashed language
+   used for real containers. */
+.social-row a {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  aspect-ratio: 1;
+  color: var(--muted);
+  border: 0;
+  border-radius: 0;
+  transition: color 0.2s ease-out;
+}
+
+.social-row a:hover,
+.social-row a:focus-visible {
+  color: var(--fg);
+}
+
+.social-row svg {
+  width: 20px;
+  height: 20px;
+  display: block;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .social-row a {
+    transition: none;
+  }
 }
 
 .project-grid {
@@ -183,6 +382,9 @@ a:hover {
   font-size: var(--step--1);
   line-height: 1.6;
   color: var(--muted);
+  /* Dates and counters live here; tabular figures stop them from jittering
+     as the digits change. */
+  font-variant-numeric: tabular-nums;
 }
 
 .rail ol,
@@ -207,16 +409,19 @@ h4 {
   text-wrap: balance;
 }
 
+/* Optical tracking tightens as the size grows: a 60px title needs more
+   negative tracking than 17px body text, which needs none. */
 h1 {
-  font-size: 36px;
+  font-size: var(--step-3);
   line-height: 1.15;
-  letter-spacing: -0.02em;
+  letter-spacing: -0.03em;
   margin: 0 0 0.5em;
 }
 
 h2 {
   font-size: 24px;
   line-height: 40px;
+  letter-spacing: -0.02em;
   margin: 2em 0 0.7em;
 }
 
@@ -233,13 +438,6 @@ h4 {
   margin: 1.6em 0 0.5em;
 }
 
-@media (min-width: 768px) {
-  h1 {
-    font-size: 60px;
-    line-height: 60px;
-  }
-}
-
 /* --- rules & meta --------------------------------------------------------- */
 
 .rule {
@@ -254,6 +452,7 @@ h4 {
   font-weight: 500;
   line-height: 1.5;
   color: var(--meta);
+  font-variant-numeric: tabular-nums;
 }
 
 .tags {
@@ -274,6 +473,343 @@ h4 {
 
 .tags a:hover {
   border-bottom-color: var(--fg);
+}
+
+/* --- inline links --------------------------------------------------------- */
+
+/* One dashed inline link for the whole site. It used to be re-derived in
+   `.card-meta a`, `.foot-line a`, `.project-links a` and `.tags a`, each with
+   slightly different thickness/offset. A global class makes the values
+   literally identical everywhere. */
+.link-dashed {
+  text-decoration: underline;
+  text-decoration-style: dashed;
+  text-underline-offset: 4px;
+  text-decoration-thickness: 1px;
+}
+
+.link-dashed:hover {
+  text-decoration-thickness: 2px;
+}
+
+/* ==========================================================================
+   Page utilities
+   Every one of these was written out again in each of the 10 pages, with
+   drifting values (h1 36px vs 48px at 768px, lede 17px vs var(--step-1)).
+   There is exactly one definition now; pages consume it.
+   ========================================================================== */
+
+/* Page head and hero are the same rhythm under two names (index uses `.hero`,
+   the index pages use `.page-head`). */
+/* The hero carries more vertical air than an inner page head: it is the first
+   thing on the site and the space is what makes the layout read as composed. */
+.page-head {
+  padding-block: 28px;
+}
+
+.hero {
+  padding-block: 88px 64px;
+}
+
+/* The home hero: greeting left, a large rounded image card right. Stacks to
+   one column below 768px with the image BELOW the text, so the first thing
+   read is still the greeting. */
+.hero-split {
+  display: grid;
+  gap: 32px;
+  align-items: center;
+}
+
+@media (min-width: 768px) {
+  .hero-split {
+    grid-template-columns: minmax(0, 1fr) clamp(240px, 24vw, 280px);
+    gap: 48px;
+  }
+}
+
+/* The whale sits in a card: soft ground, hairline, deep corner radius — the
+   reference's big rounded image block. `contain` keeps the whole illustration
+   visible (it is a sticker on white; cropping would cut the spout). */
+.hero-portrait {
+  display: block;
+  aspect-ratio: 1;
+  width: 100%;
+  /* Shrunk from 400px: the illustration is an avatar, not a hero photograph,
+     and at full column width it dominated the greeting it is meant to sit
+     beside. 280px keeps it a companion to the text. */
+  max-width: 280px;
+  justify-self: center;
+  margin: 0;
+  background: var(--code-bg);
+  border: 1px solid var(--line);
+  border-radius: 1.5rem;
+  object-fit: contain;
+}
+
+/* Spacing only — deliberately NO font-size and NO line-height: the title must
+   ride the single global h1 ramp (--step-3), otherwise each page reintroduces
+   its own breakpoint, which is exactly the defect this round removes. */
+.page-head h1,
+.hero-title {
+  margin: 0 0 12px;
+}
+
+.lede {
+  margin: 0 0 12px;
+  max-width: 34em;
+  font-size: var(--step-1);
+  line-height: 1.6;
+  color: var(--muted);
+  text-wrap: pretty;
+}
+
+.page-meta {
+  margin: 0;
+  font-family: var(--font-mono);
+  font-size: var(--step--1);
+  font-weight: 500;
+  line-height: 1.5;
+  color: var(--meta);
+  font-variant-numeric: tabular-nums;
+}
+
+/* Empty state uses the card language (dashed 1px frame + same radius), so a
+   "nothing here yet" line reads as the same object family as a PostCard. */
+.empty {
+  margin: 0;
+  padding: 20px 24px;
+  border: 1px dashed var(--line);
+  border-radius: 1rem;
+  color: var(--muted);
+}
+
+/* Home section heading — an h2 by markup, so it matches the h2 ramp exactly
+   rather than carrying its own -0.01em tracking. */
+/* The band heading doubles as the divider's pill. translateY(-50%) straddles
+   it on the dashed rule (the rule sits at the section's top edge), and the
+   opaque background breaks the line behind it — exactly the reference's look.
+   Its ::after draws the circled arrow: a fixed 20px disc with the glyph
+   centred by place-content, so the disc never depends on font metrics. */
+/* The divider pill. It is a link now (the reference's pill scrolls to the
+   list), so it is an <a>, not an <h2>: the visible large section heading is
+   .section-title below. Lighter treatment than before — non-bold gray text,
+   hairline, soft shadow, a small circled arrow. translateY(-50%) straddles it
+   on the dashed rule; the opaque background breaks the line behind it. */
+.band-heading {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  width: max-content;
+  margin: 0 auto 28px;
+  padding: 0.3rem 1.2rem;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--bg);
+  box-shadow: var(--shadow-soft);
+  transform: translateY(-50%);
+  font-family: var(--font-sans);
+  font-size: var(--step--1);
+  font-weight: 400;
+  line-height: 1.6;
+  letter-spacing: 0;
+  color: var(--muted);
+  text-decoration: none;
+  transition: color 0.2s ease-out, border-color 0.2s ease-out;
+}
+
+.band-heading:hover {
+  color: var(--fg);
+  border-color: var(--line-strong);
+}
+
+.band-heading:focus-visible {
+  outline: 2px solid var(--fg);
+  outline-offset: 3px;
+}
+
+.band-heading::after {
+  content: '↓';
+  display: grid;
+  place-content: center;
+  flex: none;
+  width: 20px;
+  height: 20px;
+  border: 1px solid var(--line-strong);
+  border-radius: 50%;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 400;
+  line-height: 1;
+  color: var(--muted);
+}
+
+/* The pill links to the list; the sticky header would cover the anchor target,
+   so the scroll lands one header below it. */
+[id^='articles-list'],
+[id^='projects-list'] {
+  scroll-margin-top: calc(var(--header-h) + 12px);
+}
+
+/* The large section heading the reference shows under the pill: 32px bold.
+   It is the aria-labelledby target, so the pill no longer needs to be the h2. */
+.section-title {
+  margin: 0 0 8px;
+  font-size: 2rem;
+  font-weight: 700;
+  line-height: 1.25;
+  letter-spacing: -0.02em;
+  color: var(--fg);
+}
+
+/* NO font-size here either — same reason as .page-head h1. */
+.hero-tagline {
+  margin: 0;
+  max-width: 40em;
+  font-size: var(--step-0);
+  line-height: 1.6;
+  color: var(--muted);
+  text-wrap: pretty;
+}
+
+.more {
+  margin: 20px 0 0;
+  font-size: 14px;
+}
+
+/* The row of links under a project card. Written out in all four pages that
+   render one; same defect class as the rest of this block. */
+.project-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 20px;
+  margin: 0;
+  font-size: var(--step--1);
+  font-weight: 500;
+  line-height: 1.5;
+  color: var(--meta);
+}
+
+/* ==========================================================================
+   Card shell
+   Two sheets plus a content layer, default coincident; on hover/focus they
+   slide 1px apart in opposite directions. The shell is global because
+   ArrowIcon.astro targets `:global(.card) .arrow` — the class name has to
+   exist outside the component scope. PostCard.astro keeps only the text
+   parts (.card-title / .card-link / .card-summary / .card-meta / .card-sep)
+   and its focus ring.
+   ========================================================================== */
+
+/* --- syntax highlighting -------------------------------------------------- */
+
+/* Code blocks are rendered by astro-expressive-code (astro.config.mjs), which
+   replaced the earlier hand-rolled Shiki setup and brings the frame, line
+   numbers, the copy button and collapsible sections.
+
+   The module's theme switching is configured in astro.config.mjs via
+   `themeCssSelector`, which points it at the site's own `data-theme` attribute
+   instead of its default `[data-theme='<theme name>']`. Without that, neither
+   selector ever matched and the dark token set stayed active in light mode —
+   dark-grey code on a light ground.
+
+   Only the block ground needs a rule here: the module paints it from its own
+   `--ec-codeBg`, which is set to `var(--code-bg)` in the config. */
+.expressive-code figure.frame,
+.expressive-code figure.frame pre {
+  background: var(--code-bg);
+}
+
+.card {
+  position: relative;
+  border: 1px dashed transparent; /* placeholder: keeps layout stable */
+  border-radius: 1.5rem; /* 24px, the reference's softer card corner */
+  /* The padding is tokenised because PostCard stretches its title link back out
+     across it (`.card-link::after`), so the two must stay in step. */
+  --card-pad-y: 24px;
+  --card-pad-x: 28px;
+  padding: var(--card-pad-y) var(--card-pad-x);
+  cursor: pointer;
+}
+
+@media (min-width: 768px) {
+  .card {
+    --card-pad-y: 32px;
+    --card-pad-x: 36px;
+  }
+}
+
+/* The whole card is the click target, not just the title text.
+   The title anchor grows a pseudo-element that stretches from the text out to
+   the card's border box (negative insets cancel the card's own padding).
+   `.card-body` is the containing block, so this lands above both sheets
+   (z-index 20 / 10) and catches every click.
+
+   Chosen over the reference's JS click delegation because a real link keeps
+   Ctrl/middle-click, "open in new tab" and link semantics for free — the site
+   otherwise ships no client JS for this at all. */
+.card-link::after {
+  content: '';
+  position: absolute;
+  inset: calc(var(--card-pad-y) * -1) calc(var(--card-pad-x) * -1);
+  z-index: 1;
+}
+
+.card-sheet {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border: 1px dashed var(--line);
+  border-radius: 1.5rem;
+  transition: transform 0.3s ease-out, border-color 0.3s ease-out;
+}
+
+.card-sheet--fill {
+  z-index: 20;
+  background: var(--bg);
+}
+
+.card-sheet--frame {
+  z-index: 10;
+}
+
+.card-body {
+  position: relative;
+  z-index: 30;
+  transition: transform 0.3s ease-out;
+}
+
+.card:hover .card-sheet--fill,
+.card:focus-visible .card-sheet--fill,
+.card:has(.card-link:focus-visible) .card-sheet--fill,
+.card:hover .card-body,
+.card:focus-visible .card-body,
+.card:has(.card-link:focus-visible) .card-body {
+  transform: translate(-1px, -1px);
+}
+
+.card:hover .card-sheet--frame,
+.card:focus-visible .card-sheet--frame,
+.card:has(.card-link:focus-visible) .card-sheet--frame {
+  transform: translate(1px, 1px);
+  /* the lift the brief asks for, done in the card's own language: the frame
+     slides and darkens instead of the box flying up with a drop shadow */
+  border-color: var(--line-strong);
+}
+
+/* PostCard.astro owns the rest of .card-meta; only the numeric variant is
+   contributed here so the date/tag row aligns across every card. */
+.card-meta {
+  font-variant-numeric: tabular-nums;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .card-sheet,
+  .card-body,
+  .band-heading {
+    transition: none;
+  }
 }
 
 /* --- screen-reader only --------------------------------------------------- */
@@ -368,38 +904,62 @@ h4 {
 
 /* --- code ----------------------------------------------------------------- */
 
+/* One code treatment across the page. Inline code and fenced blocks share the
+   same ground (--code-bg), the same mono stack and the same radius family, so
+   they read as one system. Previously inline code was 0.92em with a 1px border
+   and no radius while blocks were 13px, borderless and 8px — two dialects of
+   the same thing. */
 .prose code,
 .prose kbd {
   font-family: var(--font-mono);
-  font-size: 0.92em;
+  /* Fixed size, not em: inside an h2/h3 the old 0.92em scaled up to 18.4px and
+     a code span became bigger than the surrounding body text. */
+  font-size: 0.85em;
 }
 
-.prose :not(pre) > code {
+.prose :not(pre) > code,
+.prose :not(pre) > kbd {
   background: var(--code-bg);
-  border: 1px solid var(--line);
-  padding: 0.05em 0.35em;
+  border: 0;
+  border-radius: 4px;
+  padding: 0.12em 0.4em;
 }
 
-.prose pre {
-  background: var(--code-bg);
-  border: 1px solid var(--line);
-  color: var(--fg-body);
-  padding: 1rem 1.15rem;
+/* Fenced code blocks are owned by astro-expressive-code, which draws the frame,
+   the padding, the border, the line numbers and the copy button. The old
+   hand-written `.prose pre` rules (background/border/padding/font-size) were
+   written for the previous Shiki output and had to go: they overrode the
+   module's frame and forced a 12px monospace fallback instead of the module's
+   configured size and `var(--font-mono)`.
+
+   Only the block's outer rhythm stays here. */
+/* With `frame: 'none'` the block is just code on a tinted ground, so it needs
+   the rhythm the frame used to provide: outer margin, inner padding, and a
+   little radius so the tint reads as a block rather than a full-bleed band.
+   These are written against `figure.frame` too because the module's own
+   `figure` rules are equally specific and load later. */
+.prose .expressive-code,
+.prose .expressive-code figure.frame {
   margin: 1.6em 0;
-  overflow-x: auto;
-  font-size: var(--step--1);
-  line-height: 1.7;
+  border-radius: 0.5rem;
+  overflow: hidden;
+}
+
+.prose .expressive-code pre,
+.prose .expressive-code figure.frame pre {
+  padding: 1rem 1.15rem;
   tab-size: 4;
 }
 
-.prose pre code {
-  background: none;
-  border: 0;
-  padding: 0;
-  font-size: inherit;
-}
 
-/* --- details / summary (22 of these in the migrated notes) ---------------- */
+/* --- details / summary ---------------------------------------------------- */
+
+/* Generic Markdown <details> support. The migrated articles used to wrap every
+   code block in one of these ("代码" / "Code"); those wrappers were removed, so
+   nothing in the content uses this today. It stays because a plain <details> in
+   a future article should still render as a bordered box rather than as the
+   browser default, and because the About page's table of contents relies on the
+   same interaction pattern (via its own .toc class). */
 
 .prose details {
   margin: 1.4em 0;

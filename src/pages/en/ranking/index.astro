@@ -17,7 +17,7 @@ const hasData = entries.length > 0;
   <div class="container">
     <header class="page-head">
       <h1>Ranking</h1>
-      <p class="lede">Pages ordered by view count, counted by GoatCounter. No personal tracking.</p>
+      <p class="lede">Pages ordered by view count, counted by GoatCounter.</p>
       <p class="page-meta">
         {hasData ? `${entries.length} pages` : 'no data yet'}
         {source && <span class="sep"> · </span>}
@@ -37,9 +37,9 @@ const hasData = entries.length > 0;
               <span class="rank-num">{String(i + 1).padStart(2, '0')}</span>
               <span class="rank-body">
                 <a
-                  class="rank-link"
+                  class="link-dashed"
                   href={e.path}
-                  hreflang={e.path.startsWith('/notes/') ? 'zh-CN' : undefined}
+                  hreflang={e.path.startsWith('/articles/') ? 'zh-CN' : undefined}
                 >
                   {labelFor(e)}
                 </a>
@@ -61,7 +61,7 @@ const hasData = entries.length > 0;
             <code>GOATCOUNTER_SITE</code> or <code>GOATCOUNTER_TOKEN</code> is not configured.
           </p>
           <p>
-            In the meantime, the <a href="/en/notes/">notes</a> and
+            In the meantime, the <a href="/en/articles/">articles</a> and
             <a href="/en/projects/">projects</a> are the place to start.
           </p>
           {site && (
@@ -76,38 +76,9 @@ const hasData = entries.length > 0;
 </BaseLayout>
 
 <style>
-  /* global.css ships .wrap (896px, centered) and BaseLayout applies it to
-     <main>. The promised .container utility was not implemented there, so
-     pages that need it define it locally rather than editing global.css. */
-
-  .page-head {
-    padding-block: 28px;
-  }
-
-  .page-head h1 {
-    margin: 0 0 12px;
-    font-size: 36px;
-    font-weight: 700;
-    line-height: 1.15;
-    letter-spacing: -0.025em;
-  }
-
-  .lede {
-    margin: 0 0 12px;
-    max-width: 34em;
-    font-size: 17px;
-    line-height: 1.6;
-    color: var(--muted, #525252);
-    text-wrap: pretty;
-  }
-
-  .page-meta {
-    margin: 0;
-    font-size: 12px;
-    font-weight: 500;
-    line-height: 1.5;
-    color: var(--meta, #262626);
-  }
+  /* Page-local layout only. .page-head / .page-head h1 / .lede / .page-meta /
+     .container are defined once in global.css (R4 contract §3.2); a local copy
+     would outrank them through [data-astro-cid-*]. */
 
   .rank-list {
     list-style: none;
@@ -123,13 +94,13 @@ const hasData = entries.length > 0;
     gap: 0.75rem;
     align-items: baseline;
     padding-block: 14px;
-    border-bottom: 1px dashed var(--line, #d4d4d4);
+    border-bottom: 1px dashed var(--line);
   }
 
   .rank-num {
-    font-size: 12px;
+    font-size: var(--step--1);
     font-weight: 500;
-    color: var(--muted, #525252);
+    color: var(--muted);
     font-variant-numeric: tabular-nums;
   }
 
@@ -137,34 +108,31 @@ const hasData = entries.length > 0;
     min-width: 0;
   }
 
-  .rank-link {
-    text-decoration: none;
-  }
-
   .rank-bar {
     display: block;
     height: 2px;
-    background: var(--line, #d4d4d4);
+    background: var(--line);
     margin-top: 8px;
   }
 
   .rank-bar > span {
     display: block;
     height: 100%;
-    background: var(--fg, #000);
+    background: var(--fg);
   }
 
   .rank-count {
-    font-size: 12px;
+    font-size: var(--step--1);
     font-weight: 500;
-    color: var(--meta, #262626);
+    color: var(--meta);
     font-variant-numeric: tabular-nums;
   }
 
+  /* Same language as .card: 1px dashed var(--line), 1rem radius, 20px/24px pad. */
   .empty-state {
     max-width: 40em;
     padding: 20px 24px;
-    border: 1px dashed var(--line, #d4d4d4);
+    border: 1px dashed var(--line);
     border-radius: 1rem;
   }
 
@@ -183,15 +151,9 @@ const hasData = entries.length > 0;
   }
 
   .empty-meta {
-    font-size: 12px;
+    font-size: var(--step--1);
     font-weight: 500;
-    color: var(--muted, #525252);
-  }
-
-  @media (min-width: 768px) {
-    .page-head h1 {
-      font-size: 48px;
-    }
+    color: var(--muted);
   }
 
   @media (max-width: 34rem) {

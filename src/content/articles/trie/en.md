@@ -1,19 +1,15 @@
 ---
-title: '字典树'
+title: 'Trie'
 date: 2024-01-20T22:08:54+08:00
-tags: ['Trie', '']
-summary: '讲解字典树的公共前缀思想，并给出指针与数组两种实现模板'
+tags: ['Trie']
+category: 'algorithms'
+summary: 'Explains the shared-prefix idea behind a trie and gives pointer and array templates'
 draft: false
 ---
 
+**A trie (dictionary tree, TrieTree)** is a kind of [tree structure](https://so.csdn.net/so/search?q=%E6%A0%91%E5%BD%A2%E7%BB%93%E6%9E%84&spm=1001.2101.3001.7020). Its typical use is counting, sorting and storing large numbers of strings (but not only strings — a 01 trie, for instance). The core idea is to exploit the **common prefix** of strings to save storage space. It makes good use of the shared prefixes between strings and thereby saves memory. A trie mainly supports two operations: **insert** and **search**.
 
-
-**字典树（TrieTree）**，是一种[树形结构](https://so.csdn.net/so/search?q=%E6%A0%91%E5%BD%A2%E7%BB%93%E6%9E%84&spm=1001.2101.3001.7020)，典型应用是用于统计，排序和保存大量的字符串（但不仅限于字符串,如01字典树）。主要思想是利用字符串的**公共前缀**来节约存储空间。很好地利用了串的公共前缀，节约了存储空间。字典树主要包含两种操作，**插入**和**查找**。
-
-**TrieNode形式**
-
-<details>
-<summary>代码</summary>
+**TrieNode form**
 
 ```cpp
 struct Trie {
@@ -70,12 +66,7 @@ struct Trie {
 };
 ```
 
-</details>
-
-**数组形式**
-
-<details>
-<summary>代码</summary>
+**Array form**
 
 ```cpp
 const int maxn = 1e5 + 10;
@@ -123,5 +114,3 @@ struct Trie {
     }
 };
 ```
-
-</details>

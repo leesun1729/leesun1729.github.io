@@ -2,36 +2,33 @@
 title: 'SCC'
 date: 2024-01-20T21:55:56+08:00
 tags: ['SCC', 'Tarjan']
-summary: '介绍强连通分量与缩点，并给出 Tarjan 算法求 SCC 的模板与例题代码'
+category: 'algorithms'
+summary: 'Introduces strongly connected components and condensation, with a Tarjan SCC template and example solutions'
 draft: false
 ---
 
+**Strongly Connected Component, SCC (Strongly Connect Component)**
 
-**强连通分量 SCC (Strongly Connect Component)**
+# Definition
 
-# 定义
+In a **directed graph**, take any two vertices `(u, v)`; if both `u -> v` and `v -> u` have a path, the graph is strongly connected.
 
-在一个 **有向图** 中，任意取两个节点`(u, v)` ，`u -> v, v -> u` 均有路径，这样的图叫做强连通。
+**SCC (Strongly Connected Component)**: a maximal strongly connected subgraph.
 
-**SCC（强连通分量）**：一个极大的强连通子图。
+**Condensation**: once we have found all the SCCs of a graph, we can contract each SCC into a single vertex. After condensation we get a new graph: we iterate over all **edges of the original graph** and add them to the new graph (remember to handle **self-loops**, and note that **duplicate edges** usually appear).
 
-**缩点**：当我们求出一个图中的所有 SCC 后，我们可以将每一个 SCC 缩成一个点。缩点过后，我们可以得到一个新的图，我们遍历所有 **原图中的边**，将原图中的边加到新图中（注意判断 **自环**，并且一般会出现**重复边**）。
+- The graph obtained after condensation is necessarily a **DAG (Directed Acyclic Graph)**.
+- DAGs have many excellent properties: they admit **topological sorting**, and a topological order can be used for **DP**, and so on.
 
-- 缩点后得到的图一定是一个 **DAG（有向无环图）**。
-- DAG 有着很多优秀的性质，比如可以进行 **拓扑排序**，可以利用 拓扑排序进行 **DP** 等。
+There are two algorithms for finding the strongly connected components of a directed graph: Tarjan's and Kosaraju's (both run in `O(V + E)`).
 
-求一个有向图中的强连通分量，有两种算法，Tarjan 与 kosaraju 算法（复杂度均为`O(V + E)`）。
+# Tarjan's algorithm for SCC of a directed graph
 
-# Tarjan 求有向图的 SCC
+### Algorithm outline
 
-### 算法流程
+Define the **DFS** tree as the spanning tree formed by starting from an arbitrary vertex and going downwards.
 
-定义 **DFS** 树为：从任意节点出发，形成的一条从上往下的生成树。
-
-当我们从  访问到 direct neighbor `v` 时，如果 `v` 尚未被访问过，那么 `(u, v)` 是一条 **树边**。否则 `(u, v)` 是一条 **非树边**。
-
-<details>
-<summary>代码</summary>
+When we visit a direct neighbor `v` from `u`, if `v` has not been visited yet, then `(u, v)` is a **tree edge**. Otherwise `(u, v)` is a **non-tree edge**.
 
 ```cpp
 struct SCC {
@@ -90,12 +87,7 @@ struct SCC {
 };
 ```
 
-</details>
-
-**例题：**  [Leetcode 1192. 查找集群内的关键连接](https://leetcode.cn/problems/critical-connections-in-a-network/description/)
-
-<details>
-<summary>代码</summary>
+**Example:** [LeetCode 1192. Critical Connections in a Network](https://leetcode.cn/problems/critical-connections-in-a-network/description/)
 
 ```cpp
 class Solution {
@@ -141,12 +133,7 @@ public:
 };
 ```
 
-</details>
-
-**例题：[洛谷P2341 [USACO03FALL][HAOI2006]受欢迎的牛 G](https://www.luogu.com.cn/problem/P2341)**
-
-<details>
-<summary>代码</summary>
+**Example: [Luogu P2341 [USACO03FALL][HAOI2006] Popular Cows G](https://www.luogu.com.cn/problem/P2341)**
 
 ```cpp
 #include <bits/stdc++.h>
@@ -210,7 +197,7 @@ int main() {
     std::ios::sync_with_stdio(false);
     std::cin.tie(nullptr);
     std::cout.tie(nullptr);
-    
+
     int n, m;
     std::cin >> n >> m;
     SCC g(n);
@@ -246,12 +233,7 @@ int main() {
 }
 ```
 
-</details>
-
-**模版题：**[洛谷P2863 [USACO06JAN]The Cow Prom S](https://www.luogu.com.cn/problem/P2863)
-
-<details>
-<summary>代码</summary>
+**Template problem:** [Luogu P2863 [USACO06JAN] The Cow Prom S](https://www.luogu.com.cn/problem/P2863)
 
 ```cpp
 #include <bits/stdc++.h>
@@ -314,7 +296,7 @@ int main() {
     std::ios::sync_with_stdio(false);
     std::cin.tie(nullptr);
     std::cout.tie(nullptr);
-    
+
     int n, m;
     std::cin >> n >> m;
     SCC g(n);
@@ -336,5 +318,3 @@ int main() {
     return 0;
 }
 ```
-
-</details>

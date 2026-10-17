@@ -2,6 +2,7 @@
 title: 'Hugo博客搭建记'
 date: 2024-01-20T21:06:30+08:00
 tags: ['hugo', '博客']
+category: 'diary'
 summary: '记录用 hugo + even 主题和 GitHub Actions 搭建并部署个人博客的完整过程'
 draft: false
 ---
@@ -30,7 +31,7 @@ draft: false
 ### Step 2.5 创建repository
 因为我打算部署到github pages上，就在github上创建一个新的repository，叫`leesun1729.github.io`
 
-```
+```bash
 git init
 git add .
 git commit -m "first commit"
@@ -42,7 +43,7 @@ git push -u origin master
 ### Step 3 本地测试
 配置完成后，可以 `hugo new post/test.md` 创建一个新的post(在`hugo-blog/content/post/test.md`), 按照markdown随便写点东西以后保存，然后 `hugo server`，打开localhost看一下效果
 最后用`hugo --theme=even --baseURL="https://leesun1729.github.io/" --buildDrafts`命令生成静态文件，就是`hugo-blog/public/`文件夹，把这个文件夹内的内容push到github上就可以了
-```
+```bash
 cd public
 git init
 git add .
@@ -51,7 +52,6 @@ git remote add origin https://github.com/leesun1729/leesun1729.github.io.git
 git branch -M publish
 git push -u origin publish
 ```
-
 
 注： blog的源代码和网页内容并不是一个东西!
 
@@ -86,7 +86,6 @@ git push -u origin publish
 3. add, commit, 把源代码push到`master`
 
 这样就可以了，不必切branch然后push网页内容了。
-
 
 ### Step 6 其他
 

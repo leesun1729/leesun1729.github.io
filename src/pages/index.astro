@@ -2,23 +2,38 @@
 import BaseLayout from '../layouts/BaseLayout.astro';
 import PostCard from '../components/PostCard.astro';
 import { getCollection } from 'astro:content';
-import { SITE, formatDate, cleanTags } from '../lib/site';
+import { SITE, CATEGORIES, categoryLabel, formatDate, cleanTags } from '../lib/site';
 
 const asDate = (d: Date | string) => (d instanceof Date ? d : new Date(d));
 
-const notes = (await getCollection('notes', ({ data }) => !data.draft)).sort(
-  (a, b) => asDate(b.data.date).valueOf() - asDate(a.data.date).valueOf(),
-);
+/* Articles live as `<slug>/zh.md`; this is the Chinese home, so only the /zh
+   half is listed and the URL slug is the directory name. */
+const slugOf = (id: string) => id.split('/')[0];
+
+const notes = (await getCollection('articles', ({ data }) => !data.draft))
+  .filter((a) => a.id.endsWith('/zh'))
+  .sort((a, b) => asDate(b.data.date).valueOf() - asDate(a.data.date).valueOf());
 
 const projects = (await getCollection('projects')).sort((a, b) => a.data.order - b.data.order);
 const paste = projects.find((p) => p.id.startsWith('paste/') && p.id.endsWith('/zh')) ?? projects[0];
 
-const recent = notes.slice(0, 4);
+/* The reference home shows a grid, not a stack, so this is a wider slice than
+   the old single-column four. */
+const recent = notes.slice(0, 6);
 
-/* Chips are links in the card meta row, but the site ships no per-tag routes
-   (`/tags/*` all redirect to the notes index), so every chip points there. */
+/* Tag chips now point at real per-tag pages (/tags/<tag>/), so clicking a tag
+   on any card opens the list of articles carrying it. */
 const tagChips = (tags?: string[]) =>
-  cleanTags(tags).map((label) => ({ label, href: '/notes/' }));
+  cleanTags(tags).map((label) => ({ label: label, href: `/tags/${encodeURIComponent(label)}/` }));
+
+/* The browse row under the article band: every category and every tag that
+   actually has articles. Built from the whole collection, not just `recent`. */
+const tagCount = new Map<string, number>();
+for (const n of notes) for (const t of cleanTags(n.data.tags)) tagCount.set(t, (tagCount.get(t) ?? 0) + 1);
+const allTags = [...tagCount.entries()].sort(
+  (a, b) => b[1] - a[1] || a[0].localeCompare(b[0], 'zh'),
+);
+const catsWithNotes = CATEGORIES.filter((c) => notes.some((n) => n.data.category === c.key));
 
 const LINK_LABELS = { repo: '源码仓库', release: '下载', demo: '在线演示' } as const;
 type ProjectLinks = { repo?: string; release?: string; demo?: string };
@@ -39,39 +54,117 @@ const pasteLinks = paste ? projectLinks(paste.data.links) : [];
 >
   <div class="container">
     <header class="hero">
-      <h1 class="hero-title">Hi，我是 {SITE.author}</h1>
-      <p class="hero-tagline">{SITE.description.zh}</p>
+      <div class="hero-split">
+        <div>
+          <h1 class="hero-title">Hi，{SITE.author}!</h1>
+          <p class="hero-tagline">{SITE.description.zh}</p>
+
+          <!-- 社交图标：内联 SVG，用 currentColor 继承灰阶，深浅色自动跟随。
+               要加/删站点就改 src/lib/site.ts 的 SITE，然后在这里加一条 <li>。 -->
+          <ul class="social-row" aria-label="联系方式">
+            <li>
+              <a href={SITE.github} rel="me noreferrer" aria-label="GitHub">
+                <svg viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
+                  <path
+                    d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27s1.36.09 2 .27c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8Z"
+                  ></path>
+                </svg>
+              </a>
+            </li>
+            <li>
+              <a href={`mailto:${SITE.email}`} aria-label="邮箱">
+                <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
+                  <rect x="1.5" y="3" width="13" height="10" rx="1.5"></rect>
+                  <path d="m2 4.5 6 4.5 6-4.5"></path>
+                </svg>
+              </a>
+            </li>
+          </ul>
+        </div>
+
+        <!-- 头像：用的是 public/favicons/favicon-512x512.png。
+             要换图就改 src 里的路径，图片放 public/ 下。 -->
+        <img
+          class="hero-portrait"
+          src="/images/000/IMG_5416.jpg"
+          alt="leesun 的鲸鱼头像"
+          width="280"
+          height="280"
+          loading="eager"
+          decoding="async"
+        />
+      </div>
     </header>
 
-    <section class="section" aria-labelledby="notes-heading">
-      <h2 id="notes-heading" class="band-heading">文章</h2>
-      {
-        recent.length > 0 ? (
-          <div class="card-stack">
-            {recent.map((n) => (
-              <PostCard
-                title={n.data.title}
-                href={`/notes/${n.id}/`}
-                summary={n.data.summary}
-                date={formatDate(asDate(n.data.date), 'zh')}
-                tags={tagChips(n.data.tags)}
-              />
-            ))}
-          </div>
-        ) : (
-          <p class="empty">还没有笔记。</p>
-        )
-      }
-      <p class="more">
-        <a href="/notes/">全部 {notes.length} 篇笔记</a>
-      </p>
+    <section class="section section--divided" aria-labelledby="articles-heading">
+      <a class="band-heading" href="#articles-list">文章</a>
+      <h2 id="articles-heading" class="section-title">文章</h2>
+    
+      <div class="browse-row">
+        <span class="browse-label">分类：</span>
+        <span class="browse-items">
+          {catsWithNotes.map((c, i) => (
+            <>
+              {i > 0 && <span class="browse-sep" aria-hidden="true">、</span>}
+              <a class="browse-link" href={`/articles/category/${c.key}/`}>
+                {categoryLabel(c.key, 'zh')} ({notes.filter((n) => n.data.category === c.key).length})
+              </a>
+            </>
+          ))}
+        </span>
+      </div>
+
+      <div class="browse-row">
+        <span class="browse-label">标签：</span>
+        <span class="browse-items">
+          {allTags.map(([t, n], i) => (
+            <>
+              {i > 0 && <span class="browse-sep" aria-hidden="true">、</span>}
+              <a class="browse-link" href={`/tags/${encodeURIComponent(t)}/`}>
+                #{t} ({n})
+              </a>
+            </>
+          ))}
+        </span>
+      </div>
+
+       <div> </div>
+
+      <div id="articles-list">
+        {
+          recent.length > 0 ? (
+            <div class="card-stack">
+              {recent.map((n) => (
+                <PostCard
+                  title={n.data.title}
+                  href={`/articles/${slugOf(n.id)}/`}
+                  summary={n.data.summary}
+                  date={formatDate(asDate(n.data.date), 'zh')}
+                  category={n.data.category ? categoryLabel(n.data.category, 'zh') : undefined}
+                  categoryHref={n.data.category ? `/articles/category/${n.data.category}/` : undefined}
+                  tags={tagChips(n.data.tags)}
+                  cover={n.data.cover}
+                />
+              ))}
+            </div>
+          ) : (
+            <p class="empty">还没有文章。</p>
+          )
+        }
+        <p class="more">
+          <a href="/articles/">全部 {notes.length} 篇文章</a>
+        </p>
+      </div>
     </section>
 
-    <section class="section" aria-labelledby="projects-heading">
-      <h2 id="projects-heading" class="band-heading">项目</h2>
+    <section class="section section--divided" aria-labelledby="projects-heading">
+      <a class="band-heading" href="#projects-list">项目</a>
+      <h2 id="projects-heading" class="section-title">项目</h2>
+
+      <div id="projects-list">
       {
         paste ? (
-          <div class="project-grid">
+          <div class="card-stack">
             <div class="project-item">
               <PostCard
                 title={paste.data.title}
@@ -83,7 +176,7 @@ const pasteLinks = paste ? projectLinks(paste.data.links) : [];
               {pasteLinks.length > 0 && (
                 <p class="project-links">
                   {pasteLinks.map((l) => (
-                    <a href={l.href} rel="noreferrer">
+                    <a class="link-dashed" href={l.href} rel="noreferrer">
                       {l.label}
                     </a>
                   ))}
@@ -97,43 +190,19 @@ const pasteLinks = paste ? projectLinks(paste.data.links) : [];
           </p>
         )
       }
+      <p class="more">
+        <a href="/projects/">全部项目</a>
+      </p>
+      </div>
     </section>
   </div>
 </BaseLayout>
 
 <style>
-  /* global.css ships .wrap (896px, centered) and BaseLayout applies it to
-     <main>. The promised .container utility was not implemented there, so
-     pages that need it define it locally rather than editing global.css. */
-
-  .hero {
-    padding-block: 28px;
-  }
-
-  .hero-title {
-    margin: 0 0 12px;
-    font-size: 36px;
-    font-weight: 700;
-    line-height: 1.1;
-    letter-spacing: -0.025em;
-  }
-
-  .hero-tagline {
-    margin: 0;
-    max-width: 40em;
-    font-size: 17px;
-    line-height: 1.6;
-    color: var(--muted, #525252);
-    text-wrap: pretty;
-  }
-
-  .band-heading {
-    margin: 0 0 20px;
-    font-size: 24px;
-    font-weight: 700;
-    line-height: 40px;
-    letter-spacing: -0.01em;
-  }
+  /* Page-local layout only. .hero / .hero-title / .hero-tagline / .band-heading /
+     .more / .empty / .container have their single definition in global.css
+     (R4 contract §3.2) — a local copy would carry [data-astro-cid-*] and win
+     the cascade, silently reverting the global refinement. */
 
   .project-item {
     display: grid;
@@ -141,37 +210,50 @@ const pasteLinks = paste ? projectLinks(paste.data.links) : [];
     gap: 12px;
   }
 
-  .project-links {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 4px 20px;
-    margin: 0;
-    font-size: 12px;
-    font-weight: 500;
-    line-height: 1.5;
-    color: var(--meta, #262626);
+  /* Browse rows under the section title: "分类：A (1)、B (2)" as a running
+     text line, not chips — the reference's filter rows. Gray ink, darker on
+     hover, counts in the same voice as the label. */
+  /* The filter rows sit tight under the section title, then a clear gap
+     separates them from the first card. Without the bottom margin the list
+     ran straight into the rows and the block read as one dense paragraph. */
+  .browse-row {
+    margin: 0.25rem 0 0;
+    font-size: var(--step--1);
+    line-height: 1.9;
+    color: var(--muted);
   }
 
-  .project-links a {
+  .browse-row + .browse-row {
+    margin-top: 0.35rem;
+  }
+
+  /* The list starts well below the last filter row. */
+  #articles-list,
+  #projects-list {
+    margin-top: 2.5rem;
+  }
+
+  .browse-label {
+    font-weight: 700;
+    color: var(--meta);
+  }
+
+  .browse-sep {
+    color: var(--line-strong);
+  }
+
+  .browse-link {
+    color: var(--muted);
+    text-decoration: none;
+    font-variant-numeric: tabular-nums;
+    transition: color 0.15s ease;
+  }
+
+  .browse-link:hover {
+    color: var(--fg);
     text-decoration: underline;
     text-decoration-style: dashed;
     text-underline-offset: 4px;
   }
 
-  .more {
-    margin: 20px 0 0;
-    font-size: 14px;
-  }
-
-  .empty {
-    margin: 0;
-    color: var(--muted, #525252);
-  }
-
-  @media (min-width: 768px) {
-    .hero-title {
-      font-size: 60px;
-      line-height: 60px;
-    }
-  }
 </style>

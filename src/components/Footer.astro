@@ -6,23 +6,43 @@ interface Props {
 }
 
 const { lang } = Astro.props;
+
+/* "已运行 N 天" — days since SITE.startYear began. Computed at build time, so
+   it advances whenever the site is rebuilt (the reference does the same). */
+const start = new Date(SITE.startYear, 0, 1);
+const days = Math.max(1, Math.floor((Date.now() - start.getTime()) / 86_400_000));
 const year = new Date().getFullYear();
-const years = year > SITE.startYear ? `${SITE.startYear}–${year}` : `${SITE.startYear}`;
+
+const L = {
+  zh: {
+    days: `已运行 ${days} 天`,
+    rights: `© ${year} ${SITE.author}，保留所有权利`,
+  },
+  en: {
+    days: `Running for ${days} days`,
+    rights: `© ${year} ${SITE.author}. All rights reserved.`,
+  },
+}[lang];
 ---
 
 <footer class="site-foot">
   <div class="wrap foot-inner">
-    <p class="foot-line foot-id">{SITE.name[lang]} · {SITE.author} · {years}</p>
-    <p class="foot-line">
-      <a href={`mailto:${SITE.email}`}>{SITE.email}</a>
-      <a href={SITE.github} rel="me noreferrer">GitHub</a>
-      <a href={lang === 'zh' ? '/en/' : '/'}>{lang === 'zh' ? 'English' : '中文'}</a>
-    </p>
-    <p class="foot-note">
-      {lang === 'zh'
-        ? '正文使用系统中文黑体渲染，不加载任何网络字体。'
-        : 'Body text is set in the system CJK face. No webfont is loaded.'}
-    </p>
+    <a class="foot-brand" href={lang === 'zh' ? '/' : '/en/'}>
+      {/* Same mark, size and shape as the navbar brand icon. */}
+      <img
+        class="foot-mark"
+        src="/favicons/favicon-64x64.png"
+        alt=""
+        width="30"
+        height="30"
+        loading="lazy"
+        decoding="async"
+      />
+      <span>Hi, {SITE.author}</span>
+    </a>
+
+    <p class="foot-line">{L.days}</p>
+    <p class="foot-line">{L.rights}</p>
   </div>
 </footer>
 
@@ -33,53 +53,56 @@ const years = year > SITE.startYear ? `${SITE.startYear}–${year}` : `${SITE.st
     padding-block: 2rem 3rem;
   }
 
+  /* The reference footer is one centred row of items separated by vertical
+     rules; it collapses to a centred column on narrow screens. */
   .foot-inner {
     display: flex;
     flex-direction: column;
-    gap: 0.4rem;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+    text-align: center;
+  }
+
+  @media (min-width: 40rem) {
+    .foot-inner {
+      flex-direction: row;
+      flex-wrap: wrap;
+      gap: 0 1rem;
+    }
+  }
+
+  .foot-brand {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: var(--fg);
+    font-size: 14px;
+    font-weight: 700;
+    text-decoration: none;
+  }
+
+  .foot-mark {
+    width: 30px;
+    height: 30px;
+    display: block;
+    border-radius: 50%;
   }
 
   .foot-line {
     margin: 0;
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    gap: 0.35rem 1.25rem;
     font-size: 12px;
     font-weight: 500;
     line-height: 1.5;
     color: var(--meta);
+    font-variant-numeric: tabular-nums;
   }
 
-  .foot-id {
-    color: var(--fg);
-    font-weight: 700;
-  }
-
-  .foot-line a {
-    color: var(--meta);
-    text-decoration: underline;
-    text-decoration-style: dashed;
-    text-underline-offset: 4px;
-  }
-
-  .foot-line a:hover {
-    color: var(--fg);
-  }
-
-  .foot-note {
-    margin: 0.6rem 0 0;
-    font-size: 12px;
-    line-height: 1.5;
-    color: var(--muted);
-    max-width: 34em;
-  }
-
-  @media (max-width: 40rem) {
+  /* The vertical rules between items, from the reference's sm:border-l. */
+  @media (min-width: 40rem) {
     .foot-line {
-      flex-direction: column;
-      align-items: flex-start;
-      gap: 0.2rem;
+      padding-left: 1rem;
+      border-left: 1px solid var(--line);
     }
   }
 </style>

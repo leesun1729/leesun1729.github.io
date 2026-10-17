@@ -1,0 +1,64 @@
+---
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import PostCard from '../../../components/PostCard.astro';
+import ArticleSearch from '../../../components/ArticleSearch.astro';
+import { getCollection } from 'astro:content';
+import { formatDate, cleanTags } from '../../../lib/site';
+
+const asDate = (d: Date | string) => (d instanceof Date ? d : new Date(d));
+
+/* This locale's entries are the `<slug>/en.md` ones; the URL slug is the
+   directory name. See the Chinese index for the mirror of this filter. */
+const slugOf = (id: string) => id.split('/')[0];
+
+const notes = (await getCollection('articles', ({ data }) => !data.draft))
+  .filter((a) => a.id.endsWith('/en'))
+  .sort((a, b) => asDate(b.data.date).valueOf() - asDate(a.data.date).valueOf());
+
+/* Every tag has a real page at /en/tags/<tag>/, so a chip is a working filter:
+   click one, see the articles carrying it. */
+const tagChips = (t: string[]) =>
+  t.map((label) => ({ label: label, href: `/en/tags/${encodeURIComponent(label)}/` }));
+---
+
+<BaseLayout
+  lang="en"
+  title="Articles"
+  description="Algorithm and C++ articles, written in Chinese."
+  pathname="/en/articles/"
+>
+  <div class="container">
+    <header class="page-head">
+      <h1>Articles</h1>
+    </header>
+
+    {notes.length > 0 && <ArticleSearch lang="en" />}
+
+    {
+      notes.length > 0 ? (
+        <div class="card-stack">
+          {notes.map((n) => (
+            <PostCard
+              title={n.data.title}
+              href={`/en/articles/${slugOf(n.id)}/`}
+              summary={n.data.summary}
+              date={formatDate(asDate(n.data.date), 'en')}
+              tags={tagChips(cleanTags(n.data.tags))}
+            />
+          ))}
+        </div>
+      ) : (
+        <p class="empty">No articles yet.</p>
+      )
+    }
+  </div>
+</BaseLayout>
+
+<style>
+  /* Page-local only: .page-head / .page-head h1 / .lede / .page-meta / .empty /
+     .container are defined once in global.css (R4 contract §3.2). A local copy
+     carries [data-astro-cid-*] and outranks the global class, which is exactly
+     how /articles/ h1 stayed at 48px while / was 60px. */
+
+
+</style>

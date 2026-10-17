@@ -1,0 +1,95 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import PostCard from '../../components/PostCard.astro';
+import { getCollection } from 'astro:content';
+import { CATEGORIES, categoryLabel, formatDate, cleanTags } from '../../lib/site';
+
+const asDate = (d: Date | string) => (d instanceof Date ? d : new Date(d));
+
+/* Articles are `<slug>/zh.md` and `<slug>/en.md`, so this locale's entries are
+   the `/zh` ones and the URL slug is the directory name. */
+const slugOf = (id: string) => id.split('/')[0];
+
+/* Chinese tag index: `/tags/<tag>/`.
+   The English mirror lives at src/pages/en/tags/[tag].astro and must stay in
+   step. `params.tag` carries the raw label — Astro percent-encodes it for the
+   output path, so a Chinese tag such as 珂朵莉树 becomes a real route. */
+export async function getStaticPaths() {
+  /* getStaticPaths is hoisted to module scope, above the frontmatter, so it
+     cannot reach the `asDate` helper defined there — dates are already Date
+     objects, so compare them directly. */
+  const all = (await getCollection('articles', ({ data }) => !data.draft))
+    .filter((a) => a.id.endsWith('/zh'))
+    .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
+
+  const byTag = new Map<string, typeof all>();
+
+  for (const article of all) {
+    for (const raw of article.data.tags ?? []) {
+      /* Legacy frontmatter carries empty and whitespace-only tags (trie has
+         `['Trie', '']`); trimming and dropping them here is what keeps a blank
+         label from becoming a published route. */
+      const tag = raw.trim();
+      if (!tag) continue;
+
+      const bucket = byTag.get(tag);
+      if (bucket) bucket.push(article);
+      else byTag.set(tag, [article]);
+    }
+  }
+
+  return [...byTag.entries()]
+    .sort((a, b) => a[0].localeCompare(b[0], 'zh'))
+    .map(([tag, notes]) => ({ params: { tag }, props: { tag, notes } }));
+}
+
+const { tag, notes } = Astro.props;
+
+const total = notes.length;
+const pathname = `/tags/${encodeURIComponent(tag)}/`;
+
+/* Every tag on a card links to its own page, so a card here can be walked
+   sideways into a sibling tag. */
+const tagLinks = (tags: string[] | undefined) =>
+  cleanTags(tags).map((t) => ({ label: t, href: `/tags/${encodeURIComponent(t)}/` }));
+
+/* A category only has a page when it is a known key *and* carries articles, so
+   an unknown key falls back to plain text rather than a dangling link. */
+const categoryHref = (key: string | undefined) =>
+  CATEGORIES.some((c) => c.key === key) ? `/articles/category/${key}/` : undefined;
+---
+
+<BaseLayout
+  lang="zh"
+  title={`#${tag}`}
+  description={`${total} 篇带有${tag}标签的文章`}
+  pathname={pathname}
+>
+  <div class="container">
+    <header class="page-head">
+      <h1>#{tag}</h1>
+      <p class="lede">
+        {total} 篇带有{tag}标签的文章
+      </p>
+      <p class="page-meta">
+        {total} 篇 · <a class="link-dashed" href="/articles/">全部文章</a>
+      </p>
+    </header>
+
+    <div class="card-stack">
+      {
+        notes.map((n) => (
+          <PostCard
+            title={n.data.title}
+            href={`/articles/${slugOf(n.id)}/`}
+            summary={n.data.summary}
+            date={formatDate(asDate(n.data.date), 'zh')}
+            category={categoryLabel(n.data.category, 'zh')}
+            categoryHref={categoryHref(n.data.category)}
+            tags={tagLinks(n.data.tags)}
+          />
+        ))
+      }
+    </div>
+  </div>
+</BaseLayout>

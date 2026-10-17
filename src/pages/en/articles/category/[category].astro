@@ -1,0 +1,73 @@
+---
+import BaseLayout from '../../../../layouts/BaseLayout.astro';
+import PostCard from '../../../../components/PostCard.astro';
+import { getCollection } from 'astro:content';
+import { CATEGORIES, categoryLabel, formatDate, cleanTags } from '../../../../lib/site';
+
+const asDate = (d: Date | string) => (d instanceof Date ? d : new Date(d));
+
+/* This locale's entries are the `<slug>/en.md` ones; the URL slug is the
+   directory name. See the Chinese category index for the mirror of this filter. */
+const slugOf = (id: string) => id.split('/')[0];
+
+/* English category index: `/en/articles/category/<key>/`. */
+export async function getStaticPaths() {
+  /* getStaticPaths is hoisted to module scope, above the frontmatter, so it
+     cannot reach the `asDate` helper defined there — dates are already Date
+     objects, so compare them directly. */
+  const all = (await getCollection('articles', ({ data }) => !data.draft))
+    .filter((a) => a.id.endsWith('/en'))
+    .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
+
+  /* Only categories with articles get a page; the rest would be empty. */
+  return CATEGORIES.map((c) => ({
+    params: { category: c.key },
+    props: { key: c.key, notes: all.filter((a) => a.data.category === c.key) },
+  })).filter((p) => p.props.notes.length > 0);
+}
+
+const { key, notes } = Astro.props;
+
+const label = categoryLabel(key, 'en');
+const total = notes.length;
+const pathname = `/en/articles/category/${key}/`;
+
+/* Tag chips link to the real per-tag routes built by src/pages/en/tags/[tag].astro. */
+const tagLinks = (tags: string[] | undefined) =>
+  cleanTags(tags).map((t) => ({ label: t, href: `/en/tags/${encodeURIComponent(t)}/` }));
+---
+
+<BaseLayout
+  lang="en"
+  title={label}
+  description={`${total} articles filed under ${label}`}
+  pathname={pathname}
+>
+  <div class="container">
+    <header class="page-head">
+      <h1>{label}</h1>
+      <p class="lede">
+        {total} {total === 1 ? 'article' : 'articles'} filed under {label}
+      </p>
+      <p class="page-meta">
+        {total} {total === 1 ? 'article' : 'articles'} · <a class="link-dashed" href="/en/articles/">All articles</a>
+      </p>
+    </header>
+
+    <div class="card-stack">
+      {
+        notes.map((n) => (
+          <PostCard
+            title={n.data.title}
+            href={`/en/articles/${slugOf(n.id)}/`}
+            summary={n.data.summary}
+            date={formatDate(asDate(n.data.date), 'en')}
+            category={categoryLabel(n.data.category, 'en')}
+            categoryHref={`/en/articles/category/${key}/`}
+            tags={tagLinks(n.data.tags)}
+          />
+        ))
+      }
+    </div>
+  </div>
+</BaseLayout>

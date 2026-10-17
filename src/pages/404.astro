@@ -21,24 +21,15 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 
       <p>
         如果是从搜索引擎或者旧链接过来的，那些文章大多还在，只是换了地址：
-        以前的 <code>/post/</code> 目录现在叫<a href="/notes/">笔记</a>。
+        以前的 <code>/post/</code> 目录现在叫<a href="/articles/">文章</a>。
       </p>
 
       <ul>
         <li><a href="/">回到首页</a></li>
-        <li><a href="/notes/">全部笔记</a></li>
+        <li><a href="/articles/">全部文章</a></li>
         <li><a href="/projects/">项目</a></li>
       </ul>
     </article>
   </div>
 </BaseLayout>
 
-<style>
-  /* global.css ships .wrap (896px, centered) and BaseLayout applies it to
-     <main>. The promised .container utility was not implemented there, so
-     pages that need it define it locally rather than editing global.css. */
-
-  .page-head {
-    padding-block: 28px;
-  }
-</style>

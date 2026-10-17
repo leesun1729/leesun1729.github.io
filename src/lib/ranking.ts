@@ -21,7 +21,7 @@ export interface RankingData {
  *     "generatedAt": "2026-10-15T00:00:00.000Z" | null,
  *     "source": "goatcounter",
  *     "site": "https://leesun1729.goatcounter.com" | null,
- *     "entries": [{ "path": "/notes/trie/", "title": "字典树", "count": 123 }]
+ *     "entries": [{ "path": "/articles/trie/", "title": "字典树", "count": 123 }]
  *   }
  *
  * The shipped state is `entries: []` with `generatedAt: null`, and every failure

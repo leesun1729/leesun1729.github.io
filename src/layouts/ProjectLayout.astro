@@ -100,10 +100,14 @@ const entries = (Object.keys(linkLabels) as (keyof ProjectLinks)[])
     border-bottom: 1px solid var(--line);
   }
 
+  /* .project-head h1 sets no font-size: the single h1 ramp lives in
+     global.css (R4 contract §2). */
   .project-head h1 {
     margin-bottom: 0.35rem;
   }
 
+  /* The tagline is a summary, not running prose: no first-line indent, and its
+     type/colour follow the same summary treatment as the note lede. */
   .tagline {
     text-indent: 0;
     margin: 0;
@@ -125,13 +129,19 @@ const entries = (Object.keys(linkLabels) as (keyof ProjectLinks)[])
     padding: 0;
   }
 
+  /* Rail links sit in the same marginalia column as the TOC, so they use the
+     same treatment: quiet at rest, a dashed underline revealed on hover.
+     Previously this was a permanently-visible solid rule while `.toc a` was
+     quiet-at-rest — two different link languages in one column. */
   .rail-links a {
     text-decoration: none;
-    border-bottom: 1px solid var(--line);
   }
 
   .rail-links a:hover {
-    border-bottom-color: var(--fg);
+    color: var(--fg);
+    text-decoration: underline;
+    text-decoration-style: dashed;
+    text-underline-offset: 4px;
   }
 
   @media (max-width: 60rem) {

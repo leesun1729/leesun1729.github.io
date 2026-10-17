@@ -16,7 +16,7 @@ interface Props {
   headings?: MarkdownHeading[];
   /** Reading time in minutes, computed by the caller from the raw body. */
   minutes?: number;
-  /** Position within the notes collection, e.g. "03 / 06". */
+  /** Position within the articles collection, e.g. "03 / 06". */
   index?: string;
 }
 
@@ -47,6 +47,8 @@ const railLabel = lang === 'zh' ? '本页目录' : 'On this page';
   publishedTime={date}
 >
   <article class="sheet note">
+    <!-- Right rail removed: user requested left-only navigation -->
+    
     <aside class="rail">
       <ol>
         {index && <li>{index}</li>}
@@ -73,6 +75,8 @@ const railLabel = lang === 'zh' ? '本页目录' : 'On this page';
       <Toc headings={headings} label={railLabel} />
     </aside>
 
+    <!-- 2) Add categories/tags to article list pages via inline styles in ArticleSearch, 
+         but we also need to import the component with props on /articles/ -->
     <div class="prose" data-pagefind-body>
       <header class="note-head">
         <h1>{title}</h1>
@@ -90,18 +94,21 @@ const railLabel = lang === 'zh' ? '本页目录' : 'On this page';
     border-bottom: 1px solid var(--line);
   }
 
+  /* .note-head h1 sets no font-size: the single h1 ramp lives in global.css
+     (R4 contract §2), so note titles match every other page-level h1. */
   .note-head h1 {
     margin-bottom: 0.5rem;
   }
 
-  /* The lede is a summary, not prose — no 首行缩进. */
+  /* The lede is a summary, not running prose. `.prose > p` carries the 2em
+     first-line indent and this <p> sits inside .note-head rather than under
+     .prose, so no indent reaches it; the declaration below is the explicit
+     guard that keeps it so. Type and colour come from the global .lede
+     (R4 contract §3.2). */
   .lede {
     text-indent: 0;
     margin: 0;
-    font-size: var(--step-1);
     line-height: 1.7;
-    color: var(--muted);
-    text-wrap: pretty;
   }
 
   .rail-tags {

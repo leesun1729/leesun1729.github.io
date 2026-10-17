@@ -30,7 +30,7 @@ const projectLinks = (links: ProjectLinks) =>
   <div class="container">
     <header class="page-head">
       <h1>项目</h1>
-      <p class="lede">自己写的、还在维护的东西。数量不多，都尽量做完整。</p>
+      <p class="lede"> vibcoding </p>
       <p class="page-meta">{projects.length} 个项目</p>
     </header>
 
@@ -51,7 +51,7 @@ const projectLinks = (links: ProjectLinks) =>
                 {links.length > 0 && (
                   <p class="project-links">
                     {links.map((l) => (
-                      <a href={l.href} rel="noreferrer">
+                      <a class="link-dashed" href={l.href} rel="noreferrer">
                         {l.label}
                       </a>
                     ))}
@@ -69,38 +69,9 @@ const projectLinks = (links: ProjectLinks) =>
 </BaseLayout>
 
 <style>
-  /* global.css ships .wrap (896px, centered) and BaseLayout applies it to
-     <main>. The promised .container utility was not implemented there, so
-     pages that need it define it locally rather than editing global.css. */
-
-  .page-head {
-    padding-block: 28px;
-  }
-
-  .page-head h1 {
-    margin: 0 0 12px;
-    font-size: 36px;
-    font-weight: 700;
-    line-height: 1.15;
-    letter-spacing: -0.025em;
-  }
-
-  .lede {
-    margin: 0 0 12px;
-    max-width: 34em;
-    font-size: 17px;
-    line-height: 1.6;
-    color: var(--muted, #525252);
-    text-wrap: pretty;
-  }
-
-  .page-meta {
-    margin: 0;
-    font-size: 12px;
-    font-weight: 500;
-    line-height: 1.5;
-    color: var(--meta, #262626);
-  }
+  /* Page-local layout only. .page-head / .page-head h1 / .lede / .page-meta /
+     .empty / .container are defined once in global.css (R4 contract §3.2);
+     a local copy would outrank them through [data-astro-cid-*]. */
 
   .project-item {
     display: grid;
@@ -108,31 +79,4 @@ const projectLinks = (links: ProjectLinks) =>
     gap: 12px;
   }
 
-  .project-links {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 4px 20px;
-    margin: 0;
-    font-size: 12px;
-    font-weight: 500;
-    line-height: 1.5;
-    color: var(--meta, #262626);
-  }
-
-  .project-links a {
-    text-decoration: underline;
-    text-decoration-style: dashed;
-    text-underline-offset: 4px;
-  }
-
-  .empty {
-    margin: 0;
-    color: var(--muted, #525252);
-  }
-
-  @media (min-width: 768px) {
-    .page-head h1 {
-      font-size: 48px;
-    }
-  }
 </style>

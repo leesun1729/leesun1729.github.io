@@ -1,56 +1,285 @@
 ---
 import BaseLayout from '../../../layouts/BaseLayout.astro';
 import { SITE } from '../../../lib/site';
+
+/* Self-introduction: one trait per line, short fragments (the reference's style). */
+const traits = [
+  "Pursuing a master's degree",
+  'Based in China',
+  'Into Honor of Kings and Chinese animation',
+  'Loves travelling and trying new things',
+];
+
+/* TOC entries map 1:1 onto the page's h2 ids — keep both sides in sync. */
+const sections = [
+  { id: 'footprints', label: 'Footprints' },
+  { id: 'anime', label: 'Anime' },
+  { id: 'contact', label: 'Contact' },
+];
+
+/* Platform label + the real link, sourced from src/lib/site.ts. No invented accounts. */
+const contacts = [
+  { label: 'Email', href: `mailto:${SITE.email}`, text: SITE.email, external: false },
+  { label: 'GitHub', href: SITE.github, text: 'github.com/leesun1729', external: true },
+];
+
+/* Placeholder slots for the anime section. */
+const animeSlots = Array.from({ length: 6 });
 ---
 
 <BaseLayout
   lang="en"
   title="About"
-  description="leesun — M.Eng. candidate in Software Engineering at USTC, working on LLM applications, agents and RAG."
+  description="About leesun: a short self-introduction, footprints, anime and contact links."
   pathname="/en/about/"
 >
   <div class="container">
+    <header class="page-head">
+      <h1>About</h1>
+    </header>
+
+    <details class="toc">
+      <summary>
+        <span class="toc-title">Contents</span>
+        <span class="toc-hint" aria-hidden="true">
+          <span class="hint-expand">Expand</span>
+          <span class="hint-collapse">Collapse</span>
+        </span>
+      </summary>
+      <nav class="toc-nav" aria-label="Contents">
+        <ul>
+          {
+            sections.map((s) => (
+              <li>
+                <a class="link-dashed" href={`#${s.id}`}>
+                  {s.label}
+                </a>
+              </li>
+            ))
+          }
+        </ul>
+      </nav>
+    </details>
+
     <article class="prose">
-      <header class="page-head">
-        <h1>About</h1>
-      </header>
+      <ul class="traits">
+        {traits.map((t) => <li>{t}</li>)}
+      </ul>
 
-      <p>
-        I'm leesun. I did my B.Eng. in Computer Science at Shantou University (STU), and I'm now
-        an M.Eng. candidate in Software Engineering at USTC, working on LLM applications, agents
-        and RAG. I write code, read papers, and keep algorithm notes here.
-      </p>
+      <h2 id="footprints">Footprints</h2>
 
-      <p>
-        The site is called 自留地 — "the plot you keep for yourself." No recommendation feed, no
-        ads, no chasing whatever is trending. Only the things I want to come back to.
-      </p>
+      <iframe
+        class="vagula-map"
+        src="/VagulaMap/index.html"
+        title="Travel footprint map"
+        loading="lazy"
+        allowfullscreen
+      ></iframe>
 
-      <h2>What I'm working on</h2>
+      <h2 id="anime">Anime</h2>
 
-      <p>
-        Right now, LLM applications: wiring retrieval, tool use and multi-step reasoning into
-        systems that actually run rather than staying at the demo stage. I also maintain
-        <a href="/en/projects/paste/">Paste</a>, a native macOS clipboard manager — my answer to
-        the question of how light a small utility should be.
-      </p>
+      <p>I watch a bit of everything, mostly Chinese animation. The list will fill in.</p>
 
-      <h2>Contact</h2>
+      <!-- Add anime entries here: replace the "＋" in each <li> with
+           "Title (year) · one short line"; copy an <li> if you need more,
+           delete the extras if you need fewer. -->
+      <ul class="anime-grid" aria-label="Anime placeholders, to be filled in">
+        {
+          animeSlots.map(() => (
+            <li class="anime-slot">
+              <span aria-hidden="true">＋</span>
+            </li>
+          ))
+        }
+      </ul>
 
-      <ul>
-        <li>Email: <a href={`mailto:${SITE.email}`}>{SITE.email}</a></li>
-        <li>GitHub: <a href={SITE.github} rel="me noreferrer">github.com/leesun1729</a></li>
+      <h2 id="contact">Contact</h2>
+
+      <ul class="contacts">
+        {
+          contacts.map((c) => (
+            <li>
+              <span class="contact-label">{c.label}</span>
+              <a href={c.href} rel={c.external ? 'me noreferrer' : undefined}>
+                {c.text}
+              </a>
+            </li>
+          ))
+        }
       </ul>
     </article>
   </div>
 </BaseLayout>
 
 <style>
-  /* global.css ships .wrap (896px, centered) and BaseLayout applies it to
-     <main>. The promised .container utility was not implemented there, so
-     pages that need it define it locally rather than editing global.css. */
+  /* Page-local blocks only. .container / .page-head are defined once in
+     global.css (R4 contract §3.2); a local copy would outrank them through
+     [data-astro-cid-*]. */
 
-  .page-head {
-    padding-block: 28px;
+  /* --- Contents: native <details>, no JS, keyboard reachable ------------- */
+
+  /* Same dashed language as .card / .map / .empty-state: 1px dashed var(--line). */
+  .toc {
+    border: 1px dashed var(--line);
+    border-radius: 1rem;
+    margin: 0 0 1.75rem;
+    font-family: var(--font-mono);
+    font-size: var(--step--1);
+  }
+
+  .toc > summary {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 0.7rem 1rem;
+    cursor: pointer;
+    color: var(--meta);
+    list-style: none;
+  }
+
+  .toc > summary::-webkit-details-marker {
+    display: none;
+  }
+
+  .toc > summary::marker {
+    content: '';
+  }
+
+  .toc > summary:hover {
+    color: var(--fg);
+  }
+
+  /* Focus ring: the single global :focus-visible rule (contract §4.4). */
+
+  .toc[open] > summary {
+    border-bottom: 1px dashed var(--line);
+  }
+
+  .hint-collapse {
+    display: none;
+  }
+
+  .toc[open] .hint-expand {
+    display: none;
+  }
+
+  .toc[open] .hint-collapse {
+    display: inline;
+  }
+
+  .toc-nav {
+    padding: 0.7rem 1rem 0.8rem;
+  }
+
+  .toc-nav ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.25rem 1.25rem;
+  }
+
+  /* The jump links carry the global .link-dashed class (R4 contract §3.3);
+     only the colour state stays local. */
+  .toc-nav a {
+    color: inherit;
+  }
+
+  .toc-nav a:hover {
+    color: var(--fg);
+  }
+
+  /* --- Self-introduction: short fragments, no first-line indent --------- */
+
+  .traits {
+    font-size: var(--step-1);
+    line-height: 1.7;
+    margin: 0 0 2rem;
+  }
+
+  .traits li {
+    margin-bottom: 0.15em;
+  }
+
+  /* --- Footprints: the owner's VagulaMap, embedded as an iframe --------- */
+
+  .vagula-map {
+    display: block;
+    width: 100%;
+    height: 600px;
+    border: 1px dashed var(--line);
+    border-radius: 1rem;
+    overflow: hidden;
+    background: var(--bg);
+  }
+
+  @media (max-width: 40rem) {
+    .vagula-map {
+      height: 420px;
+    }
+  }
+
+  /* --- Anime: placeholder grid, ready for the owner to fill in ---------- */
+
+  .anime-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.75rem;
+    list-style: none;
+    margin: 1.2em 0 0;
+    padding: 0;
+  }
+
+  @media (min-width: 768px) {
+    .anime-grid {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+  }
+
+  .anime-slot {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 4.5rem;
+    margin: 0;
+    border: 1px dashed var(--line);
+    border-radius: 1rem; /* same corner language as .card / .map / .empty-state */
+    /* The "＋" is a glyph, so it takes a text token. --line-strong is a border
+       token and must never colour text (R4 contract §0), and its light value
+       sits under the 3:1 floor for a non-body glyph. --muted matches the
+       neighbouring "to be filled in" note (.map-sub) and clears 4.5:1. */
+    color: var(--muted);
+    font-size: var(--step-1);
+  }
+
+  /* --- Contact: platform label + real link ------------------------------ */
+
+  .contacts {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  .contacts li {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 0.25rem 1rem;
+    padding: 0.6rem 0;
+    margin: 0;
+    border-bottom: 1px dashed var(--line);
+  }
+
+  .contact-label {
+    min-width: 5rem;
+    font-family: var(--font-mono);
+    font-size: var(--step--1);
+    color: var(--meta);
+  }
+
+  h2 {
+    scroll-margin-top: 1.5rem;
   }
 </style>

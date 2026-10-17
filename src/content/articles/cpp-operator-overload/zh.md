@@ -2,6 +2,7 @@
 title: 'C++运算符重载'
 date: 2024-01-20T21:50:09+08:00
 tags: ['优先队列', '运算符重载']
+category: 'algorithms'
 summary: '讲解 priority_queue 的内部实现，以及运算符重载与自定义比较函数的用法'
 draft: false
 ---
@@ -33,9 +34,6 @@ draft: false
 
 ### 优先队列基本操作 / 用法
 
-<details>
-<summary>代码</summary>
-
 ```cpp
 q.empty(); 队列为空返回1
 q.pop();   出队
@@ -43,11 +41,6 @@ q.push();  入队
 q.top();   返回队列中优先级最高的元素
 q.size();  返回队列中元素的个数
 ```
-
-</details>
-
-<details>
-<summary>代码</summary>
 
 ```cpp
 // 默认优先队列 priority_queue 是最大堆
@@ -62,11 +55,6 @@ q.pop();
 cout << q.top() << '\n'; // 1
 ```
 
-</details>
-
-<details>
-<summary>代码</summary>
-
 ```cpp
 //定义优先级队列q，less表示按照递减(从大到小)的顺序插入元素，与默认情况相同
 priority_queue<int,vector<int>,less<int>> q;
@@ -75,22 +63,17 @@ priority_queue<int,vector<int>,less<int>> q;
 priority_queue<int,vector<int>,greater<int>> q;
 ```
 
-</details>
-
 ### 关于优先队列重载运算符
 
-<details>
-<summary>代码</summary>
-
 ```cpp
-struct point{    
-    int x;    
-    int y;    
-    int times;    
-    friend bool operator < (point a, point b)    
-    {    
-        return a.times > b.times;    //重载小于号使得小的先出队列    
-    }    
+struct point{
+    int x;
+    int y;
+    int times;
+    friend bool operator < (point a, point b)
+    {
+        return a.times > b.times;    //重载小于号使得小的先出队列
+    }
 };
 
 // 默认情况下，队列中应按从大到小排序
@@ -103,14 +86,9 @@ priority_queue<point> q;
 // 所以实现了按照times的从小到大排序
 ```
 
-</details>
-
 ### 结构体内部
 
 方式一
-
-<details>
-<summary>代码</summary>
 
 ```cpp
 struct Point {
@@ -124,12 +102,7 @@ struct Point {
 };
 ```
 
-</details>
-
 方式二
-
-<details>
-<summary>代码</summary>
 
 ```cpp
 struct Point {
@@ -143,8 +116,6 @@ struct Point {
 };
 ```
 
-</details>
-
     
 优先队列在内部通常使用堆（heap）数据结构，而最常见的形式是最大堆和最小堆。在C++的标准库实现中，`std::priority_queue` 默认为一个最大堆。这意味着队列的顶部（即队列的`top()`方法返回的元素）是所有元素中“最大”的元素。更具体地说，如果没有指明比较方式，优先队列使用`std::less`类型作为内部比较对象，该对象使用元素类型的`<`运算符来决定元素的顺序。
     
@@ -157,46 +128,33 @@ struct Point {
     
 对于`std::priority_queue`来说，如果你想要改变排序行为创建一个最小堆（小的元素优先），你可以这样重载`<`：
     
-<details>
-<summary>代码</summary>
-
 ```cpp
 bool operator<(const node &other) const {
     return val > other.val; // 对于优先队列来说，这样会让小值优先
 }
 ```
-
-</details>
     
 或者，你可以使用一个自定义的比较类型：
     
-<details>
-<summary>代码</summary>
-
 ```cpp
 struct CompareNode {
     bool operator()(const node& n1, const node& n2) {
         return n1.val > n2.val; // 也是小值优先
     }
 };
-    
+
 std::priority_queue<node, std::vector<node>, CompareNode> queue;
 ```
-
-</details>
     
 这种做法的一个好处是，代码的意图非常清晰 —— 你看到比较函数时就能立刻知道队列是如何排序的。而且，它使得类型的常规`<`运算符保持按照字面“小于”的意义，这有助于保持代码直观和一致。
     
 
 ### 结构体外部
 
-<details>
-<summary>代码</summary>
-
 ```cpp
 //定义的比较结构体
-//注意：cmp是个结构体 
-struct cmp {//自定义排序规则 
+//注意：cmp是个结构体
+struct cmp {//自定义排序规则
 	bool operator()(const Point& a,const Point& b) {
         if(a.x == b.x)
             return a.y < b.y;
@@ -208,12 +166,7 @@ struct cmp {//自定义排序规则
 priority_queue<Point,vector<Point>, cmp> q;
 ```
 
-</details>
-
 ### 函数自定义排序规则，可以出现在`sort`排序中
-
-<details>
-<summary>代码</summary>
 
 ```cpp
 struct Point {
@@ -228,12 +181,7 @@ bool cmp(Point a, Point b) {
 sort(p + 1, p + 1 + 1000, cmp);
 ```
 
-</details>
-
 ### 函数自定义排序规则，可以直接出现在`sort`排序中
-
-<details>
-<summary>代码</summary>
 
 ```cpp
 struct Point {
@@ -263,5 +211,3 @@ sort(begin(P), end(P), [](const Point &p1, const Point &p2){
 		return p1.x < p2.x;
 });
 ```
-
-</details>

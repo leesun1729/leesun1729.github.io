@@ -1,0 +1,92 @@
+---
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import PostCard from '../../../components/PostCard.astro';
+import { getCollection } from 'astro:content';
+import { CATEGORIES, categoryLabel, formatDate, cleanTags } from '../../../lib/site';
+
+const asDate = (d: Date | string) => (d instanceof Date ? d : new Date(d));
+
+/* This locale's entries are the `<slug>/en.md` ones; the URL slug is the
+   directory name. See the Chinese tag index for the mirror of this filter. */
+const slugOf = (id: string) => id.split('/')[0];
+
+/* English tag index: `/en/tags/<tag>/`. Tags themselves are language-neutral
+   labels, so both locales build the same set from their own half of the pair. */
+export async function getStaticPaths() {
+  /* getStaticPaths is hoisted to module scope, above the frontmatter, so it
+     cannot reach the `asDate` helper defined there — dates are already Date
+     objects, so compare them directly. */
+  const all = (await getCollection('articles', ({ data }) => !data.draft))
+    .filter((a) => a.id.endsWith('/en'))
+    .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
+
+  const byTag = new Map<string, typeof all>();
+
+  for (const article of all) {
+    for (const raw of article.data.tags ?? []) {
+      /* Legacy frontmatter carries empty and whitespace-only tags; trimming
+         and dropping them here is what keeps a blank label from becoming a
+         published route. */
+      const tag = raw.trim();
+      if (!tag) continue;
+
+      const bucket = byTag.get(tag);
+      if (bucket) bucket.push(article);
+      else byTag.set(tag, [article]);
+    }
+  }
+
+  return [...byTag.entries()]
+    .sort((a, b) => a[0].localeCompare(b[0], 'zh'))
+    .map(([tag, notes]) => ({ params: { tag }, props: { tag, notes } }));
+}
+
+const { tag, notes } = Astro.props;
+
+const total = notes.length;
+const pathname = `/en/tags/${encodeURIComponent(tag)}/`;
+
+/* Every tag on a card links to its own page in this locale. */
+const tagLinks = (tags: string[] | undefined) =>
+  cleanTags(tags).map((t) => ({ label: t, href: `/en/tags/${encodeURIComponent(t)}/` }));
+
+/* A category only has a page when it is a known key *and* carries articles, so
+   an unknown key falls back to plain text rather than a dangling link. */
+const categoryHref = (key: string | undefined) =>
+  CATEGORIES.some((c) => c.key === key) ? `/en/articles/category/${key}/` : undefined;
+---
+
+<BaseLayout
+  lang="en"
+  title={`#${tag}`}
+  description={`${total} ${total === 1 ? 'article' : 'articles'} tagged ${tag}`}
+  pathname={pathname}
+>
+  <div class="container">
+    <header class="page-head">
+      <h1>#{tag}</h1>
+      <p class="lede">
+        {total} {total === 1 ? 'article' : 'articles'} tagged {tag}
+      </p>
+      <p class="page-meta">
+        {total} {total === 1 ? 'article' : 'articles'} · <a class="link-dashed" href="/en/articles/">All articles</a>
+      </p>
+    </header>
+
+    <div class="card-stack">
+      {
+        notes.map((n) => (
+          <PostCard
+            title={n.data.title}
+            href={`/en/articles/${slugOf(n.id)}/`}
+            summary={n.data.summary}
+            date={formatDate(asDate(n.data.date), 'en')}
+            category={categoryLabel(n.data.category, 'en')}
+            categoryHref={categoryHref(n.data.category)}
+            tags={tagLinks(n.data.tags)}
+          />
+        ))
+      }
+    </div>
+  </div>
+</BaseLayout>

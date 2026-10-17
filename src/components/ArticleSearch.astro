@@ -1,0 +1,297 @@
+---
+import type { Lang } from '../lib/site';
+
+export interface Props {
+  /** Locale of the list page this box sits on. Drives every user-facing string. */
+  lang: Lang;
+}
+
+const { lang } = Astro.props;
+
+/* The site ships no i18n helper for this copy, so the four strings live here as
+   a small per-locale table rather than being scattered through the markup. */
+const COPY: Record<Lang, { placeholder: string; count: (n: number) => string; empty: string }> = {
+  zh: {
+    placeholder: '从文章标题和内容中查找关键词',
+    count: (n) => `${n} 篇文章`,
+    empty: '没有匹配的文章，换个关键词试试。',
+  },
+  en: {
+    placeholder: 'Search articles by title and content',
+    count: (n) => `${n} articles`,
+    empty: 'No articles match. Try another keyword.',
+  },
+};
+
+const t = COPY[lang];
+const inputId = `article-search-input-${lang}`;
+---
+
+<div class="article-search" data-article-search data-lang={lang}>
+  <label class="sr-only" for={inputId}>{t.placeholder}</label>
+  <div class="article-search-field">
+    <input
+      id={inputId}
+      class="article-search-input"
+      data-search-input
+      type="search"
+      placeholder={t.placeholder}
+      autocomplete="off"
+      autocapitalize="off"
+      spellcheck="false"
+    />
+    <!-- Decorative magnifier. aria-hidden: the label already names the field. -->
+    <svg class="article-search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <circle cx="10.5" cy="10.5" r="6.5"></circle>
+      <path d="m15.5 15.5 5 5"></path>
+    </svg>
+  </div>
+  <!-- Filled in by the script once the card count is known, so a no-JS visitor
+       never reads a count that does not describe what is on screen. -->
+  <p class="article-search-status" data-search-status role="status" aria-live="polite"></p>
+  <p class="empty article-search-empty" data-search-empty hidden>{t.empty}</p>
+</div>
+
+<style>
+  .article-search {
+    display: grid;
+    gap: 12px;
+    /* `.page-head` already carries 28px of block padding and `.card-stack`
+       uses a 28px gap; matching it keeps the box on the page's rhythm. */
+    margin: 0 0 28px;
+  }
+
+  /* The field wrapper owns the dashed border and the icon; the input inside
+     is borderless so the focus ring lands on the whole field, not on the
+     text box. */
+  .article-search-field {
+    position: relative;
+    display: flex;
+    align-items: center;
+    border: 1px dashed var(--line);
+    border-radius: 0.75rem;
+    background: var(--bg);
+    transition: border-color 0.2s ease-out;
+  }
+
+  .article-search-field:focus-within {
+    border-color: var(--line-strong);
+    outline: 2px solid var(--fg);
+    outline-offset: 3px;
+  }
+
+  .article-search-input {
+    width: 100%;
+    /* Compact field: 8px block padding + a 1.5 line of the smaller text size
+       lands around 36px tall. Right padding leaves room for the icon. */
+    padding: 0.45rem 2.4rem 0.45rem 0.9rem;
+    min-height: 36px;
+    appearance: none;
+    -webkit-appearance: none;
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+    color: var(--fg);
+    /* One step down from prose (17px): the field is furniture, not content. */
+    font-size: var(--step--1);
+    line-height: 1.5;
+  }
+
+  .article-search-input:focus {
+    outline: none; /* the field wrapper carries the ring */
+  }
+
+  .article-search-input::placeholder {
+    color: var(--muted);
+    /* Placeholders inherit the input's font-size, so shrinking the input
+       already shrank the hint proportionally; opacity keeps it quiet. */
+    opacity: 1;
+  }
+
+  /* Magnifier, vertically centred at the right edge. currentColor follows the
+     field text so it flips with the theme. */
+  .article-search-icon {
+    position: absolute;
+    right: 0.8rem;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 16px;
+    height: 16px;
+    color: var(--muted);
+    pointer-events: none;
+  }
+
+  .article-search-status {
+    margin: 0;
+    font-family: var(--font-mono);
+    font-size: var(--step--1);
+    font-weight: 500;
+    line-height: 1.5;
+    color: var(--meta);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .article-search-empty[hidden] {
+    display: none;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .article-search-field {
+      transition: none;
+    }
+  }
+</style>
+
+<script>
+  type PagefindResult = { data: () => Promise<{ url?: string }> };
+  type PagefindModule = {
+    init?: () => Promise<unknown>;
+    search: (query: string) => Promise<{ results: PagefindResult[] }>;
+  };
+
+  /* Card hrefs and Pagefind urls are both site paths, but one may arrive as
+     `/articles/trie/`, `/articles/trie/index.html` or with a hash fragment.
+     Normalising both sides to a bare trailing-slash path makes the comparison
+     a plain map lookup. */
+  function normalisePath(raw: string): string | null {
+    try {
+      const path = new URL(raw, window.location.href).pathname;
+      return path.replace(/index\.html$/, '').replace(/\/+$/, '') + '/';
+    } catch {
+      return null;
+    }
+  }
+
+  /* The bundle only exists after a Pagefind build. `@vite-ignore` plus an
+     indirect specifier keeps Vite from trying to resolve it at build time. */
+  async function loadPagefind(): Promise<PagefindModule | null> {
+    const bundlePath = '/pagefind/pagefind.js';
+    try {
+      const mod = (await import(/* @vite-ignore */ bundlePath)) as PagefindModule;
+      if (typeof mod?.search !== 'function') return null;
+      if (typeof mod.init === 'function') await mod.init();
+      return mod;
+    } catch {
+      return null;
+    }
+  }
+
+  function setup(root: HTMLElement) {
+    const input = root.querySelector<HTMLInputElement>('[data-search-input]');
+    const status = root.querySelector<HTMLElement>('[data-search-status]');
+    const empty = root.querySelector<HTMLElement>('[data-search-empty]');
+    if (!input || !status) return;
+
+    const lang = root.dataset.lang === 'en' ? 'en' : 'zh';
+    const countText = (n: number) => (lang === 'en' ? `${n} articles` : `${n} 篇文章`);
+
+    /* The list is server-rendered, so the cards themselves are the source of
+       truth: Pagefind is only asked *whether* a card's url matches. */
+    const cards = Array.from(document.querySelectorAll<HTMLElement>('.card-stack .card'));
+    if (cards.length === 0) {
+      root.hidden = true;
+      return;
+    }
+
+    const byUrl = new Map<string, HTMLElement>();
+    for (const card of cards) {
+      /* PostCard already publishes its destination as `data-post-link`; the
+         anchor is the fallback so this keeps working if that attribute goes. */
+      const href = card.dataset.postLink ?? card.querySelector('a[href]')?.getAttribute('href');
+      const key = href ? normalisePath(href) : null;
+      if (key && !byUrl.has(key)) byUrl.set(key, card);
+    }
+
+    status.textContent = countText(cards.length);
+
+    let pagefind: PagefindModule | null = null;
+    let timer = 0;
+    /* Every search carries a token; a slower earlier query that resolves after
+       a newer one is discarded instead of repainting stale results. */
+    let token = 0;
+
+    const apply = (visible: Set<HTMLElement> | null) => {
+      let shown = 0;
+      for (const card of cards) {
+        const on = visible === null || visible.has(card);
+        card.hidden = !on;
+        if (on) shown += 1;
+      }
+      status.textContent = countText(shown);
+      if (empty) empty.hidden = shown > 0;
+    };
+
+    /* Degraded mode. `/pagefind/pagefind.js` only exists after
+       `pagefind --site dist`, which the build script runs — so `astro dev`
+       never has it. Rather than disabling the box (which read as "search is
+       broken"), fall back to a substring match over each card's own rendered
+       text: title, summary and tags are all in the DOM already. It is not
+       indexed search — no word stemming, no relevance ranking — but it answers
+       the same question during development. */
+    const localHits = (q: string): Set<HTMLElement> => {
+      const needle = q.toLowerCase();
+      const hits = new Set<HTMLElement>();
+      for (const card of cards) {
+        if (card.textContent?.toLowerCase().includes(needle)) hits.add(card);
+      }
+      return hits;
+    };
+
+    const run = async (query: string) => {
+      const q = query.trim();
+      if (q === '') {
+        token += 1;
+        apply(null);
+        return;
+      }
+      const mine = ++token;
+      if (!pagefind) {
+        apply(localHits(q));
+        return;
+      }
+      let hits: Set<HTMLElement>;
+      try {
+        const search = await pagefind.search(q);
+        const data = await Promise.all(search.results.map((r) => r.data()));
+        hits = new Set<HTMLElement>();
+        for (const d of data) {
+          const key = d.url ? normalisePath(d.url) : null;
+          const card = key ? byUrl.get(key) : undefined;
+          if (card) hits.add(card);
+        }
+      } catch {
+        /* A failed query never blanks the list: the previous state stands. */
+        return;
+      }
+      if (mine !== token) return;
+      apply(hits);
+    };
+
+    const schedule = (value: string) => {
+      window.clearTimeout(timer);
+      timer = window.setTimeout(() => void run(value), 120);
+    };
+
+    input.addEventListener('input', () => schedule(input.value));
+    /* The native clear button on `type="search"` fires `search`, not `input`. */
+    input.addEventListener('search', () => {
+      window.clearTimeout(timer);
+      void run(input.value);
+    });
+
+    void loadPagefind().then((mod) => {
+      if (!mod) {
+        /* No index on disk (dev server, or a build before `pagefind` ran).
+           Stay usable on the substring fallback instead of going quiet. */
+        root.dataset.state = 'local';
+        return;
+      }
+      pagefind = mod;
+      root.dataset.state = 'ready';
+      /* A query typed before the bundle finished loading still gets answered. */
+      if (input.value.trim() !== '') void run(input.value);
+    });
+  }
+
+  Array.from(document.querySelectorAll<HTMLElement>('[data-article-search]')).forEach(setup);
+</script>

@@ -1,0 +1,65 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import PostCard from '../../components/PostCard.astro';
+import ArticleSearch from '../../components/ArticleSearch.astro';
+import { getCollection } from 'astro:content';
+import { formatDate, cleanTags } from '../../lib/site';
+
+const asDate = (d: Date | string) => (d instanceof Date ? d : new Date(d));
+
+/* Articles are stored as `<slug>/zh.md` and `<slug>/en.md`, so this locale's
+   entries are the ones whose id ends in `/zh`. The URL slug is the directory
+   name, which is what `slugOf` returns. */
+const slugOf = (id: string) => id.split('/')[0];
+
+const notes = (await getCollection('articles', ({ data }) => !data.draft))
+  .filter((a) => a.id.endsWith('/zh'))
+  .sort((a, b) => asDate(b.data.date).valueOf() - asDate(a.data.date).valueOf());
+
+/* Every tag now has a real page at /tags/<tag>/ (getStaticPaths over the tag
+   set), so a chip is a working filter: click one, see the articles carrying it. */
+const tagChips = (t: string[]) =>
+  t.map((label) => ({ label: label, href: `/tags/${encodeURIComponent(label)}/` }));
+---
+
+<BaseLayout
+  lang="zh"
+  title="文章"
+  description="算法与 C++ 学习文章：珂朵莉树、SCC、字典树、运算符重载等。"
+  pathname="/articles/"
+>
+  <div class="container">
+    <header class="page-head">
+      <h1>文章</h1>
+    </header>
+
+    {notes.length > 0 && <ArticleSearch lang="zh" />}
+
+    {
+      notes.length > 0 ? (
+        <div class="card-stack">
+          {notes.map((n) => (
+            <PostCard
+              title={n.data.title}
+              href={`/articles/${slugOf(n.id)}/`}
+              summary={n.data.summary}
+              date={formatDate(asDate(n.data.date), 'zh')}
+              tags={tagChips(cleanTags(n.data.tags))}
+            />
+          ))}
+        </div>
+      ) : (
+        <p class="empty">还没有文章。</p>
+      )
+    }
+  </div>
+</BaseLayout>
+
+<style>
+  /* Page-local only: .page-head / .page-head h1 / .lede / .page-meta / .empty /
+     .container are defined once in global.css (R4 contract §3.2). A local copy
+     carries [data-astro-cid-*] and outranks the global class, which is exactly
+     how /articles/ h1 stayed at 48px while / was 60px. */
+
+
+</style>

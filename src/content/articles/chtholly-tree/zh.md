@@ -2,31 +2,27 @@
 title: '珂朵莉树'
 date: 2024-01-20T21:59:08+08:00
 tags: ['珂朵莉树', '线段树']
+category: 'algorithms'
 summary: '用珂朵莉树实现区间加、区间赋值、区间第 k 小与区间幂次和查询'
 draft: false
 ---
-
 
 题目链接：[CF896C Willem, Chtholly and Seniorious](https://codeforces.com/problemset/problem/896/C)
 
 题目要求维护一种数据结构，支持以下操作
 
-`将 [l, r] 区间内所有数加上 x`
-
-`将 [l, r] 区间内所有数改成 x`
-
-`求 [l, r] 区间第 k 小的数`
-
-`求 [l, r] 区间内所有数的 x 次方的和取模 y`
+```plaintext
+将 [l, r] 区间内所有数加上 x
+将 [l, r] 区间内所有数改成 x
+求 [l, r] 区间第 k 小的数
+求 [l, r] 区间内所有数的 x 次方的和取模 y
+```
 
 用于区间推平操作和数据随机时可以使用这种数据结构
 
 **[点击了解更多](https://blog.csdn.net/qq_50332374/article/details/119722580?ops_request_misc=%257B%2522request%255Fid%2522%253A%2522169830796616800211522669%2522%252C%2522scm%2522%253A%252220140713.130102334..%2522%257D&request_id=169830796616800211522669&biz_id=0&utm_medium=distribute.pc_search_result.none-task-blog-2~all~sobaiduend~default-2-119722580-null-null.142%5Ev96%5Epc_search_result_base1&utm_term=%E7%8F%82%E6%9C%B5%E8%8E%89%E6%A0%91&spm=1018.2226.3001.4187)**
 
 **具体实现**: 将每个区间 `[l, r]`上值为 `v` 定义为一个结点，这里需要将 `v` 定义为`mutable`类型，是因为当把 `node` 结点放入 `std::set` 中时， 这些对象在 `std::set`中会被当作 `const` 对象处理，就不能修改存储在 `std::set` 中的结构体对象的成员，因为任何尝试改变其中元素的操作都可能影响集合的顺序性质，这样的操作会违反 `std::set` 的内部机制，但这里我们需要修改的是区间`[l, r]`上的值即可，有序性是由每个结点的区间的左端点决定，因此将`v` 定义为`mutable`类型以方便后续对区间进行修改值
-
-<details>
-<summary>代码</summary>
 
 ```cpp
 typedef long long ll;
@@ -38,10 +34,7 @@ struct node {
         return x.l < y.l;
     }
 };
-
 ```
-
-</details>
 
 **c++语法**: 这里在结构体内对运算符进行重载，对之后的`std::set`的排序方式重新定义按照区间左端点排序
 
@@ -50,9 +43,6 @@ struct node {
 `condition1 ：` pos 恰好为一个结点的左端点，直接返回
 
 `condition2 ：` pos 小于当前结点的左端点，那么 pos 一定在该结点之前的结点区间内，将这个结点区间`[l, r]`划分为`[l, pos - 1]`和 `[pos, r]`
-
-<details>
-<summary>代码</summary>
 
 ```cpp
 std::set<node> tree;
@@ -69,19 +59,13 @@ std::set<node> ::iterator split(ll pos) {
     tree.insert(node(l, pos - 1, v));
     return tree.insert(node(pos, r, v)).first;
 }
-
 ```
-
-</details>
 
 **c++语法**: `在这里插入代码片`这里`tree.insert().first`是`std::set`的一个返回值，当往std::set中插入值时，`std::set`会返回一个pair对象，第一个元素是一个迭代器，它指向新插入的元素或者一个已经有相同值的元素（因为 `std::set` 不允许出现重复的元素）。`pair` 的第二个元素是一个布尔值，指示插入是否发生（如果实际上插入了新元素则为 `true`，如果一个等效的元素已经存在，则为 `false`）
 
 **区间赋值**: 只要获取要求修改区间左、右端点的结点，把这一段删除，再插入要求赋的值和修改区间的左、右端点作为新的结点，对于新添加的区间`[l, r]` , 要先`split(r + 1)` 再 `split(l)`，即先右后左，否则会编译错误，如果先对左端点进行划分，再对右端点划分可能会对原来左端点划分的结点删除，比如区间`[1, 10]`, 现在要修改左端点 1，右端点8；
 
 现在先对左端点进行划分，得到左端点所在结点 `[1, 10]`,在对右端点进行划分，得到 `[1, 7]` , `[8, 10]` ,原先左端点划分的结点`[1, 10]`就会被删除，编译报错！
-
-<details>
-<summary>代码</summary>
 
 ```cpp
 // 区间赋值
@@ -90,15 +74,9 @@ void assign(ll l, ll r, ll v) {
     tree.erase(begin, end);
     tree.insert(node(l, r, v));
 }
-
 ```
 
-</details>
-
 **区间第k大数**: 暴力求解即可
-
-<details>
-<summary>代码</summary>
 
 ```cpp
 // 区间第k大数
@@ -117,15 +95,9 @@ ll kth(ll l, ll r, ll k) {
     }
     return -1; // error return
 }
-
 ```
 
-</details>
-
 **区间幂次求和**: 快速幂 + 暴力
-
-<details>
-<summary>代码</summary>
 
 ```cpp
 // 快速幂
@@ -149,7 +121,4 @@ ll sum_of_pow(ll l, ll r, ll x, ll y) {
     }
     return res;
 }
-
 ```
-
-</details>

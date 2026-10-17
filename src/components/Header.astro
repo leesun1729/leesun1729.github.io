@@ -1,5 +1,6 @@
 ---
 import { SITE, NAV, localeTag, counterpart, type Lang } from '../lib/site';
+import ThemeToggle from './ThemeToggle.astro';
 
 interface Props {
   lang: Lang;
@@ -10,153 +11,444 @@ const { lang, pathname } = Astro.props;
 const alt = counterpart(pathname);
 const home = lang === 'zh' ? '/' : '/en/';
 const items = NAV[lang];
+const norm = (p: string) => (p.endsWith('/') ? p : `${p}/`);
+const here = norm(pathname) === '/' ? '/' : norm(pathname);
+
+/* Both language destinations for the dropdown: this page's url in each
+   locale. counterpart() resolves "this page, other language"; the same-
+   language entry just points at where you already are. */
+const zhHref = lang === 'zh' ? here : alt.href;
+const enHref = lang === 'en' ? here : alt.href;
 
 const isActive = (href: string) =>
   href === home ? pathname === home : pathname.startsWith(href);
-
-const altLabel = alt.lang === 'en' ? 'English' : '中文';
-const altShort = alt.lang === 'en' ? 'EN' : '中';
 ---
 
-<header class="site-head">
+<header class="site-head" data-scrolled="false">
   <div class="wrap head-inner">
-    <a class="brand" href={home}>{SITE.name[lang]}</a>
-
-    <nav class="site-nav" aria-label={lang === 'zh' ? '主导航' : 'Main'}>
-      <ul>
-        {
-          items.map((item) => (
-            <li>
-              <a href={item.href} aria-current={isActive(item.href) ? 'page' : undefined}>
-                {item.label}
-              </a>
-            </li>
-          ))
-        }
-      </ul>
-    </nav>
-
-    <a
-      class="lang-switch"
-      href={alt.href}
-      hreflang={localeTag[alt.lang]}
-      lang={localeTag[alt.lang]}
-      title={alt.exact ? altLabel : `${altLabel} (${SITE.name[alt.lang]})`}
-    >
-      <span aria-hidden="true">{altShort}</span>
-      <span class="sr-only">{altLabel}</span>
+    <a class="brand" href={home}>
+      <img
+        class="brand-mark"
+        src="/favicons/favicon-64x64.png"
+        alt=""
+        width="30"
+        height="30"
+        decoding="async"
+      />
+      <span>Hi, {SITE.name[lang]}</span>
     </a>
+
+    <div class="head-actions">
+      <nav class="site-nav" aria-label={lang === 'zh' ? '主导航' : 'Main'}>
+        <ul>
+          {
+            items.map((item) => (
+              <li>
+                <a href={item.href} aria-current={isActive(item.href) ? 'page' : undefined}>
+                  {item.label}
+                </a>
+              </li>
+            ))
+          }
+        </ul>
+      </nav>
+
+      <!-- Language dropdown: translate glyph + chevron. A button because it
+           opens a menu; the two languages are links inside it. -->
+      <div class="lang-menu" data-lang-menu>
+        <button
+          type="button"
+          class="lang-btn"
+          data-lang-btn
+          aria-haspopup="true"
+          aria-expanded="false"
+          aria-label={lang === 'zh' ? '切换语言' : 'Change language'}
+        >
+          <svg class="lang-icon" viewBox="0 0 24 24" width="16" height="16" aria-hidden="true" focusable="false">
+            <path d="M3 5.5h8M7 3.5v2M4.8 5.5c0 3.6 2.4 6.4 5.6 7.4M8.6 8.6c-.7 2-2.5 3.7-4.6 4.4" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"></path>
+            <path d="m12.5 20.5 3.6-9 3.6 9M13.9 17.3h4.4" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"></path>
+          </svg>
+          <svg class="lang-chevron" viewBox="0 0 16 16" width="10" height="10" aria-hidden="true" focusable="false">
+            <path d="m4 6 4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"></path>
+          </svg>
+        </button>
+        <ul class="lang-dropdown" data-lang-dropdown hidden>
+          <li>
+            <a href={zhHref} hreflang="zh-CN" lang="zh-CN" aria-current={lang === 'zh' ? 'true' : undefined}>中文</a>
+          </li>
+          <li>
+            <a href={enHref} hreflang="en" lang="en" aria-current={lang === 'en' ? 'true' : undefined}>English</a>
+          </li>
+        </ul>
+      </div>
+
+      <ThemeToggle lang={lang} />
+
+      <button
+        type="button"
+        class="menu-btn"
+        data-menu-btn
+        aria-expanded="false"
+        aria-controls="mobile-nav"
+        aria-label={lang === 'zh' ? '打开菜单' : 'Open menu'}
+      >
+        <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" focusable="false">
+          <path d="M4 7h16M4 12h16M4 17h16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"></path>
+        </svg>
+      </button>
+    </div>
   </div>
+
+  <!-- Mobile nav: the desktop row collapses into this panel below 768px. -->
+  <nav class="mobile-nav wrap" id="mobile-nav" data-mobile-nav hidden aria-label={lang === 'zh' ? '主导航' : 'Main'}>
+    <ul>
+      {
+        items.map((item) => (
+          <li>
+            <a href={item.href} aria-current={isActive(item.href) ? 'page' : undefined}>
+              {item.label}
+            </a>
+          </li>
+        ))
+      }
+    </ul>
+  </nav>
 </header>
 
 <style>
-  /* Spec §3: 80px tall, absolutely positioned (NOT sticky), no background —
-     the page ground shows straight through. */
+  /* The header is sticky but NOT full-bleed: it is a centred bar a little
+     wider than the content column, so it reads as floating over the page
+     rather than as a band across the viewport. `--head-w` is the content
+     column plus a fixed overhang on each side (see :root). */
   .site-head {
-    position: absolute;
+    position: sticky;
     top: 0;
-    left: 0;
-    right: 0;
-    z-index: 20;
-    min-height: var(--header-h);
-    background: transparent;
+    z-index: 100;
+    width: min(var(--head-w), calc(100% - 2 * var(--gutter)));
+    margin-inline: auto;
+    background: color-mix(in srgb, var(--bg) 82%, transparent);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    /* Full hairline around the bar, but square at the top and rounded at the
+       bottom only: the bar is pinned to the viewport edge, so rounding its top
+       corners would leave a notch of page showing above it. */
+    border: 1px solid transparent;
+    border-radius: 0 0 1rem 1rem;
+    transition: border-color 0.2s ease-out;
   }
 
+  @supports not (backdrop-filter: blur(1px)) {
+    .site-head {
+      background: var(--bg);
+    }
+  }
+
+  .site-head[data-scrolled='true'] {
+    border-color: var(--line);
+  }
+
+  /* The bar supplies its own width, so the inner row must not re-apply the
+     .wrap column: it only contributes the horizontal padding. */
   .head-inner {
     display: flex;
     align-items: center;
     gap: 1.5rem;
-    min-height: var(--header-h);
+    min-height: var(--head-h);
+    max-width: none;
+    padding-inline: var(--gutter);
   }
 
+  /* Brand: small round avatar + "Hi, Leesun" in medium-weight sans — UI text,
+     not content, so it does not wear the serif. The whole group is one link. */
   .brand {
-    font-size: 17px;
-    font-weight: 700;
-    letter-spacing: -0.01em;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-family: var(--font-sans);
+    font-size: 15px;
+    font-weight: 500;
+    letter-spacing: 0;
     line-height: 1.5;
     color: var(--fg);
     text-decoration: none;
     margin-right: auto;
   }
 
-  .brand:hover {
-    text-decoration: underline;
-    text-decoration-style: dashed;
-    text-underline-offset: 4px;
+  .brand-mark {
+    width: 30px;
+    height: 30px;
+    display: block;
+    flex: none;
+    border-radius: 50%;
   }
 
+  .head-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  /* Nav links: regular gray text; the active page is darker and bolder. No
+     underlines at all — the reference marks state with ink, not rules. */
   .site-nav ul {
     display: flex;
     flex-wrap: wrap;
     align-items: center;
-    gap: 0.25rem;
+    gap: 0;
     list-style: none;
     margin: 0;
     padding: 0;
+    font-family: var(--font-sans);
     font-size: 14px;
-    font-weight: 500;
+    font-weight: 400;
     line-height: 1.5;
   }
 
-  /* Spec §2: nav links carry 12px inline padding. */
   .site-nav a {
     display: inline-block;
-    padding: 0.25rem 12px;
-    color: var(--meta);
+    padding: 0.35rem 12px;
+    color: var(--muted);
     text-decoration: none;
+    transition: color 0.15s ease;
   }
 
   .site-nav a:hover {
-    color: var(--fg);
-    text-decoration: underline;
-    text-decoration-style: dashed;
-    text-underline-offset: 4px;
+    color: var(--fg-body);
   }
 
   .site-nav a[aria-current='page'] {
     color: var(--fg);
-    font-weight: 700;
+    font-weight: 600;
   }
 
-  .lang-switch {
+  /* Language dropdown. */
+  .lang-menu {
+    position: relative;
     flex: none;
-    font-size: 14px;
-    font-weight: 500;
-    line-height: 1.5;
-    color: var(--meta);
-    text-decoration: none;
-    border: 1px dashed var(--line-strong);
-    border-radius: 999px;
-    padding: 0.15rem 0.6rem;
   }
 
-  .lang-switch:hover {
+  .lang-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    padding: 0.35rem 0.45rem;
+    color: var(--muted);
+    background: none;
+    border: 0;
+    border-radius: 0.5rem;
+    cursor: pointer;
+    transition: color 0.15s ease;
+  }
+
+  .lang-btn:hover {
     color: var(--fg);
-    border-color: var(--fg);
   }
 
-  /* Below 40rem the five-item nav cannot share one 80px row with the brand,
-     so it drops to a second row; both rows still fit inside --header-h. */
-  @media (max-width: 40rem) {
-    .head-inner {
-      flex-wrap: wrap;
-      align-content: center;
-      row-gap: 0.25rem;
-      column-gap: 0.75rem;
-    }
+  .lang-btn:focus-visible {
+    outline: 2px solid var(--fg);
+    outline-offset: 3px;
+  }
 
+  .lang-chevron {
+    transition: transform 0.2s ease-out;
+  }
+
+  .lang-btn[aria-expanded='true'] {
+    color: var(--fg);
+  }
+
+  .lang-btn[aria-expanded='true'] .lang-chevron {
+    transform: rotate(180deg);
+  }
+
+  .lang-dropdown {
+    position: absolute;
+    top: calc(100% + 6px);
+    right: 0;
+    z-index: 10;
+    min-width: 120px;
+    margin: 0;
+    padding: 0.35rem;
+    list-style: none;
+    background: var(--bg);
+    border: 1px solid var(--line);
+    border-radius: 0.75rem;
+    box-shadow: var(--shadow-soft);
+    font-family: var(--font-sans);
+    font-size: 14px;
+  }
+
+  .lang-dropdown[hidden] {
+    display: none;
+  }
+
+  .lang-dropdown a {
+    display: block;
+    padding: 0.4rem 0.7rem;
+    border-radius: 0.5rem;
+    color: var(--muted);
+    text-decoration: none;
+  }
+
+  .lang-dropdown a:hover {
+    color: var(--fg);
+    background: var(--code-bg);
+  }
+
+  .lang-dropdown a[aria-current='true'] {
+    color: var(--fg);
+    font-weight: 600;
+  }
+
+  /* Mobile: the hamburger exists only below 768px, the desktop row only above. */
+  .menu-btn {
+    display: none;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    padding: 0;
+    color: var(--muted);
+    background: none;
+    border: 0;
+    border-radius: 0.5rem;
+    cursor: pointer;
+  }
+
+  .menu-btn:hover {
+    color: var(--fg);
+  }
+
+  .menu-btn:focus-visible {
+    outline: 2px solid var(--fg);
+    outline-offset: 3px;
+  }
+
+  .mobile-nav {
+    max-width: none;
+    padding-block: 0.5rem 1rem;
+    padding-inline: var(--gutter);
+    border-top: 1px dashed var(--line);
+  }
+
+  .mobile-nav[hidden] {
+    display: none;
+  }
+
+  .mobile-nav ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    font-family: var(--font-sans);
+    font-size: 15px;
+  }
+
+  .mobile-nav a {
+    display: block;
+    padding: 0.55rem 0;
+    color: var(--muted);
+    text-decoration: none;
+  }
+
+  .mobile-nav a:hover {
+    color: var(--fg);
+  }
+
+  .mobile-nav a[aria-current='page'] {
+    color: var(--fg);
+    font-weight: 600;
+  }
+
+  @media (max-width: 47.99rem) {
     .site-nav {
-      order: 3;
-      width: 100%;
+      display: none;
     }
 
-    .site-nav ul {
-      gap: 0;
-      font-size: 13px;
+    .menu-btn {
+      display: inline-flex;
     }
+  }
 
+  @media (prefers-reduced-motion: reduce) {
+    .site-head,
+    .lang-btn,
+    .lang-chevron,
     .site-nav a {
-      padding-inline: 10px;
+      transition: none;
     }
   }
 </style>
+
+<script>
+  /* Three small behaviours, no framework:
+     1. data-scrolled on <header> once the page moves (rAF-throttled).
+     2. the language dropdown: toggle, close on outside click / Escape.
+     3. the mobile menu: toggle + honest aria-expanded.
+     The two toggles close each other so the bar never shows two open panels. */
+  const head = document.querySelector<HTMLElement>('.site-head');
+  if (head) {
+    let queued = false;
+    const update = () => {
+      queued = false;
+      const next = String(window.scrollY > 0);
+      if (head.dataset.scrolled !== next) head.dataset.scrolled = next;
+    };
+    addEventListener(
+      'scroll',
+      () => {
+        if (queued) return;
+        queued = true;
+        requestAnimationFrame(update);
+      },
+      { passive: true },
+    );
+    update();
+  }
+
+  const menu = document.querySelector<HTMLElement>('[data-lang-menu]');
+  const langBtn = document.querySelector<HTMLButtonElement>('[data-lang-btn]');
+  const dropdown = document.querySelector<HTMLElement>('[data-lang-dropdown]');
+  const menuBtn = document.querySelector<HTMLButtonElement>('[data-menu-btn]');
+  const mobileNav = document.querySelector<HTMLElement>('[data-mobile-nav]');
+
+  const closeLang = () => {
+    if (!langBtn || !dropdown) return;
+    dropdown.hidden = true;
+    langBtn.setAttribute('aria-expanded', 'false');
+  };
+  const closeMobile = () => {
+    if (!menuBtn || !mobileNav) return;
+    mobileNav.hidden = true;
+    menuBtn.setAttribute('aria-expanded', 'false');
+  };
+
+  langBtn?.addEventListener('click', () => {
+    if (!dropdown) return;
+    const open = dropdown.hidden;
+    closeMobile();
+    dropdown.hidden = !open;
+    langBtn.setAttribute('aria-expanded', String(open));
+  });
+
+  menuBtn?.addEventListener('click', () => {
+    if (!mobileNav) return;
+    const open = mobileNav.hidden;
+    closeLang();
+    mobileNav.hidden = !open;
+    menuBtn.setAttribute('aria-expanded', String(open));
+  });
+
+  document.addEventListener('click', (e) => {
+    if (menu && !menu.contains(e.target as Node)) closeLang();
+    if (menuBtn && mobileNav && !mobileNav.contains(e.target as Node) && e.target !== menuBtn) {
+      closeMobile();
+    }
+  });
+
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+      closeLang();
+      closeMobile();
+    }
+  });
+</script>

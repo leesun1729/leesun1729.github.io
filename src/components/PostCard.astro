@@ -13,9 +13,11 @@ export interface Props {
   category?: string;
   categoryHref?: string;
   tags?: { label: string; href: string }[];
+  /** Optional square cover thumbnail shown on the card's right edge. */
+  cover?: string;
 }
 
-const { title, href, summary, date, category, categoryHref, tags = [] } = Astro.props;
+const { title, href, summary, date, category, categoryHref, tags = [], cover } = Astro.props;
 
 /* The meta line is "date · category · #tags". Built as a list so the separator
    is emitted only *between* two rendered parts: a card with a date alone has
@@ -31,6 +33,7 @@ const hasMeta = meta.length > 0 || tags.length > 0;
   <span class="card-sheet card-sheet--frame" aria-hidden="true"></span>
 
   <div class="card-body">
+    <div class="card-text">
     <h3 class="card-title">
       <a class="card-link" href={href}>
         <span class="card-title-text">{title}</span>
@@ -46,7 +49,7 @@ const hasMeta = meta.length > 0 || tags.length > 0;
           {meta.map((part, i) => (
             <>
               {i > 0 && <span class="card-sep" aria-hidden="true"> · </span>}
-              {part.href ? <a href={part.href}>{part.value}</a> : <span>{part.value}</span>}
+              {part.href ? <a class="link-dashed" href={part.href}>{part.value}</a> : <span>{part.value}</span>}
             </>
           ))}
           {meta.length > 0 && tags.length > 0 && (
@@ -55,71 +58,25 @@ const hasMeta = meta.length > 0 || tags.length > 0;
           {tags.map((tag, i) => (
             <>
               {i > 0 && <span class="card-sep" aria-hidden="true"> </span>}
-              <a class="card-tag" href={tag.href}>#{tag.label}</a>
+              <a class="card-tag link-dashed" href={tag.href}>#{tag.label}</a>
             </>
           ))}
         </p>
       )
     }
+    </div>
+    {/* Decorative: the title link already names the card. After the text in
+        the DOM so the thumbnail sits on the card's right edge. */}
+    {cover && <img class="card-cover" src={cover} alt="" aria-hidden="true" loading="lazy" />}
   </div>
 </article>
 
 <style>
-  /* Spec §4 — two sheets plus a content layer. Default: the sheets coincide.
-     Hover/focus: they slide apart by 1px in opposite directions. */
-  .card {
-    position: relative;
-    border: 1px dashed transparent; /* placeholder: keeps layout stable */
-    border-radius: 1rem;
-    padding: 20px 24px;
-    cursor: pointer;
-  }
-
-  @media (min-width: 768px) {
-    .card {
-      padding: 28px;
-    }
-  }
-
-  .card-sheet {
-    position: absolute;
-    inset: 0;
-    width: 100%;
-    height: 100%;
-    border: 1px dashed var(--line);
-    border-radius: 1rem;
-    transition: transform 0.3s ease-out;
-  }
-
-  .card-sheet--fill {
-    z-index: 20;
-    background: var(--bg);
-  }
-
-  .card-sheet--frame {
-    z-index: 10;
-  }
-
-  .card-body {
-    position: relative;
-    z-index: 30;
-    transition: transform 0.3s ease-out;
-  }
-
-  .card:hover .card-sheet--fill,
-  .card:focus-visible .card-sheet--fill,
-  .card:has(.card-link:focus-visible) .card-sheet--fill,
-  .card:hover .card-body,
-  .card:focus-visible .card-body,
-  .card:has(.card-link:focus-visible) .card-body {
-    transform: translate(-1px, -1px);
-  }
-
-  .card:hover .card-sheet--frame,
-  .card:focus-visible .card-sheet--frame,
-  .card:has(.card-link:focus-visible) .card-sheet--frame {
-    transform: translate(1px, 1px);
-  }
+  /* The card shell — the outer box, both dashed sheets, the content layer,
+     the hover/focus displacement and the reduced-motion guard — lives in
+     global.css (R4 contract §3.1). Those class names must stay global because
+     ArrowIcon.astro selects against them with :global(.card) .arrow.
+     What remains here is the card's typography, its links and its focus rings. */
 
   /* The card itself carries tabindex="0" for parity with the reference; its
      ring must be visible, and the inner anchor keeps its own. */
@@ -128,17 +85,46 @@ const hasMeta = meta.length > 0 || tags.length > 0;
     outline-offset: 3px;
   }
 
+  /* With a cover the body splits: text left, a 132px square thumbnail right.
+     Without one, .card-text is a plain block and the card spans full width. */
+  .card-body {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+  }
+
+  .card-text {
+    min-width: 0;
+    flex: 1;
+  }
+
+  .card-cover {
+    flex: none;
+    width: 132px;
+    height: 132px;
+    object-fit: cover;
+    border: 1px solid var(--line);
+    border-radius: 1rem; /* 16px, softer than the card's 24px */
+  }
+
+  @media (max-width: 40rem) {
+    .card-cover {
+      width: 96px;
+      height: 96px;
+    }
+  }
+
   .card-title {
     margin: 0;
-    font-size: 18px;
+    font-size: 20px;
     font-weight: 700;
-    line-height: 1.25;
+    line-height: 1.3;
     letter-spacing: -0.025em;
   }
 
   @media (min-width: 768px) {
     .card-title {
-      font-size: 20px;
+      font-size: 24px;
     }
   }
 
@@ -183,23 +169,24 @@ const hasMeta = meta.length > 0 || tags.length > 0;
     font-weight: 500;
     line-height: 1.5;
     color: var(--meta);
+    font-variant-numeric: tabular-nums;
   }
 
+  /* The dashed underline comes from the global .link-dashed class on the
+     anchors themselves (R4 contract §3.3); only the colour states are local. */
   .card-meta a {
     color: var(--meta);
-    text-decoration: underline;
-    text-decoration-style: dashed;
-    text-underline-offset: 4px;
   }
 
   .card-meta a:hover {
     color: var(--fg);
   }
 
-  @media (prefers-reduced-motion: reduce) {
-    .card-sheet,
-    .card-body {
-      transition: none;
-    }
+  /* The title link is stretched over the whole card (global.css `.card-link::after`),
+     so the meta row has to sit above that overlay or the tag chips would be
+     unclickable. Raising the row, not each chip, keeps one stacking decision. */
+  .card-meta {
+    position: relative;
+    z-index: 2;
   }
 </style>
